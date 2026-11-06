@@ -45,6 +45,7 @@
   - `balance = (dB - dA) / (dA + dB)`, em [-1, 1], onde `dA` e `dB` são as distâncias do cursor a cada herói.
   - `speedA = 1 - k·balance` e `speedB = 1 + k·balance`. A soma é constante, o que implementa a regra do espelho.
 - **Alternativa a testar:** posição horizontal do cursor na tela.
+- **Controles do protótipo:** mouse ou arraste do primeiro toque controla o olhar; `Tab` alterna proximidade/horizontal; `R` reinicia as trilhas. Na leitura horizontal, esquerda observa A e direita observa B. Sem entrada ativa ou nas barras fora da área da fase, o equilíbrio volta a zero. Ao soltar o toque, o olhar fica neutro; no desktop, mover o mouse ativa novamente a observação.
 - ⚠️ **Decisão em aberto:** escolher entre as duas leituras no protótipo, com tecla de debug para alternar.
 - Cada `World` tem **relógio próprio**: `deltaMundo = delta × speed`.
 
@@ -173,6 +174,15 @@ multiplicador  = cresce com os encontros de tinta
 
 ## 10. Visual e som
 
+### Direção visual aprovada (conceitos V1)
+
+- Dois heróis são manifestações da mesma pessoa de aparência andrógina: Sombra em índigo e Reflexo em marfim. Cabelo curto assimétrico, presilhas em lados opostos, suéter amplo, calça curta e tênis simples; expressão contida e vista elevada. A influência de *Serial Experiments Lain* está no clima e no cotidiano dos anos 1990, com personagens próprios.
+- Marca: duas cordas índigo/marfim unidas num nó compacto, sem alças de laço de presente. A logo V1 coloca o nó acima do nome `NÓS`, com letras serifadas e textura de tinta.
+- Na roupa, o símbolo é um bordado pequeno e discreto, rente ao tecido e adaptado à perspectiva; não um fecho volumoso. Referências em `design/`.
+- Estes arquivos são conceitos aprovados, ainda não sprites animados nem arte aplicada ao protótipo. Legibilidade em tamanho de jogo e acessibilidade da paleta ainda precisam de validação.
+
+### Tratamento previsto
+
 - **Aquarela:**
   - framebuffers (FBO) com difusão de tinta e textura de papel;
   - bordas escurecidas;
@@ -259,6 +269,7 @@ nos/
 - [ ] Leitura do olhar: proximidade × posição horizontal (M1)
 - [ ] Números de balanceamento (k, limiares, Δt, tamanhos do pote)
 - [ ] Paleta final das duas tintas
+- [x] Direção inicial dos personagens, nó de duas cores e logo V1 (conceitos em `design/`; paleta final e legibilidade ainda em teste)
 - [ ] Imagem final da galeria em ÍRIS
 - [ ] Textos: 13 aforismos, 13 versos e 13 versos ocultos
 - [ ] Lista final de pincéis

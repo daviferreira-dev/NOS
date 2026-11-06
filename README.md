@@ -30,6 +30,14 @@ Requer JDK 17 ou superior.
 ./gradlew core:test       # testes
 ```
 
+### Testar o protótipo M1 atual
+
+- Mova o mouse perto do círculo (mundo A) ou do quadrado (mundo B): o observado desacelera e o outro acelera. Em telas de toque, arraste um dedo.
+- `Tab` alterna entre proximidade e posição horizontal. No modo horizontal, esquerda observa A e direita observa B; o centro equilibra os dois.
+- `R` reinicia as trilhas para comparar os modos. Sem entrada ativa, ambos voltam à velocidade normal. Os heróis esperam ao chegar ao fim.
+- A arte aprovada está em `design/` como referência; o jogo ainda usa formas cinzas. Desbotamento, harmonia e HUD são os próximos passos.
+- Os testes JUnit verificam o controle do tempo e a entrada sem OpenGL. `core:test` também executa as verificações de movimento.
+
 ## Tecnologias
 - [libGDX](https://libgdx.com/), com projeto gerado pelo gdx-liftoff.
 - Alvos: Desktop (LWJGL3), Android e Web (TeaVM).

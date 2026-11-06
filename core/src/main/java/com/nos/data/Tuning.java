@@ -4,6 +4,7 @@ package com.nos.data;
 public final class Tuning {
     public static final float BASE_SPEED = 1f;
     public static final float GAZE_STRENGTH = 0.8f;
+    public static final float GAZE_DISTANCE_EPSILON = 0.0001f;
     public static final float VIEW_WIDTH = 960f;
     public static final float VIEW_HEIGHT = 540f;
     public static final float HERO_SPEED = 55f;
