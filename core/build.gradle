@@ -12,3 +12,14 @@ dependencies {
 jar {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+// Verifica o movimento em uma JVM comum, sem abrir janela nem inicializar OpenGL.
+tasks.register('movementChecks', JavaExec) {
+  dependsOn testClasses
+  classpath = sourceSets.test.runtimeClasspath
+  mainClass = 'com.nos.world.MovementChecks'
+  args rootProject.file('assets/levels/m1.json').absolutePath
+}
+test.dependsOn movementChecks
+// As verificações atuais são executadas por movementChecks; JUnit ainda não foi adicionado.
+test.failOnNoDiscoveredTests = false

@@ -31,6 +31,7 @@ gdxTeaVM {
 
   /// You can add additional classes or packages that need reflection here.
   //reflection.add("gdx.liftoff.reflect")
+  reflection.add("com.nos.data.LevelData")
 
   webDefaults {
     mainClass.set("com.nos.teavm.TeaVMLauncher")

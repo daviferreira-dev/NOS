@@ -4,9 +4,19 @@ import com.nos.data.Tuning;
 
 /** Centraliza o espelho: observar A desacelera A e acelera B. */
 public final class MirrorPair {
-    private final World worldA = new World();
-    private final World worldB = new World();
+    private final World worldA;
+    private final World worldB;
     private float balance;
+
+    public MirrorPair() {
+        worldA = new World();
+        worldB = new World();
+    }
+
+    public MirrorPair(Trail trailA, Trail trailB) {
+        worldA = new World(trailA);
+        worldB = new World(trailB);
+    }
 
     public void setBalance(float balance) {
         if (Float.isNaN(balance) || Float.isInfinite(balance)) {
