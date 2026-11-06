@@ -11,7 +11,9 @@ Este é **NÓS**, um jogo 2D em libGDX: puzzle de fluxo, poético e filosófico.
 - Textos do jogo (aforismos, versos, UI) ficam em arquivos de dados, **nunca** fixos no código.
 
 ## Marco atual
-**M1: protótipo em cinza.** Atualize esta linha a cada marco concluído.
+**M1 em validação de jogabilidade; primeira fatia de Água jogável em construção.** Não considerar M1 divertido/aprovado até teste do usuário.
+
+**Escopo ampliado pelo usuário nesta iteração:** percurso contínuo com câmera acompanhando a dupla, ambiente variado, personagens ilustrados, tipografia revisada e abertura curta pulável. Essa autorização antecipa apresentação e um recorte de M2 para testar a experiência completa. Não implica concluir os 13 níveis ou implementar M4/M5 inteiros. Os limites abaixo descrevem o plano original do M1; a ampliação acima prevalece nos itens já autorizados.
 
 **No M1, faça apenas:**
 - duas trilhas (`CatmullRomSpline`) e dois heróis andando sozinhos;

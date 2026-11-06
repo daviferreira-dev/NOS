@@ -14,6 +14,9 @@ public final class BrushInput extends InputAdapter {
     private boolean inside;
     private boolean toggleRequested;
     private boolean restartRequested;
+    private boolean pressRequested;
+    private boolean pauseRequested;
+    private int difficultyChoice;
 
     private void move(int x, int y) {
         screenX = x;
@@ -28,6 +31,7 @@ public final class BrushInput extends InputAdapter {
     public boolean touchDown(int x, int y, int pointer, int button) {
         if (pointer != 0 || button != Input.Buttons.LEFT) return false;
         move(x, y);
+        pressRequested = true;
         return true;
     }
 
@@ -56,6 +60,11 @@ public final class BrushInput extends InputAdapter {
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.TAB) toggleRequested = true;
         else if (keycode == Input.Keys.R) restartRequested = true;
+        else if (keycode == Input.Keys.ENTER) pressRequested = true;
+        else if (keycode == Input.Keys.SPACE || keycode == Input.Keys.ESCAPE) pauseRequested = true;
+        else if (keycode == Input.Keys.NUM_1) difficultyChoice = 1;
+        else if (keycode == Input.Keys.NUM_2) difficultyChoice = 2;
+        else if (keycode == Input.Keys.NUM_3) difficultyChoice = 3;
         else return false;
         return true;
     }
@@ -82,6 +91,9 @@ public final class BrushInput extends InputAdapter {
     }
 
     public void deactivate() { active = false; inside = false; }
+    public boolean consumePress() { boolean value = pressRequested; pressRequested = false; return value; }
+    public boolean consumePause() { boolean value = pauseRequested; pauseRequested = false; return value; }
+    public int consumeDifficulty() { int value = difficultyChoice; difficultyChoice = 0; return value; }
     public boolean isActive() { return inside; }
     public float getX() { return position.x; }
     public float getY() { return position.y; }

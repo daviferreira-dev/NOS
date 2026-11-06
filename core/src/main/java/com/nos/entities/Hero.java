@@ -24,6 +24,10 @@ public final class Hero {
     }
 
     public float getX() { return position.x; }
+    public void seek(float distance) {
+        this.distance = Math.max(0, Math.min(trail.getLength(), distance));
+        trail.positionAtDistance(this.distance, position);
+    }
     public float getY() { return position.y; }
     public float getDistance() { return distance; }
     public boolean hasArrived() { return distance >= trail.getLength(); }

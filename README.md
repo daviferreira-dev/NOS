@@ -11,14 +11,16 @@ Cada ação afeta os dois mundos ao mesmo tempo: acelerar um é desacelerar o ou
 ## Como jogar
 | Ação | Desktop / Web | Android |
 |---|---|---|
-| Observar (desacelerar um mundo) | Aproximar o cursor do herói | Arrastar o dedo até o herói |
-| Pausar | `Esc` | Botão de pausa |
+| Observar (modo horizontal padrão) | Cursor à esquerda: Sombra; à direita: Reflexo | Arrastar para a esquerda/direita |
+| Comparar com proximidade | `Tab` | — |
+| Pausar | `Espaço` / `Esc` | — |
+| Recomeçar | `R` | Toque após o resultado |
 
 - **Harmonia:** não deixe os mundos se desequilibrarem demais.
 - **Pote de tinta:** cada volta ao ponto de controle gasta tinta. Pote vazio é fim de jogo.
 - **Encontros de tinta:** fazer os heróis passarem juntos pelos cruzamentos multiplica a pontuação.
 
-## Estrutura
+## Estrutura planejada
 - **3 capítulos** (Água, Fogo, Vento) com 4 fases cada, mais o capítulo final.
 - **3 dificuldades:** Brisa, Maré e Tormenta.
 - **Telas:** menu inicial, game over e pontuação por fase, com recorde local.
@@ -30,13 +32,21 @@ Requer JDK 17 ou superior.
 ./gradlew core:test       # testes
 ```
 
-### Testar o protótipo M1 atual
+### Primeira travessia jogável
 
-- Mova o mouse perto do círculo (mundo A) ou do quadrado (mundo B): o observado desacelera e o outro acelera. Em telas de toque, arraste um dedo.
-- `Tab` alterna entre proximidade e posição horizontal. No modo horizontal, esquerda observa A e direita observa B; o centro equilibra os dois.
-- `R` reinicia as trilhas para comparar os modos. Sem entrada ativa, ambos voltam à velocidade normal. Os heróis esperam ao chegar ao fim.
-- A arte aprovada está em `design/` como referência; o jogo ainda usa formas cinzas. Desbotamento, harmonia e HUD são os próximos passos.
-- Os testes JUnit verificam o controle do tempo e a entrada sem OpenGL. `core:test` também executa as verificações de movimento.
+- Abertura de dez segundos, pulável por clique/tecla, seguida de início com três dificuldades. Nesta versão não há áudio.
+- Uma fase contínua de aproximadamente um minuto, com câmera acompanhando os personagens por margens, madeira e um jardim abandonado. A implementação completa dos capítulos ainda não existe.
+- Mova o cursor para a esquerda para desacelerar Sombra e acelerar Reflexo; para a direita, o inverso. Reflexo tem uma trilha mais longa. O centro mantém velocidades iguais, mas não resolve automaticamente a fase.
+- Os troncos atravessam as trilhas conforme a maré: desacelere o herói para esperar o espaço abrir. Impactos empurram e gastam tinta. O desequilíbrio prolongado custa uma medida do pote e retorna ao ponto de controle; a última medida perdida encerra a sessão.
+- Olhar recupera a tinta do mundo observado. Tinta zerada faz o herói parar até receber atenção. Encontros nas flores recarregam o pote e aumentam os pontos, uma vez por cruzamento.
+- Chegue com os dois ao final dentro de quatro segundos de diferença. Há resultado e recorde local, salvo somente via `Preferences`. `R` volta ao início; `Espaço` pausa.
+- Os personagens já usam as ilustrações aprovadas, com deslocamento e oscilação, mas ainda não têm animação de caminhada por direção. Os originais estão em `design/`.
+- `core:test` executa JUnit para olhar, entrada, câmera, tinta, harmonia, pausa, tentativas e travessia, além das verificações de movimento. Uma simulação confirma vitória com atenção alternada e derrota ao deixar a fase sem controle.
+- A verificação gráfica `java -jar lwjgl3/build/libs/NOS-1.14.2.3.jar --smoke-test CAMINHO_ABSOLUTO` captura menu, jogo e pausa com janela invisível e fecha sozinha. `--intro-smoke` verifica a abertura. Não é necessário executá-la para jogar.
+
+### Arte e tipografia
+
+Conceitos e aquarelas criados com geração de imagens a partir da direção aprovada pelo usuário. Cormorant Garamond (títulos) e Atkinson Hyperlegible (leitura) usam atlas de alta resolução, com licenças OFL incluídas em `assets/ui/`. Gerador e notas em `tools/`.
 
 ## Tecnologias
 - [libGDX](https://libgdx.com/), com projeto gerado pelo gdx-liftoff.

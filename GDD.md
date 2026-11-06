@@ -31,6 +31,7 @@
 ## 3. Perspectiva, controles e plataformas
 
 - **Vista de cima.** Os dois mundos ocupam **o mesmo espaço**, sobrepostos em duas camadas de tinta translúcidas.
+- **Travessia contínua (revisão após teste):** a câmera acompanha os heróis por uma paisagem de 3.200 unidades, passando de margens com juncos a madeira abandonada e ruínas de jardim. As trilhas seguem adiante, sem dar voltas na mesma arena. A câmera enquadra ambos quando se afastam.
 - **Os heróis andam sozinhos**, cada um por uma **trilha sinuosa** pintada. As trilhas se cruzam.
 - **Controle:** o jogador arrasta o pincel (mouse no desktop e na web, dedo no Android). Um único gesto contínuo.
 - **Plataformas:** Desktop (LWJGL3), Android e Web (TeaVM).
@@ -46,6 +47,7 @@
   - `speedA = 1 - k·balance` e `speedB = 1 + k·balance`. A soma é constante, o que implementa a regra do espelho.
 - **Alternativa a testar:** posição horizontal do cursor na tela.
 - **Controles do protótipo:** mouse ou arraste do primeiro toque controla o olhar; `Tab` alterna proximidade/horizontal; `R` reinicia as trilhas. Na leitura horizontal, esquerda observa A e direita observa B. Sem entrada ativa ou nas barras fora da área da fase, o equilíbrio volta a zero. Ao soltar o toque, o olhar fica neutro; no desktop, mover o mouse ativa novamente a observação.
+- Na fatia jogável, a leitura **horizontal é o padrão provisório**, para evitar perseguir dois alvos móveis. `Tab` permite comparar com proximidade. O caminho de Reflexo é mais longo, então deixar a simulação neutra não sincroniza as chegadas.
 - ⚠️ **Decisão em aberto:** escolher entre as duas leituras no protótipo, com tecla de debug para alternar.
 - Cada `World` tem **relógio próprio**: `deltaMundo = delta × speed`.
 
@@ -60,6 +62,11 @@
 - **Sobe com:** golpes de obstáculos, e `|balance|` acima de um limiar por tempo prolongado.
 - **Desce** lentamente quando o equilíbrio volta.
 - **Se estourar:** o jogador volta ao último **ponto de controle** da fase e gasta tinta do pote.
+- A primeira fatia usa três medidas no pote e um ponto de controle após ambos passarem de 48% da trilha. Tinta e posição são recuperadas ao retornar; perder a última medida encerra a sessão.
+
+### 4.3.1 Correntes da primeira fatia
+- Os antigos ícones de X e círculo foram substituídos por troncos que se deslocam transversalmente à trilha. O espaço livre é a indicação visual da passagem; aproximar-se do tronco custa tinta, aumenta o desequilíbrio e empurra o herói.
+- **Decisão experimental:** a maré é um relógio ambiental compartilhado da sessão (pausa junto com ela), independente dos relógios locais dos heróis. Isso permite esperar uma abertura alterando o tempo de um mundo; se herói e abertura usassem exatamente o mesmo relógio e progresso, desacelerar não mudaria o resultado.
 
 ### 4.4 Pote de tinta (tentativas)
 - Estoque **único por capítulo**.
@@ -179,7 +186,10 @@ multiplicador  = cresce com os encontros de tinta
 - Dois heróis são manifestações da mesma pessoa de aparência andrógina: Sombra em índigo e Reflexo em marfim. Cabelo curto assimétrico, presilhas em lados opostos, suéter amplo, calça curta e tênis simples; expressão contida e vista elevada. A influência de *Serial Experiments Lain* está no clima e no cotidiano dos anos 1990, com personagens próprios.
 - Marca: duas cordas índigo/marfim unidas num nó compacto, sem alças de laço de presente. A logo V1 coloca o nó acima do nome `NÓS`, com letras serifadas e textura de tinta.
 - Na roupa, o símbolo é um bordado pequeno e discreto, rente ao tecido e adaptado à perspectiva; não um fecho volumoso. Referências em `design/`.
-- Estes arquivos são conceitos aprovados, ainda não sprites animados nem arte aplicada ao protótipo. Legibilidade em tamanho de jogo e acessibilidade da paleta ainda precisam de validação.
+- Os conceitos aprovados são referências para sprites e marca. Legibilidade em tamanho de jogo e acessibilidade da paleta ainda precisam de validação.
+- Na fatia jogável, as ilustrações aprovadas já são usadas como sprites estáticos com deslocamento e oscilação suave. Não são ainda animações de caminhada por direção. O ambiente é uma aquarela panorâmica original gerada por IA, sem repetição de tiles. Os arquivos de referência originais continuam em `design/`.
+- Tipografia: Cormorant Garamond para títulos e Atkinson Hyperlegible para leitura, rasterizadas em alta resolução; licenças OFL acompanham os atlas em `assets/ui/`.
+- Abertura: sequência de aproximadamente dez segundos em camadas animadas, pulável por clique ou tecla, antes da tela de início. Água, duas presenças, nó e logo; texto mínimo. Não é um vídeo renderizado nem contém áudio nesta versão.
 
 ### Tratamento previsto
 
@@ -267,6 +277,9 @@ nos/
 ## 15. Decisões em aberto
 
 - [ ] Leitura do olhar: proximidade × posição horizontal (M1)
+- [x] Percurso contínuo com câmera acompanhando os personagens, escolhido pelo usuário após testar a arena fixa.
+- [ ] Validar a nova leitura horizontal, a sinalização dos troncos e o ritmo da travessia com o usuário.
+- [ ] Validar maré ambiental compartilhada e balanceamento do primeiro recorte de Água.
 - [ ] Números de balanceamento (k, limiares, Δt, tamanhos do pote)
 - [ ] Paleta final das duas tintas
 - [x] Direção inicial dos personagens, nó de duas cores e logo V1 (conceitos em `design/`; paleta final e legibilidade ainda em teste)
