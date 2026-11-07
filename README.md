@@ -14,7 +14,9 @@ Esta é a nova experiência curta, criada após estudar princípios de Unravel T
 
 Perto do mecanismo da primeira margem, E ata a presença e passa o controle à outra. A ponte se estende. Na margem oposta, E fixa a escora e solta o vínculo. A vitória exige as duas presenças no jardim adiante. Soltar cedo pode recolher a ponte; quem estiver sem piso retorna à última margem segura, sem morte.
 
-A câmera acompanha quem você controla. Há quatro quadros de caminhada, poses próprias de repouso e sustentação, registrados nos pés e em altura comum. O parceiro contorna obstáculos e procura a ponte aberta para reunir-se a você. A ação E aparece sobre o mecanismo próximo. Ainda não há animação completa em oito direções ou áudio; a abertura é pulável.
+A câmera acompanha quem você controla. Há quatro quadros de caminhada, poses próprias de repouso e sustentação, registrados nos pés e em altura comum. O parceiro contorna obstáculos e procura a ponte aberta para reunir-se a você. A ação E aparece sobre o mecanismo próximo. Ainda não há animação completa em oito direções.
+
+A abertura usa três enquadramentos ilustrados e dois temas musicais originais. Terminar ou pular leva ao menu, que espera sem limite de tempo. Somente Começar ou um novo Enter inicia a partida. R no menu revê a abertura; M liga/desliga a música e preserva sua escolha. Notas de composição, prompts e limites em `design/OPENING-AND-MUSIC.md`.
 
 ## Jogar
 

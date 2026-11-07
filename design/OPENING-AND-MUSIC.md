@@ -1,0 +1,26 @@
+# Abertura e trilha — 07/11/2026
+
+Fluxo: filme ilustrado de 23 segundos → menu sem limite de tempo → Começar ou Enter → transição → travessia. Pular vai somente ao menu. O evento que pula o filme não é reaproveitado como comando de começar. Rever abertura retorna ao filme e novamente ao menu. A logo aparece apenas no menu, em uma área separada dos personagens.
+
+Montagem: plano de conjunto das margens, detalhe do toque/reflexo e retorno ao plano aberto; reenquadramento lento, escurecimento entre cenas e legendas curtas em faixa própria. É uma cutscene de ilustrações animadas por câmera e transições, não um vídeo com animação corporal quadro a quadro.
+
+## Imagens
+
+Ferramenta integrada image_gen. Referência: `design/characters-concept-v2.png`. Arquivos finais: `assets/art/opening-bank-v1.png` e `assets/art/opening-reflection-v1.png`. Sem substituição das folhas existentes.
+
+### Prompt — margem
+
+Use case: illustration-story. Create a cinematic 16:9 landscape frame for the opening of the indie game NÓS, NOT a sprite sheet. Reference image supplies the exact approved identities: two androgynous young adults with short asymmetric tousled dark hair, small hair clips, loose knit sweaters and cropped pants, canvas shoes; one in muted indigo, the other warm ivory. Preserve their faces and clothing. Sophisticated hand-drawn graphite and watercolor on fine paper, muted indigo, warm parchment, wet stone, silver morning mist; quiet mysterious mood, elegant 1990s hand-drawn animation composition, soft natural light. No text, logos, UI, speech balloons, neon, extra characters or dramatic magical effects. Full-bleed environment with cinematic depth, NOT a concept sheet. Shot: a wide eye-level view beside a misty river. The two characters are together on the LEFT third, full bodies, standing on an ancient mossy stone bank looking toward an unfinished, weathered wooden footbridge over the water to the RIGHT. They occupy roughly 30 percent of frame height, and their silhouettes are clearly separated. The indigo character is nearest the water and ivory just behind. Tall reeds in foreground, broken stone arch in distance. River fills the center and right with subtle reflections, pale mist and broad calm negative space. A thin ordinary cord rests loosely between the characters' hands, very subtle. Landscape should feel like a place one can enter. Keep the upper half mostly landscape and mist. Camera will slowly push in; leave breathing room around figures. Bridge, banks and distant arch match the game's gentle watercolor aesthetic.
+
+### Prompt — reflexo
+
+Use case: illustration-story. Create a cinematic 16:9 landscape frame for the opening of the indie game NÓS, NOT a sprite sheet. Reference image supplies the exact approved identities: two androgynous young adults with short asymmetric tousled dark hair, small hair clips, loose knit sweaters and cropped pants, canvas shoes; one in muted indigo, the other warm ivory. Preserve their faces and clothing. Sophisticated hand-drawn graphite and watercolor on fine paper, muted indigo, warm parchment, wet stone, silver morning mist; quiet mysterious mood, elegant 1990s hand-drawn animation composition, soft natural light. No text, logos, UI, speech balloons, neon, extra characters or dramatic magical effects. Full-bleed environment with cinematic depth, NOT a concept sheet. Shot: an intimate cinematic close-up at the same river, looking obliquely down at the water. In the LEFT foreground, show only the indigo character's knit sleeve and natural hand reaching down, index and middle fingers barely touching the surface near the middle. In the CENTER-RIGHT water show a delicate recognizable reflected face and upper shoulders of the IVORY character, not the indigo sleeve's owner, slightly broken by a few concentric ripples. The reflected face is contemplative and human, not ghostly; the distinction is quiet and intriguing. Frame contains pebbles and reeds near upper left and dark blue watercolor water filling the rest. No floating body, no literal mirror frame, no extra hands. Reflected face upside-down naturally as a reflection, anatomically coherent. A small ivory thread floats along one ripple as a visual motif, extremely restrained. This is a memory-like symbolic shot, no lettering or logo. Fill the full cinematic frame.
+
+## Música original
+
+- `assets/audio/entre-margens.ogg`: 80 segundos, 72 BPM, piano sintetizado com vozes sustentadas e reflexos estéreo. Tema da abertura e do menu.
+- `assets/audio/o-que-permanece.ogg`: 60 segundos, 64 BPM, variação mais espaçada do motivo harmônico. Tema da travessia.
+
+Composição e síntese determinística em `tools/compose_score.py` (NumPy no ambiente de desenvolvimento; nenhuma dependência adicionada ao jogo). Não utiliza músicas, samples ou gravações externas. OGG estéreo 32 kHz; AssetManager/Music faz streaming, loop e transições de volume. M liga/desliga música; a preferência é salva por Preferences. Áudio pausa quando o aplicativo perde foco. A checagem visual invisível desativa a reprodução para não interferir no usuário.
+
+Validação perceptiva da trilha e da montagem permanece com o usuário. A síntese instrumental não equivale a gravação de piano acústico.

@@ -14,17 +14,19 @@ import com.badlogic.gdx.graphics.PixmapIO;
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
+        if(args.length>0&&args[0].equals("--audio-check")) { AudioCheck.run();return; }
         if (args.length >= 2 && (args[0].equals("--smoke-test") || args[0].equals("--intro-smoke"))) {
             Lwjgl3ApplicationConfiguration config = getDefaultConfiguration();
             config.setInitialVisible(false);
-            new Lwjgl3Application(new NosGame(args[0].equals("--smoke-test")) {
+            config.disableAudio(true);
+            new Lwjgl3Application(new NosGame(args[0].equals("--smoke-test"),false,true) {
                 private int frames;
                 @Override public void render() {
                     if (frames == 3) {
                         if(getScreen() instanceof GameScreen) ((GameScreen)getScreen()).prepareSmokeScene();
                         else if(getScreen() instanceof PuzzleScreen) ((PuzzleScreen)getScreen()).prepareSmokeScene();
                         else if(getScreen() instanceof BridgeScreen) ((BridgeScreen)getScreen()).prepareSmokeScene(args.length>2&&args[2].equals("--mechanism"));
-                        else ((IntroScreen)getScreen()).prepareSmokeScene();
+                        else ((IntroScreen)getScreen()).prepareSmokeScene(args.length>2?args[2]:"reflection");
                     }
                     super.render();
                     if (frames == 1) {

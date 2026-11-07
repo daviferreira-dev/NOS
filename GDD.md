@@ -9,7 +9,8 @@ Depois de considerar a aparência e a jogabilidade dos testes anteriores insatis
 - A outra atravessa e usa E na escora da margem oposta. A ponte fica permanentemente segura, o nó se solta e as duas presenças podem seguir ao jardim. A saída exige ambas.
 - Sem tempo limite, dano, tinta ou pontuação. Soltar cedo permite que a ponte recue; quem ficar sem piso retorna à última margem segura, sem morte e sem bloquear a sessão. Espaço/Esc pausa; R recomeça.
 - Planta em `levels/bridge-encounter.json` e `BridgeTuning`. Margens, água, faixa da ponte e obstáculos têm geometria explícita. Sistemas de colisão e estado podem ser testados sem OpenGL.
-- Apresentação: cenário próprio com duas margens e vão central, ponte pintada, ciclo inicial de quatro quadros por personagem, câmera acompanhando o corpo ativo. Não é uma animação final em oito direções. Abertura anterior permanece pulável e leva ao novo encontro.
+- Apresentação: cenário próprio com duas margens e vão central, ponte pintada, ciclo inicial de quatro quadros por personagem, câmera acompanhando o corpo ativo. Não é uma animação final em oito direções.
+- Abertura revisada a pedido do usuário: montagem ilustrada de 23 segundos com planos da margem, do reflexo e retorno ao conjunto, movimentos lentos de câmera, transições e duas composições instrumentais originais. Terminar ou pular leva a um menu que espera indefinidamente. A logo fica separada dos personagens; somente Começar ou um novo Enter no menu inicia a travessia. Rever abertura e ligar/desligar música estão disponíveis no menu. M alterna a música durante o jogo; Preferences preserva a escolha. A música pausa ao perder foco. Isso amplia a autorização de apresentação e áudio sem antecipar a narrativa completa do M5.
 - Refinamento: repouso e sustentação têm poses próprias; os quadros compartilham altura visual e origem nos pés. A caminhada avança pela distância realmente percorrida e para diante de colisões. Mecanismos usam sprites em aquarela com estados de repouso/acionamento, e a ação contextual aparece junto ao objeto próximo. O rodapé informa quando o parceiro está sustentando a ponte.
 - Seguimento: o parceiro procura um desvio caminhável quando a linha direta encontra pedra ou água; cruza somente pela faixa da ponte aberta. A busca não teletransporta o corpo e respeita as mesmas colisões do jogador. O retorno à margem segura continua reservado à perda de piso quando a ponte recolhe.
 - Referências de princípios, não de reprodução de assets: [Unravel Two](https://www.ea.com/games/unravel/unravel-two) (relação entre dois corpos e vínculo), [COCOON](https://annapurnainteractive.com/games/cocoon) (regras combinadas em desafios ambientais), [GRIS](https://store.steampowered.com/app/683320/GRIS/) (coerência visual, movimento e apresentação).
@@ -17,6 +18,8 @@ Depois de considerar a aparência e a jogabilidade dos testes anteriores insatis
 **Decisões atuais**
 - [x] Prototipar uma ponte que muda fisicamente por ação das duas presenças.
 - [x] Preservar os testes anteriores e a pasta antiga; trabalho ativo na nova pasta da OneDrive.
+- [x] Separar o fim da cutscene do início da partida e exigir uma ação explícita no menu.
+- [ ] Validar a nova montagem e os temas musicais com o usuário.
 - [ ] Validar com o usuário o controle de uma presença ativa e o seguimento do parceiro.
 - [ ] Validar animação, clareza do mecanismo e interesse do encontro antes de produzir mais mapas.
 

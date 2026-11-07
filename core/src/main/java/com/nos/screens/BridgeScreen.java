@@ -16,6 +16,8 @@ public final class BridgeScreen extends ScreenAdapter {
     private final BridgeRenderer renderer=new BridgeRenderer();
     private final FitViewport viewport=new FitViewport(960,540);
     private float accumulator;
+    public BridgeScreen() { this(false); }
+    public BridgeScreen(boolean begin) { if(begin) encounter.start(); }
     @Override public void show() { Gdx.input.setInputProcessor(input); }
     @Override public void render(float delta) {
         input.project(viewport,Gdx.graphics.getHeight());

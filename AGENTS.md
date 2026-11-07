@@ -19,6 +19,8 @@ Este é **NÓS**, um jogo 2D em libGDX, poético e filosófico. O encontro ativo
 
 **Escopo ampliado pelo usuário nesta iteração:** percurso contínuo com câmera acompanhando a dupla, ambiente variado, personagens ilustrados, tipografia revisada e abertura curta pulável. Essa autorização antecipa apresentação e um recorte de M2 para testar a experiência completa. Não implica concluir os 13 níveis ou implementar M4/M5 inteiros. Os limites abaixo descrevem o plano original do M1; a ampliação acima prevalece nos itens já autorizados.
 
+**Revisão de apresentação pedida em 07/11/2026:** cutscene ilustrada mais elaborada, música original e menu que espera um comando explícito para começar. Fim ou pulo do filme nunca inicia a partida. Depois disso, refinar hierarquia das mensagens e uso do espaço da interface do encontro. Áudio de abertura/travessia e esses ajustes de apresentação estão autorizados e prevalecem sobre a restrição histórica de áudio do M1 abaixo.
+
 **No M1, faça apenas:**
 - duas trilhas (`CatmullRomSpline`) e dois heróis andando sozinhos;
 - `GazeTimeSystem` (olhar → tempo), `FadeSystem` e `HarmonySystem`;
