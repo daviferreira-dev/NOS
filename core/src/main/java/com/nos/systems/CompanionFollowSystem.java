@@ -22,33 +22,36 @@ public final class CompanionFollowSystem {
     }
     public void reset() { hasTarget=false;repath=0; }
     public void update(PuzzleHero follower,PuzzleHero leader,boolean open,float delta) {
-        float dx=leader.getX()-follower.getX(),dy=leader.getY()-follower.getY();
+        updateToward(follower,leader.getX(),leader.getY(),open,delta,BridgeTuning.FOLLOW_DISTANCE,BridgeTuning.FOLLOW_SPEED);
+    }
+    public void updateToward(PuzzleHero follower,float goalX,float goalY,boolean open,float delta,float stopDistance,float speed) {
+        float dx=goalX-follower.getX(),dy=goalY-follower.getY();
         float distance=(float)Math.hypot(dx,dy);
         repath-=delta;
         if(open!=lastOpen) { reset();lastOpen=open; }
-        if(distance<=BridgeTuning.FOLLOW_DISTANCE) { reset();return; }
-        if(collision.clearPath(follower.getX(),follower.getY(),leader.getX(),leader.getY(),open)) {
+        if(distance<=stopDistance) { reset();return; }
+        if(collision.clearPath(follower.getX(),follower.getY(),goalX,goalY,open)) {
             reset();
-            float travel=Math.min(distance-BridgeTuning.FOLLOW_DISTANCE,BridgeTuning.FOLLOW_SPEED*delta);
+            float travel=Math.min(distance-stopDistance,speed*delta);
             collision.move(follower,dx/distance*travel,dy/distance*travel,open);
             return;
         }
         if(hasTarget&&Math.hypot(targetX-follower.getX(),targetY-follower.getY())<BridgeTuning.FOLLOW_WAYPOINT)
             repath=0;
         if(repath<=0) {
-            hasTarget=findTarget(follower,leader,open);
+            hasTarget=findTarget(follower,goalX,goalY,stopDistance,open);
             repath=BridgeTuning.FOLLOW_REPATH;
         }
         if(!hasTarget) return;
         dx=targetX-follower.getX();dy=targetY-follower.getY();distance=(float)Math.hypot(dx,dy);
         if(distance>0) {
-            float travel=Math.min(distance,BridgeTuning.FOLLOW_SPEED*delta);
+            float travel=Math.min(distance,speed*delta);
             collision.move(follower,dx/distance*travel,dy/distance*travel,open);
         }
     }
     private float x(int index) { return originX+(index%columns+.5f)*BridgeTuning.FOLLOW_GRID; }
     private float y(int index) { return originY+(index/columns+.5f)*BridgeTuning.FOLLOW_GRID; }
-    private boolean findTarget(PuzzleHero follower,PuzzleHero leader,boolean open) {
+    private boolean findTarget(PuzzleHero follower,float goalX,float goalY,float stopDistance,boolean open) {
         Arrays.fill(parent,-2);
         int head=0,tail=0;
         // Raízes próximas e visíveis evitam encaixar o corpo à força na grade.
@@ -60,8 +63,8 @@ public final class CompanionFollowSystem {
         }
         while(head<tail) {
             int index=queue[head++];
-            if(Math.hypot(x(index)-leader.getX(),y(index)-leader.getY())<=BridgeTuning.FOLLOW_DISTANCE*.85f
-                &&collision.clearPath(x(index),y(index),leader.getX(),leader.getY(),open)) {
+            if(Math.hypot(x(index)-goalX,y(index)-goalY)<=Math.max(stopDistance*.85f,BridgeTuning.FOLLOW_GRID*1.5f)
+                &&collision.clearPath(x(index),y(index),goalX,goalY,open)) {
                 // O ponto mais distante ainda visível elimina o zigue-zague da grade.
                 for(int node=index;node>=0;node=parent[node]) {
                     if(collision.clearPath(follower.getX(),follower.getY(),x(node),y(node),open)) {

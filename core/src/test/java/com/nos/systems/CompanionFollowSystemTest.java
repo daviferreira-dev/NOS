@@ -43,4 +43,12 @@ public class CompanionFollowSystemTest {
         follow(follower,leader,false,120);
         assertEquals(200,follower.getX(),0);assertEquals(270,follower.getY(),0);
     }
+    @Test public void preciseDestinationOffGridCanBeReachedAfterDetour() {
+        PuzzleHero follower=new PuzzleHero(320,180);
+        for(int i=0;i<1200;i++) {
+            system.updateToward(follower,483,180,false,BridgeTuning.FIXED_STEP,2,BridgeTuning.FOLLOW_SPEED);
+            assertTrue(collision.walkable(follower.getX(),follower.getY(),false));
+        }
+        assertTrue(Math.hypot(follower.getX()-483,follower.getY()-180)<=2.1f);
+    }
 }

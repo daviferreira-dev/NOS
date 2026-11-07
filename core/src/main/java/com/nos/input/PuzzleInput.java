@@ -59,5 +59,9 @@ public final class PuzzleInput extends InputAdapter {
     public boolean takePause() { boolean v=pause;pause=false;return v; }
     public boolean takeRestart() { boolean v=restart;restart=false;return v; }
     public int takeAnchor() { int v=anchor;anchor=0;return v; }
+    public void suspendMovement() {
+        for(int key:new int[]{Input.Keys.W,Input.Keys.A,Input.Keys.S,Input.Keys.D,Input.Keys.UP,Input.Keys.DOWN,Input.Keys.LEFT,Input.Keys.RIGHT}) held[key]=false;
+        touch=false;tap=false;start=false;pause=false;restart=false;anchor=0;
+    }
     public void clearHeld() { java.util.Arrays.fill(held,false);touch=false; }
 }

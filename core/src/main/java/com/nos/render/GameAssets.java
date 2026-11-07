@@ -14,7 +14,7 @@ public final class GameAssets implements Disposable {
     public final Texture garden, logo, knot, bridgeBackground, bridgeDeck;
     public final HeroFrame[][] walk=new HeroFrame[2][4],poses=new HeroFrame[2][2];
     public final TextureRegion[][] mechanisms=new TextureRegion[2][2];
-    public final TextureRegion shadow, reflection, driftwood, rock;
+    public final TextureRegion shadow, reflection, driftwood, rock,bridgeStone;
     public final BitmapFont font, title;
     public final I18NBundle text;
     public GameAssets() {
@@ -27,6 +27,7 @@ public final class GameAssets implements Disposable {
         manager.load("art/heroes.png", Texture.class);
         manager.load("art/driftwood.png", Texture.class);
         manager.load("art/stone.png",Texture.class);
+        manager.load("art/bridge-stone-v2.png",Texture.class);
         manager.load("art/logo.png", Texture.class);
         manager.load("art/knot.png", Texture.class);
         manager.load("ui/body.fnt", BitmapFont.class);
@@ -61,6 +62,9 @@ public final class GameAssets implements Disposable {
         driftwood=new TextureRegion(wood);
         Texture stone=manager.get("art/stone.png",Texture.class);
         stone.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);rock=new TextureRegion(stone);
+        Texture paintedStone=manager.get("art/bridge-stone-v2.png",Texture.class);
+        paintedStone.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
+        bridgeStone=new TextureRegion(paintedStone,220,195,1054,643);
         heroes.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         garden.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         logo.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);

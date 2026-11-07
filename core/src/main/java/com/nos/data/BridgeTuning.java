@@ -9,5 +9,12 @@ public final class BridgeTuning {
     public static final float WALK_FRAME_PER_UNIT=.045f;
     public static final float FOLLOW_GRID=20, FOLLOW_REPATH=.3f, FOLLOW_WAYPOINT=2;
     public static final float NOTICE_DURATION=4.5f;
+    public static final float COMPANION_START_DISTANCE=96,COMPANION_STOP_DISTANCE=64;
+    public static final float COMPANION_CATCHUP_DISTANCE=150,COMPANION_WALK_SPEED=132;
+    public static final float COMPANION_REACTION=.4f,COMPANION_OBSERVE_TIME=2.4f;
+    public static final float COMPANION_OBSERVE_MAX_DISTANCE=190,COMPANION_RELEASE_DELAY=.55f;
+    public static final float COMPANION_WINCH_RADIUS=3,COMPANION_APPROACH_SPEED=145;
+    public static final float COMPANION_OBSERVE_PLAYER_RANGE=170,COMPANION_OBSERVE_OWN_RANGE=250;
+    public static final float COMPANION_CLEARANCE=36;
     private BridgeTuning() { }
 }

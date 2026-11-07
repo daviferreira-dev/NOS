@@ -1,6 +1,31 @@
 # NÓS — Documento de Design (GDD)
 
-## Revisão ativa — Encontro ambiental da ponte (07/11/2026)
+## Revisão ativa — Uma presença controlável, duas pessoas (07/11/2026)
+
+O usuário aprovou testar uma relação em que se controla apenas uma presença e se percebe a outra como pessoa distinta, apesar do mesmo rosto. O recorte continua sendo a ponte; não se antecipa a história completa nem se explica o mistério. Esta revisão substitui a troca por Tab da versão anterior.
+
+- O jogador move somente Sombra (WASD/setas por padrão). Reflexo não é selecionável. Câmera, marcador por forma e sombra de contato identificam Sombra sem depender apenas da cor.
+- Reflexo tem um pequeno tempo de reação e distâncias diferentes para partir e parar. Ao se aproximarem do rio, observa a água uma vez e pergunta discretamente "Você também viu?". O pedido de ajuda interrompe essa observação; ele retoma o acompanhamento se o jogador se afasta. Não usar a autonomia para bloquear a sessão ou resolver o desafio sozinho.
+- No guincho, a ação contextual pede ajuda. Reflexo caminha até o mecanismo respeitando pedras, margens e água; se Sombra ocupa o ponto, espera espaço. A ponte só começa a estender quando Reflexo chega e assume a sustentação. Sombra continua sob controle durante todo o processo.
+- Sombra atravessa e fixa a escora com a ação contextual. Reflexo não fixa essa escora sozinho. A ponte fica segura; ele solta o guincho, faz uma pequena pausa e se reúne a Sombra pela ponte. Ambos precisam chegar ao jardim para concluir.
+- Perto do guincho, pedir novamente cancela a aproximação ou chama Reflexo de volta. Não há comando remoto para soltar a sustentação do meio da ponte. Sem cronômetro, dano ou tinta; o retorno à margem segura continua como recuperação de perda inesperada de piso.
+- Abertura ilustrada, menu com início explícito, sprites e trilhas originais são aproveitados. Volume máximo da música reduzido a 20% por pedido do usuário. A cutscene sempre termina no menu; somente Começar ou um novo Enter inicia a partida.
+- Interface: ajuda/pausa modal interrompe toda a simulação, escurece a cena e substitui o HUD. Comandos em teclas visuais e grupos. Objetivo mostra "Etapa N de 3", expande ao mudar e depois encolhe; os atalhos ficam discretos com o tempo. Painéis compartilham papel creme, títulos serifados e texto de apoio legível. Textos e teclas podem ser ajustados pelo menu; preferências são salvas. Sem suporte de gamepad nesta implementação.
+- Apresentação ambiental: contato dos pés mais legível, remoção de riscos soltos sobre a água, pedra sem tintura verde chapada, destino com indicação legível sem cruzar a coluna, laterais em cor da cena e opção de tela cheia. Nenhuma alteração na planta de colisão.
+- Arquitetura: `BridgeEncounter`, `CompanionBehaviorSystem`, `CompanionFollowSystem`, `BridgeCollisionSystem`, `BridgeKeyBindings`, `BridgeInput`, `BridgeScreen`, `BridgeUiState`, `BridgeHudRenderer` e `BridgeRenderer`. Ajustes em `BridgeTuning`; planta no JSON existente.
+
+**Decisões atuais**
+- [x] Testar Sombra como única presença controlável e Reflexo como pessoa autônoma.
+- [x] Manter o pedido de ajuda contextual e a solução final da escora nas mãos do jogador.
+- [x] Pausar a simulação durante ajuda e configuração, com comandos visuais e hierarquia de leitura.
+- [ ] Validar se Reflexo parece uma pessoa, e não um corpo que simplesmente copia o jogador.
+- [ ] Validar ritmo da cooperação, clareza do guincho e interesse da ponte.
+- [ ] Validar leitura, tamanho de texto, remapeamento e nova apresentação do cenário.
+- [ ] Aprofundar as diferenças de percepção e memória somente depois desse teste.
+
+---
+
+## Revisão anterior — Encontro da ponte com troca de controle
 
 Depois de considerar a aparência e a jogabilidade dos testes anteriores insatisfatórias, o usuário pediu referências de jogos publicados e aprovou seguir com um encontro ambiental: **um sustenta, o outro atravessa e fixa a ponte**. Esta revisão é o teste atual e prevalece sobre as revisões anteriores preservadas abaixo.
 

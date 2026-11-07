@@ -17,10 +17,13 @@ public final class BridgeRenderer implements Disposable {
     private final SpriteBatch batch=new SpriteBatch();
     private final ShapeRenderer shapes=new ShapeRenderer();
     private final BridgeHudRenderer hud=new BridgeHudRenderer(assets,batch,shapes);
+    private final BridgeUiState ui=new BridgeUiState();
+    private final TextureRegion bridgeRock=assets.bridgeStone;
     private final Matrix4 scene=new Matrix4();
     private final GlyphLayout layout=new GlyphLayout();
     private final Color ink=new Color(.23f,.22f,.36f,1),paper=new Color(.98f,.95f,.87f,1),gold=new Color(.64f,.45f,.22f,1);
     private float camera,time;
+    public BridgeUiState ui() { return ui; }
     public void snapTo(BridgeEncounter encounter) {
         camera=Math.max(0,Math.min(encounter.getData().width-960,encounter.hero(encounter.getActive()).getX()-360));
     }
@@ -28,6 +31,7 @@ public final class BridgeRenderer implements Disposable {
         render(encounter,viewport,delta,false,false);
     }
     public void render(BridgeEncounter encounter,Viewport viewport,float delta,boolean touchControls,boolean help) {
+        ui.update(encounter,delta);
         if(encounter.getState()==BridgeEncounter.State.PLAYING) time+=delta;
         BridgeData data=encounter.getData();
         float[] interaction=encounter.interactionPoint();
@@ -36,7 +40,7 @@ public final class BridgeRenderer implements Disposable {
         viewport.apply();scene.setToOrtho2D(camera,0,960,540);
         batch.setProjectionMatrix(scene);shapes.setProjectionMatrix(scene);
         batch.begin();batch.setColor(Color.WHITE);batch.draw(assets.bridgeBackground,0,0,data.width,data.height);
-        for(float[] obstacle:data.obstacles) { batch.setColor(.82f,.86f,.76f,1);batch.draw(assets.rock,obstacle[0],obstacle[1],obstacle[2],obstacle[3]); }
+        for(float[] obstacle:data.obstacles) batch.draw(bridgeRock,obstacle[0],obstacle[1],obstacle[2],obstacle[3]);
         batch.setColor(Color.WHITE);batch.end();
         blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
         float[] bridge=data.bridge;
@@ -54,44 +58,67 @@ public final class BridgeRenderer implements Disposable {
             PuzzleHero bound=encounter.hero(encounter.getBound());shapes.setColor(gold);
             shapes.line(bound.getX()+13,bound.getY()+34,data.winch[0]+16,data.winch[1]+20);
         }
-        shapes.setColor(.84f,.87f,.86f,.25f);
-        for(int i=0;i<13;i++) {
-            float y=80+(i*39+time*13)%390;
-            float x=data.river[0]+30+(i*71)%240;
-            shapes.line(x,y,x+14,y+5);
-        }
         shapes.end();
         batch.begin();batch.setColor(Color.WHITE);
         float visible=encounter.getSupport();
         if(visible>0) batch.draw(assets.bridgeDeck,bridge[0]-7,bridge[1]-5,(bridge[2]+14)*visible,bridge[3]+10,
             0,0,Math.max(1,(int)(assets.bridgeDeck.getWidth()*visible)),assets.bridgeDeck.getHeight(),false,false);
+        batch.end();
+        if(interaction!=null) {
+            blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
+            shapes.setColor(gold.r,gold.g,gold.b,.12f+.035f*(float)Math.sin(time*2));
+            shapes.ellipse(interaction[0]-28,interaction[1]-8,56,18);shapes.end();
+        }
+        batch.begin();batch.setColor(Color.WHITE);
         mechanism(data.winch,0,encounter.getBound()>=0);
         mechanism(data.latch,1,encounter.isLocked());
         batch.end();
         blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
         for(int i=0;i<2;i++) {
             PuzzleHero h=encounter.hero(i);
-            shapes.setColor(ink.r,ink.g,ink.b,.16f);shapes.ellipse(h.getX()-15,h.getY()-5,30,10);
-            if(i==encounter.getActive()) { shapes.setColor(gold.r,gold.g,gold.b,.75f);shapes.rectLine(h.getX()-8,h.getY()-5,h.getX()+8,h.getY()-5,2); }
+            shapes.setColor(ink.r,ink.g,ink.b,i==0?.29f:.18f);shapes.ellipse(h.getX()-13,h.getY()-5,26,10);
+            if(i==0) {
+                shapes.setColor(ink);shapes.triangle(h.getX()-6,h.getY()+79,h.getX()+6,h.getY()+79,h.getX(),h.getY()+71);
+                shapes.setColor(paper);shapes.triangle(h.getX()-4,h.getY()+78,h.getX()+4,h.getY()+78,h.getX(),h.getY()+73);
+            }
         }
         shapes.end();batch.begin();batch.setColor(Color.WHITE);
         if(encounter.hero(0).getY()>encounter.hero(1).getY()) { hero(encounter,0);hero(encounter,1); }
         else { hero(encounter,1);hero(encounter,0); }
         batch.end();
         if(interaction!=null&&encounter.getState()==BridgeEncounter.State.PLAYING) {
+            String action=actionText(encounter);
+            assets.font.getData().setScale(.29f*ui.textScale);layout.setText(assets.font,action);
+            float promptWidth=Math.max(124,layout.width+20);
             blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
             shapes.setColor(paper.r,paper.g,paper.b,.96f);
-            shapes.rect(interaction[0]-62,interaction[1]+67,124,25);
-            shapes.setColor(gold);shapes.rect(interaction[0]-62,interaction[1]+67,124,2);
+            shapes.rect(interaction[0]-promptWidth/2,interaction[1]+67,promptWidth,29);
+            shapes.setColor(gold);shapes.rect(interaction[0]-promptWidth/2,interaction[1]+94,promptWidth,2);
             shapes.end();batch.begin();
-            centered(assets.text.get(encounter.action()),interaction[0],interaction[1]+84,.29f,ink);
+            centered(action,interaction[0],interaction[1]+81.5f+UiTypography.BODY_VISUAL_CENTER*.29f*ui.textScale,.29f*ui.textScale,ink);
             batch.end();
         }
+        String speech=encounter.companionSpeech();
+        if(speech!=null&&encounter.getState()==BridgeEncounter.State.PLAYING) {
+            PuzzleHero other=encounter.hero(1);
+            blend();shapes.begin(ShapeRenderer.ShapeType.Filled);shapes.setColor(paper.r,paper.g,paper.b,.93f);
+            shapes.rect(other.getX()-82,other.getY()+88,164,29);shapes.end();
+            batch.begin();centered(assets.text.get(speech),other.getX(),other.getY()+102.5f+UiTypography.BODY_VISUAL_CENTER*.30f*ui.textScale,.30f*ui.textScale,ink);batch.end();
+        }
         if(encounter.isLocked()) {
-            batch.begin();centered(assets.text.get("bridgeGardenLabel"),data.exit[0]+data.exit[2]/2,data.ground[1]+data.ground[3]+22,.40f,ink);batch.end();
+            float destinationX=data.exit[0]+data.exit[2]/2,destinationY=data.exit[1]+32;
+            blend();shapes.begin(ShapeRenderer.ShapeType.Filled);shapes.setColor(paper.r,paper.g,paper.b,.9f);
+            shapes.rect(destinationX-51,destinationY,102,26);shapes.end();
+            batch.begin();centered(assets.text.get("bridgeGardenLabel"),destinationX,destinationY+13+UiTypography.BODY_VISUAL_CENTER*.33f*ui.textScale,.33f*ui.textScale,ink);batch.end();
         }
         batch.setProjectionMatrix(viewport.getCamera().combined);shapes.setProjectionMatrix(viewport.getCamera().combined);
-        hud.render(encounter,touchControls,help);
+        hud.render(encounter,touchControls,help,ui);
+    }
+    private String actionText(BridgeEncounter encounter) {
+        String action=assets.text.get(encounter.action());
+        int bound=ui.bindings.key(com.nos.input.BridgeKeyBindings.Action.INTERACT);
+        String key=bound==com.badlogic.gdx.Input.Keys.SPACE?assets.text.get("bridgeKeySpace"):com.badlogic.gdx.Input.Keys.toString(bound);
+        return action.startsWith("E  ")?key+action.substring(1):action;
     }
     private void mechanism(float[] point,int type,boolean active) {
         batch.draw(assets.mechanisms[active?1:0][type],point[0]-33,point[1]-10,66,66);

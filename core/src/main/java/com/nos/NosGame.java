@@ -33,7 +33,8 @@ public class NosGame extends Game {
         setScreen(new BridgeScreen(true));soundtrack.journey();previous.dispose();
     }
     @Override public void render() {
-        if(soundtrack!=null&&Gdx.input.isKeyJustPressed(Input.Keys.M)) soundtrack.toggleMute();
+        if(soundtrack!=null&&Gdx.input.isKeyJustPressed(Input.Keys.M)
+            &&!(getScreen() instanceof BridgeScreen&&((BridgeScreen)getScreen()).isConfiguringControls())) soundtrack.toggleMute();
         super.render();
         if(soundtrack!=null) soundtrack.update(Math.min(.1f,Gdx.graphics.getDeltaTime()));
     }

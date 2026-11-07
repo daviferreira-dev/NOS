@@ -4,18 +4,24 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-/** Um corpo ativo, troca e uma única ação contextual. */
+/** Sombra recebe os comandos; Reflexo não pode ser selecionado pelo teclado. */
 public final class BridgeInput extends InputAdapter {
     private final PuzzleInput delegate=new PuzzleInput();
-    private boolean tabHeld,swap;
+    private BridgeKeyBindings bindings=new BridgeKeyBindings();
     private boolean helpHeld,help,touchControls=true,desktopTap;
     public void setTouchControls(boolean value) { touchControls=value; }
-    @Override public boolean keyDown(int key) {
+    public void setBindings(BridgeKeyBindings value) { clear();bindings=value; }
+    @Override public boolean keyDown(int physicalKey) {
+        int key=physicalKey==Input.Keys.ENTER?Input.Keys.ENTER:bindings.translate(physicalKey);
+        if(key<0) return false;
         if(key==Input.Keys.H) { if(!helpHeld) help=true;helpHeld=true;return true; }
-        if(key==Input.Keys.TAB) { if(!tabHeld) swap=true;tabHeld=true;return true; }
         return delegate.keyDown(key);
     }
-    @Override public boolean keyUp(int key) { if(key==Input.Keys.H) { helpHeld=false;return true; }if(key==Input.Keys.TAB) { tabHeld=false;return true; }return delegate.keyUp(key); }
+    @Override public boolean keyUp(int physicalKey) {
+        int key=physicalKey==Input.Keys.ENTER?Input.Keys.ENTER:bindings.translate(physicalKey);
+        if(key<0) return false;
+        if(key==Input.Keys.H) { helpHeld=false;return true; }return delegate.keyUp(key);
+    }
     @Override public boolean touchDown(int x,int y,int p,int b) {
         if(touchControls) return delegate.touchDown(x,y,p,b);
         if(p==0&&b==com.badlogic.gdx.Input.Buttons.LEFT) { desktopTap=true;return true; }return false;
@@ -26,10 +32,11 @@ public final class BridgeInput extends InputAdapter {
     public void project(Viewport v,int h) { if(touchControls) delegate.projectTouch(v,h); }
     public float x() { return delegate.axisX(); }
     public float y() { return delegate.axisY(); }
-    public int action() { int a=delegate.takeAnchor();if(swap) { swap=false;return 1; }return a; }
+    public int action() { return delegate.takeAnchor()==2?2:0; }
     public boolean start() { boolean value=delegate.takeStart()||desktopTap;desktopTap=false;return value; }
     public boolean help() { boolean value=help;help=false;return value; }
     public boolean pause() { return delegate.takePause(); }
     public boolean restart() { return delegate.takeRestart(); }
-    public void clear() { tabHeld=false;swap=false;helpHeld=false;help=false;desktopTap=false;delegate.clearHeld(); }
+    public void clearForMenu() { help=false;desktopTap=false;delegate.suspendMovement(); }
+    public void clear() { helpHeld=false;help=false;desktopTap=false;delegate.suspendMovement();delegate.clearHeld(); }
 }
