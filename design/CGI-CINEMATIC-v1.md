@@ -1,6 +1,6 @@
 # NÓS — Direção da cinematográfica CGI, v1
 
-Status: piloto 3D curto concluído com ferramentas gratuitas locais. O jogo continua com a abertura ilustrada atual. O quadro visual deste documento é uma referência estática de aparência CGI; o vídeo piloto é uma cena 3D distinta, com mão, tecido e água animados. A cinematográfica completa com os dois personagens ainda não foi produzida.
+Status: **REJEITADO PELO USUÁRIO**. O piloto teve aparência infantil e não entregou a atuação nem o acabamento da referência. Não integrar ao jogo e não retomar essa tentativa. O material abaixo registra o experimento; não é uma abertura aprovada.
 
 ## Direção aprovada pelo usuário
 

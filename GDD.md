@@ -14,13 +14,13 @@ O usuário aprovou testar uma relação em que se controla apenas uma presença 
 - Apresentação ambiental: contato dos pés mais legível, remoção de riscos soltos sobre a água, pedra sem tintura verde chapada, destino com indicação legível sem cruzar a coluna, laterais em cor da cena e opção de tela cheia. Nenhuma alteração na planta de colisão.
 - Arquitetura: `BridgeEncounter`, `CompanionBehaviorSystem`, `CompanionFollowSystem`, `BridgeCollisionSystem`, `BridgeKeyBindings`, `BridgeInput`, `BridgeScreen`, `BridgeUiState`, `BridgeHudRenderer` e `BridgeRenderer`. Ajustes em `BridgeTuning`; planta no JSON existente.
 
-**Abertura CGI — piloto instrumental gratuito (07/11/2026)**
+**Abertura CGI — piloto rejeitado (07/11/2026)**
 
-O usuário aprovou produzir um plano piloto curto com Blender portátil e ferramentas gratuitas, antes da cinematográfica completa. O piloto de oito segundos está em `outputs/CGI-v1/NOS-CGI-PILOTO-v1.mp4`: seis segundos de animação 3D real da mão de Sombra junto à água, mais dois de marca separada dos personagens. O render é 768 × 432, a 24 fps; arquivo editável com mão articulada, materiais procedurais, câmera e água animada. O usuário rejeitou a voz sintética e escolheu concluir a prévia com música, ambiente e legendas, adiando a narração. A entrega usa composição e programação próprias com piano amostrado GeneralUser GS gratuito, sem fala. Fontes, procedência e licenças em `tools/cinematic/`.
+O usuário rejeitou a prévia CGI por aparência infantil, qualidade insuficiente e movimento sem a atuação esperada da referência. O teste de mão, água e voz sintética não entregou a cinematográfica solicitada. Essa tentativa está encerrada e não deve ser integrada ao jogo nem apresentada como abertura pronta. Os entregáveis foram retirados da pasta ativa e arquivados fora do projeto. Os scripts permanecem somente como registro do experimento rejeitado.
 
-O piloto é uma prova de animação, com acabamento de protótipo. Não contém os dois personagens completos, nem a atuação e continuidade dos rostos previstas para os aproximadamente 36 segundos da abertura. O quadro `design/cinematic-cgi-look-v1.png` permanece uma referência estática de aparência; não é o render do piloto. Nenhum serviço pago foi utilizado.
+A imagem `design/cinematic-cgi-look-v1.png` continua sendo uma referência estática de aparência, não um render 3D alcançado. A abertura ilustrada já distribuída continua no jogo, com menu que espera início explícito. A narração está adiada, como escolhido pelo usuário após rejeitar a voz sintética. O trabalho atual se concentra na jogabilidade e na arte em aquarela aprovada.
 
-O vídeo foi decodificado integralmente e a cena Blender reaberta para conferir a animação sem scripts automáticos. Depois do feedback sobre dedos dobrando para trás, a flexão foi corrigida e as falanges foram verificadas nos 144 quadros. Início, toque e recuo passaram por inspeção visual. A avaliação estética e a decisão de usar essa direção ainda precisam do teste do usuário. O piloto não foi integrado ao executável: abertura ilustrada e menu de início explícito permanecem. Nenhuma dependência de reprodução de vídeo foi adicionada ao jogo.
+O usuário autorizou continuar o jogo depois desse experimento, com decisões de implementação aprovadas automaticamente, sem novas perguntas de rotina, sem custo adicional e sem interferir nos outros trabalhos. O próximo recorte acrescenta agência e posicionamento ao pátio após a ponte; Sombra continua controlável e Reflexo autônomo. Não considerar M1/M2 completos ou divertidos antes do teste do usuário.
 
 **Decisões atuais**
 - [x] Testar Sombra como única presença controlável e Reflexo como pessoa autônoma.
@@ -32,8 +32,8 @@ O vídeo foi decodificado integralmente e a cena Blender reaberta para conferir 
 - [ ] Aprofundar as diferenças de percepção e memória somente depois desse teste.
 - [x] Preparar ferramentas gratuitas isoladas, render 3D e trilha instrumental para um plano piloto.
 - [x] Retirar a voz sintética rejeitada e adiar narração, por decisão do usuário.
-- [ ] Validar o piloto CGI e a trilha com o usuário.
-- [ ] Modelar e animar os dois personagens completos com continuidade de identidade antes da abertura inteira.
+- [x] Avaliação do piloto CGI pelo usuário: rejeitado; encerrar essa tentativa.
+- [ ] Cinematográfica completa suspensa; o experimento de CGI procedural foi rejeitado.
 - [ ] Definir integração e formato por plataforma depois de haver cinematográfica revisada, preservando pular → menu → Começar.
 
 ---

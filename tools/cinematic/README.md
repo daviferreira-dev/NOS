@@ -1,3 +1,5 @@
+> Experimento rejeitado pelo usuário. Estes scripts são arquivo de produção, não uma abertura aprovada. Os vídeos foram retirados da pasta ativa; não integrar nem retomar esta tentativa.
+
 # Produção local do piloto CGI
 
 Ferramentas de autoria externas ao libGDX; não adicionam dependências ao Gradle. A instalação e o uso gratuito dessas ferramentas foram aprovados pelo usuário. Não há chamadas a APIs pagas.
