@@ -39,9 +39,14 @@ public final class BridgeScreen extends ScreenAdapter {
         } else accumulator=0;
         ScreenUtils.clear(.23f,.22f,.36f,1);renderer.render(encounter,viewport,Math.min(.1f,delta));
     }
-    public void prepareSmokeScene() {
+    public void prepareSmokeScene() { prepareSmokeScene(false); }
+    public void prepareSmokeScene(boolean atMechanism) {
         encounter.start();
         for(int i=0;i<300;i++) encounter.update(1,0,BridgeTuning.FIXED_STEP);
+        if(atMechanism) {
+            for(int i=0;i<80;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+            renderer.snapTo(encounter);return;
+        }
         encounter.interact();
         for(int i=0;i<100;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
         for(int i=0;i<240;i++) encounter.update(1,0,BridgeTuning.FIXED_STEP);

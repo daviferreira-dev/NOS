@@ -26,6 +26,7 @@ public final class BridgeRenderer implements Disposable {
     public void render(BridgeEncounter encounter,Viewport viewport,float delta) {
         if(encounter.getState()==BridgeEncounter.State.PLAYING) time+=delta;
         BridgeData data=encounter.getData();
+        float[] interaction=encounter.interactionPoint();
         float target=Math.max(0,Math.min(data.width-960,encounter.hero(encounter.getActive()).getX()-360));
         camera+=(target-camera)*(1-(float)Math.exp(-5*delta));
         viewport.apply();scene.setToOrtho2D(camera,0,960,540);
@@ -37,13 +38,6 @@ public final class BridgeRenderer implements Disposable {
         float[] bridge=data.bridge;
         shapes.setColor(.16f,.20f,.22f,.2f);
         shapes.rect(bridge[0],bridge[1]-4,bridge[2]*encounter.getSupport(),bridge[3]+8);
-        mechanism(data.winch[0],data.winch[1],encounter.getBound()>=0);
-        mechanism(data.latch[0],data.latch[1],encounter.isLocked());
-        for(int i=0;i<2;i++) {
-            PuzzleHero h=encounter.hero(i);
-            shapes.setColor(ink.r,ink.g,ink.b,.16f);shapes.ellipse(h.getX()-15,h.getY()-5,30,10);
-            if(i==encounter.getActive()) { shapes.setColor(gold.r,gold.g,gold.b,.75f);shapes.rectLine(h.getX()-8,h.getY()-5,h.getX()+8,h.getY()-5,2); }
-        }
         shapes.end();
         blend();shapes.begin(ShapeRenderer.ShapeType.Line);
         if(encounter.getSupport()>.05f) {
@@ -54,8 +48,7 @@ public final class BridgeRenderer implements Disposable {
         }
         if(encounter.getBound()>=0) {
             PuzzleHero bound=encounter.hero(encounter.getBound());shapes.setColor(gold);
-            shapes.circle(bound.getX(),bound.getY()+8,12);
-            shapes.line(bound.getX(),bound.getY()+14,data.winch[0]+16,data.winch[1]+20);
+            shapes.line(bound.getX()+13,bound.getY()+34,data.winch[0]+16,data.winch[1]+20);
         }
         shapes.setColor(.84f,.87f,.86f,.25f);
         for(int i=0;i<13;i++) {
@@ -68,9 +61,28 @@ public final class BridgeRenderer implements Disposable {
         float visible=encounter.getSupport();
         if(visible>0) batch.draw(assets.bridgeDeck,bridge[0]-7,bridge[1]-5,(bridge[2]+14)*visible,bridge[3]+10,
             0,0,Math.max(1,(int)(assets.bridgeDeck.getWidth()*visible)),assets.bridgeDeck.getHeight(),false,false);
+        mechanism(data.winch,0,encounter.getBound()>=0);
+        mechanism(data.latch,1,encounter.isLocked());
+        batch.end();
+        blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
+        for(int i=0;i<2;i++) {
+            PuzzleHero h=encounter.hero(i);
+            shapes.setColor(ink.r,ink.g,ink.b,.16f);shapes.ellipse(h.getX()-15,h.getY()-5,30,10);
+            if(i==encounter.getActive()) { shapes.setColor(gold.r,gold.g,gold.b,.75f);shapes.rectLine(h.getX()-8,h.getY()-5,h.getX()+8,h.getY()-5,2); }
+        }
+        shapes.end();batch.begin();batch.setColor(Color.WHITE);
         if(encounter.hero(0).getY()>encounter.hero(1).getY()) { hero(encounter,0);hero(encounter,1); }
         else { hero(encounter,1);hero(encounter,0); }
         batch.end();
+        if(interaction!=null&&encounter.getState()==BridgeEncounter.State.PLAYING) {
+            blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
+            shapes.setColor(paper.r,paper.g,paper.b,.96f);
+            shapes.rect(interaction[0]-62,interaction[1]+67,124,25);
+            shapes.setColor(gold);shapes.rect(interaction[0]-62,interaction[1]+67,124,2);
+            shapes.end();batch.begin();
+            centered(assets.text.get(encounter.action()),interaction[0],interaction[1]+84,.29f,ink);
+            batch.end();
+        }
         batch.setProjectionMatrix(viewport.getCamera().combined);shapes.setProjectionMatrix(viewport.getCamera().combined);
         blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
         shapes.setColor(paper.r,paper.g,paper.b,.94f);shapes.rect(24,475,912,54);
@@ -78,33 +90,26 @@ public final class BridgeRenderer implements Disposable {
         shapes.setColor(.72f,.69f,.61f,.4f);shapes.circle(90,50,28);
         shapes.setColor(paper);shapes.rectLine(75,50,105,50,2);shapes.rectLine(90,35,90,65,2);
         shapes.setColor(.49f,.51f,.49f,1);shapes.rect(630,26,130,43);
-        shapes.setColor(gold);shapes.rect(780,26,130,43);
+        shapes.setColor(gold.r,gold.g,gold.b,interaction!=null?1:.4f);shapes.rect(780,26,130,43);
         shapes.end();
         batch.begin();
         title(assets.text.get("bridgeTitle"),480,525,.43f);
-        centered(assets.text.get(encounter.hint()),480,490,.33f,ink);
+        centered(assets.text.get(encounter.hint()),480,494,.33f,ink);
         text(assets.text.get("bridgeMove"),155,69,.33f,paper);
-        text(assets.text.get(encounter.getActive()==0?"bridgeActiveShadow":"bridgeActiveReflection"),155,42,.29f,paper);
+        text(assets.text.get(encounter.companionStatus()),155,42,.29f,paper);
         centered(assets.text.get("bridgeSwap"),695,53,.29f,paper);
         centered(assets.text.get(encounter.action()),845,53,.27f,paper);
         batch.end();
         if(encounter.getState()!=BridgeEncounter.State.PLAYING) overlay(encounter);
     }
-    private void mechanism(float x,float y,boolean active) {
-        shapes.setColor(.34f,.27f,.19f,1);shapes.rect(x-17,y-9,6,37);shapes.rect(x+12,y-9,6,37);
-        shapes.setColor(.58f,.46f,.28f,1);shapes.rect(x-16,y+6,34,15);
-        shapes.setColor(.33f,.28f,.20f,1);shapes.circle(x,y+16,12);
-        shapes.setColor(active?gold:paper);shapes.circle(x,y+16,9);
-        shapes.setColor(.42f,.34f,.23f,1);
-        for(int i=0;i<4;i++) {
-            float a=i*(float)Math.PI/2+(active?time:0);
-            shapes.rectLine(x,y+16,x+(float)Math.cos(a)*11,y+16+(float)Math.sin(a)*11,2);
-        }
+    private void mechanism(float[] point,int type,boolean active) {
+        batch.draw(assets.mechanisms[active?1:0][type],point[0]-33,point[1]-10,66,66);
     }
     private void hero(BridgeEncounter encounter,int index) {
-        PuzzleHero hero=encounter.hero(index);TextureRegion frame=assets.walk[index][encounter.frame(index)];
-        boolean flip=hero.getFacing()<0;
-        batch.draw(frame,hero.getX()+(flip?27:-27),hero.getY()-5,flip?-54:54,72);
+        PuzzleHero hero=encounter.hero(index);
+        HeroFrame frame=encounter.getBound()==index?assets.poses[index][1]
+            :hero.isMoving()?assets.walk[index][encounter.frame(index)]:assets.poses[index][0];
+        frame.draw(batch,hero.getX(),hero.getY(),hero.getFacing()<0);
     }
     private void blend() { Gdx.gl.glEnable(GL20.GL_BLEND);Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA); }
     private void text(String s,float x,float y,float scale,Color color) {

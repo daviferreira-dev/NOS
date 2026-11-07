@@ -23,7 +23,7 @@ public class Lwjgl3Launcher {
                     if (frames == 3) {
                         if(getScreen() instanceof GameScreen) ((GameScreen)getScreen()).prepareSmokeScene();
                         else if(getScreen() instanceof PuzzleScreen) ((PuzzleScreen)getScreen()).prepareSmokeScene();
-                        else if(getScreen() instanceof BridgeScreen) ((BridgeScreen)getScreen()).prepareSmokeScene();
+                        else if(getScreen() instanceof BridgeScreen) ((BridgeScreen)getScreen()).prepareSmokeScene(args.length>2&&args[2].equals("--mechanism"));
                         else ((IntroScreen)getScreen()).prepareSmokeScene();
                     }
                     super.render();

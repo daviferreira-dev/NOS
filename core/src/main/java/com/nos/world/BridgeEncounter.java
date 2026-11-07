@@ -3,6 +3,7 @@ package com.nos.world;
 import com.nos.data.*;
 import com.nos.entities.PuzzleHero;
 import com.nos.systems.BridgeCollisionSystem;
+import com.nos.systems.CompanionFollowSystem;
 
 /** Um segura, o outro atravessa e fixa a ponte; depois ambos seguem. */
 public final class BridgeEncounter {
@@ -10,6 +11,7 @@ public final class BridgeEncounter {
     private final BridgeData data;
     private final PuzzleHero[] heroes;
     private final BridgeCollisionSystem collision;
+    private final CompanionFollowSystem companion;
     private final float[] safeX=new float[2],safeY=new float[2],steps=new float[2];
     private State state=State.READY;
     private int active,bound=-1;
@@ -18,6 +20,7 @@ public final class BridgeEncounter {
     private String notice="bridgeWelcome";
     public BridgeEncounter(BridgeData data) {
         this.data=data;collision=new BridgeCollisionSystem(data);
+        companion=new CompanionFollowSystem(data,collision);
         heroes=new PuzzleHero[] {new PuzzleHero(data.shadowStart[0],data.shadowStart[1]),new PuzzleHero(data.reflectionStart[0],data.reflectionStart[1])};
         for(int i=0;i<2;i++) { safeX[i]=heroes[i].getX();safeY[i]=heroes[i].getY(); }
     }
@@ -27,7 +30,7 @@ public final class BridgeEncounter {
         else if(state==State.PAUSED) state=State.PLAYING;
         stop();
     }
-    private void stop() { velocityX=0;velocityY=0;for(PuzzleHero h:heroes) h.setMotion(0,0); }
+    private void stop() { velocityX=0;velocityY=0;companion.reset();for(PuzzleHero h:heroes) h.setMotion(0,0); }
     public void swap() { if(state==State.PLAYING) { active=1-active;stop(); } }
     private boolean near(PuzzleHero h,float[] point) {
         float dx=h.getX()-point[0],dy=h.getY()-point[1];
@@ -42,6 +45,7 @@ public final class BridgeEncounter {
             bound=-1;notify("bridgeReleased");stop();
         } else if(!locked&&near(h,data.winch)) {
             bound=active;h.setPosition(data.winch[0],data.winch[1]);
+            h.setMotion(1,0);
             active=1-active;notify("bridgeHeld");stop();
         } else notify(locked?"bridgeExit":"bridgeApproach");
     }
@@ -63,12 +67,9 @@ public final class BridgeEncounter {
         int other=1-active;
         if(other!=bound) {
             PuzzleHero follower=heroes[other],leader=heroes[active];
-            float dx=leader.getX()-follower.getX(),dy=leader.getY()-follower.getY();
-            float distance=(float)Math.sqrt(dx*dx+dy*dy);
-            if(distance>BridgeTuning.FOLLOW_DISTANCE) {
-                float travel=Math.min(distance-BridgeTuning.FOLLOW_DISTANCE,BridgeTuning.FOLLOW_SPEED*delta);
-                move(other,dx/distance*travel,dy/distance*travel);
-            }
+            float x=follower.getX(),y=follower.getY();
+            companion.update(follower,leader,isOpen(),delta);
+            recordSteps(other,x,y);
         }
         for(int i=0;i<2;i++) {
             PuzzleHero h=heroes[i];
@@ -84,6 +85,10 @@ public final class BridgeEncounter {
     private void move(int index,float dx,float dy) {
         PuzzleHero h=heroes[index];float x=h.getX(),y=h.getY();
         collision.move(h,dx,dy,isOpen());
+        recordSteps(index,x,y);
+    }
+    private void recordSteps(int index,float x,float y) {
+        PuzzleHero h=heroes[index];
         float actualX=h.getX()-x,actualY=h.getY()-y;
         steps[index]+=(float)Math.sqrt(actualX*actualX+actualY*actualY)*BridgeTuning.WALK_FRAME_PER_UNIT;
     }
@@ -101,6 +106,18 @@ public final class BridgeEncounter {
         if(!locked&&isOpen()&&near(heroes[active],data.latch)) return "bridgeFixAction";
         if(!locked&&near(heroes[active],data.winch)) return "bridgeTieAction";
         return "bridgeInteract";
+    }
+    public float[] interactionPoint() {
+        if(bound==active) return data.winch;
+        if(!locked&&isOpen()&&near(heroes[active],data.latch)) return data.latch;
+        if(!locked&&near(heroes[active],data.winch)) return data.winch;
+        return null;
+    }
+    public String companionStatus() {
+        if(bound==active) return "bridgeActiveHolding";
+        if(bound==0) return "bridgeShadowHolding";
+        if(bound==1) return "bridgeReflectionHolding";
+        return active==0?"bridgeActiveShadow":"bridgeActiveReflection";
     }
     public boolean isOpen() { return support>=BridgeTuning.OPEN_THRESHOLD; }
     public boolean isLocked() { return locked; }

@@ -14,11 +14,11 @@ Esta é a nova experiência curta, criada após estudar princípios de Unravel T
 
 Perto do mecanismo da primeira margem, E ata a presença e passa o controle à outra. A ponte se estende. Na margem oposta, E fixa a escora e solta o vínculo. A vitória exige as duas presenças no jardim adiante. Soltar cedo pode recolher a ponte; quem estiver sem piso retorna à última margem segura, sem morte.
 
-A câmera acompanha quem você controla. Há um ciclo inicial de quatro quadros por personagem, ainda não uma animação completa em oito direções. Abertura pulável preservada; áudio não implementado.
+A câmera acompanha quem você controla. Há quatro quadros de caminhada, poses próprias de repouso e sustentação, registrados nos pés e em altura comum. O parceiro contorna obstáculos e procura a ponte aberta para reunir-se a você. A ação E aparece sobre o mecanismo próximo. Ainda não há animação completa em oito direções ou áudio; a abertura é pulável.
 
 ## Jogar
 
-Dê dois cliques em `outputs/Jogar-NOS-Ponte.bat`, mantendo `NOS-Ponte.jar` ao lado. O iniciador usa o JDK 17 já instalado neste computador. O executável empacotado não requer Gradle nem downloads.
+Dê dois cliques em `outputs/Jogar-NOS-Ponte-v2.bat`, mantendo `NOS-Ponte-v2.jar` ao lado. O iniciador usa o JDK 17 já instalado neste computador. O executável empacotado não requer Gradle nem downloads. A primeira versão permanece preservada.
 
 ## Desenvolvimento
 
@@ -43,12 +43,13 @@ $env:GRADLE_USER_HOME = "C:\Users\PC Gamer\Documents\Codex\2026-11-06\instale-o-
 - `--legacy`: travessia de tempo, tinta e harmonia.
 - A pasta anterior em Documents/Codex não foi alterada. O histórico Git foi importado para esta pasta, incluindo os commits locais.
 
-Exemplo: `java -jar outputs/NOS-Ponte.jar --mirror-room`.
+Exemplo: `java -jar outputs/NOS-Ponte-v2.jar --mirror-room`.
 
 ## Organização
 
 - `BridgeEncounter`: estado e regras do encontro, sem OpenGL.
 - `BridgeCollisionSystem`: margens, água, obstáculos e ponte.
+- `CompanionFollowSystem`: seguimento com busca de desvios caminháveis.
 - `BridgeInput`: teclado e botões de toque.
 - `BridgeScreen`: orquestração em passos fixos.
 - `BridgeRenderer`: apresentação e câmera.
@@ -59,6 +60,6 @@ Os testes JUnit verificam os protótipos preservados e a solução completa da p
 
 ## Arte e direção
 
-Personagens e logo foram aprovados pelo usuário. Cenário, ponte e ciclo inicial de caminhada foram criados com geração de imagens e integrados ao jogo; referências originais em `design/`. Tipografia Cormorant Garamond e Atkinson Hyperlegible, com licenças OFL em `assets/ui/`. Notas e prompts em `design/BRIDGE-ARTS.md` (também entregues em `outputs/ARTE-E-REFERENCIAS.md`); gerador dos atlas em `tools/`.
+Personagens e logo foram aprovados pelo usuário. Cenário, ponte, mecanismos e poses foram criados com geração de imagens e integrados ao jogo; referências originais em `design/`. Tipografia Cormorant Garamond e Atkinson Hyperlegible, com licenças OFL em `assets/ui/`. Notas e prompts em `design/BRIDGE-ARTS.md` e `design/SPRITE-REFINEMENT.md`, também entregues em `outputs/`; gerador dos atlas em `tools/`.
 
 O GDD registra a revisão ativa e preserva as concepções anteriores como histórico. Os 13 níveis e capítulos da concepção original não estão implementados.

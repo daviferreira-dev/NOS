@@ -71,4 +71,24 @@ public class BridgeEncounterTest {
         run.swap();assertEquals(1,run.getActive());
         float next=run.hero(1).getX();waitFor(run,120);assertEquals(next,run.hero(1).getX(),.2f);
     }
+    @Test public void nearbyPromptMatchesActionAndHoldingStatusMatchesActualPartner() {
+        BridgeEncounter run=create();run.start();assertNull(run.interactionPoint());
+        go(run,535,270);assertSame(run.getData().winch,run.interactionPoint());
+        assertEquals("bridgeTieAction",run.action());run.interact();waitFor(run,120);
+        assertEquals("bridgeShadowHolding",run.companionStatus());
+        run.swap();assertEquals("bridgeActiveHolding",run.companionStatus());run.swap();
+        go(run,980,270);assertSame(run.getData().latch,run.interactionPoint());
+        assertEquals("bridgeFixAction",run.action());run.interact();assertNull(run.interactionPoint());
+    }
+    @Test public void bothArriveEvenWhenLeaderLeavesBridgeDiagonallyAndCirclesFarRock() {
+        BridgeEncounter run=create();tie(run);go(run,980,270);run.interact();
+        go(run,1090,320);go(run,1280,320);go(run,1470,360);waitFor(run,600);
+        assertEquals(BridgeEncounter.State.WON,run.getState());
+    }
+    @Test public void pushingAgainstClosedRiverDoesNotKeepPlayingWalkFrames() {
+        BridgeEncounter run=create();run.start();go(run,800,270);
+        int frame=run.frame(0);
+        for(int i=0;i<200;i++) run.update(1,0,BridgeTuning.FIXED_STEP);
+        assertFalse(run.hero(0).isMoving());assertEquals(frame,run.frame(0));
+    }
 }

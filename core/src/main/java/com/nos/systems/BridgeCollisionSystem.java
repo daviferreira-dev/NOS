@@ -20,6 +20,12 @@ public final class BridgeCollisionSystem {
         }
         return true;
     }
+    public boolean clearPath(float x,float y,float targetX,float targetY,boolean open) {
+        int count=Math.max(1,(int)Math.ceil(Math.hypot(targetX-x,targetY-y)/BridgeTuning.COLLISION_STEP));
+        for(int i=0;i<=count;i++)
+            if(!walkable(x+(targetX-x)*i/count,y+(targetY-y)*i/count,open)) return false;
+        return true;
+    }
     public void move(PuzzleHero hero,float dx,float dy,boolean open) {
         int steps=Math.max(1,(int)Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/BridgeTuning.COLLISION_STEP));
         float x=hero.getX(),y=hero.getY();

@@ -6,12 +6,14 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.nos.data.HeroSpriteTuning;
 
 /** Recursos compartilhados da fase, carregados e liberados juntos. */
 public final class GameAssets implements Disposable {
     private final AssetManager manager = new AssetManager();
     public final Texture garden, logo, knot, bridgeBackground, bridgeDeck;
-    public final TextureRegion[][] walk=new TextureRegion[2][4];
+    public final HeroFrame[][] walk=new HeroFrame[2][4],poses=new HeroFrame[2][2];
+    public final TextureRegion[][] mechanisms=new TextureRegion[2][2];
     public final TextureRegion shadow, reflection, driftwood, rock;
     public final BitmapFont font, title;
     public final I18NBundle text;
@@ -20,6 +22,8 @@ public final class GameAssets implements Disposable {
         manager.load("art/bridge-bank-v1.png",Texture.class);
         manager.load("art/bridge-deck-v1.png",Texture.class);
         manager.load("art/walk-cycle-v1.png",Texture.class);
+        manager.load("art/idle-hold-v1.png",Texture.class);
+        manager.load("art/bridge-mechanisms-v1.png",Texture.class);
         manager.load("art/heroes.png", Texture.class);
         manager.load("art/driftwood.png", Texture.class);
         manager.load("art/stone.png",Texture.class);
@@ -37,7 +41,17 @@ public final class GameAssets implements Disposable {
         Texture sheet=manager.get("art/walk-cycle-v1.png",Texture.class);
         sheet.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
         for(int row=0;row<2;row++) for(int column=0;column<4;column++)
-            walk[row][column]=new TextureRegion(sheet,column*sheet.getWidth()/4,row*sheet.getHeight()/2,sheet.getWidth()/4,sheet.getHeight()/2);
+            walk[row][column]=new HeroFrame(new TextureRegion(sheet,column*sheet.getWidth()/4,row*sheet.getHeight()/2,sheet.getWidth()/4,sheet.getHeight()/2),
+                HeroSpriteTuning.WALK_PIVOT,HeroSpriteTuning.WALK_SOLE[column],HeroSpriteTuning.WALK_TOP[column]);
+        Texture poseSheet=manager.get("art/idle-hold-v1.png",Texture.class);
+        poseSheet.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
+        for(int row=0;row<2;row++) for(int column=0;column<2;column++)
+            poses[row][column]=new HeroFrame(new TextureRegion(poseSheet,column*poseSheet.getWidth()/2,row*poseSheet.getHeight()/2,poseSheet.getWidth()/2,poseSheet.getHeight()/2),
+                HeroSpriteTuning.POSE_PIVOT[column],HeroSpriteTuning.POSE_SOLE,HeroSpriteTuning.POSE_TOP[column]);
+        Texture props=manager.get("art/bridge-mechanisms-v1.png",Texture.class);
+        props.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
+        for(int row=0;row<2;row++) for(int column=0;column<2;column++)
+            mechanisms[row][column]=new TextureRegion(props,column*props.getWidth()/2,row*props.getHeight()/2,props.getWidth()/2,props.getHeight()/2);
         logo = manager.get("art/logo.png", Texture.class);
         knot = manager.get("art/knot.png", Texture.class);
         knot.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
