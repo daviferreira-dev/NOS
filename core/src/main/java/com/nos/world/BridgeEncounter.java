@@ -96,7 +96,10 @@ public final class BridgeEncounter {
         float[] e=data.exit;
         return h.getX()>=e[0]&&h.getX()<=e[0]+e[2]&&h.getY()>=e[1]&&h.getY()<=e[1]+e[3];
     }
-    private void notify(String key) { notice=key;noticeTime=3; }
+    private void notify(String key) { notice=key;noticeTime=BridgeTuning.NOTICE_DURATION; }
+    public String notice() { return noticeTime>0?notice:null; }
+    public float noticeVisibility() { return Math.min(1,noticeTime/.5f); }
+    public int objectiveStep() { return locked?3:bound>=0?2:1; }
     public String hint() {
         if(noticeTime>0) return notice;
         return locked?"bridgeExit":bound>=0?"bridgeCross":"bridgeWelcome";

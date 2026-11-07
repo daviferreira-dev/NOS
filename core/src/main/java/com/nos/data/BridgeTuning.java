@@ -8,5 +8,6 @@ public final class BridgeTuning {
     public static final float FIXED_STEP=1f/120f;
     public static final float WALK_FRAME_PER_UNIT=.045f;
     public static final float FOLLOW_GRID=20, FOLLOW_REPATH=.3f, FOLLOW_WAYPOINT=2;
+    public static final float NOTICE_DURATION=4.5f;
     private BridgeTuning() { }
 }

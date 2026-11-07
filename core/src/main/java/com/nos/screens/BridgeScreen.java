@@ -2,6 +2,8 @@ package com.nos.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.nos.data.*;
@@ -16,11 +18,14 @@ public final class BridgeScreen extends ScreenAdapter {
     private final BridgeRenderer renderer=new BridgeRenderer();
     private final FitViewport viewport=new FitViewport(960,540);
     private float accumulator;
+    private boolean showHelp,smokeTouch;
+    private final boolean touchControls=Gdx.app.getType()==Application.ApplicationType.Android||Gdx.input.isPeripheralAvailable(Input.Peripheral.MultitouchScreen);
     public BridgeScreen() { this(false); }
     public BridgeScreen(boolean begin) { if(begin) encounter.start(); }
-    @Override public void show() { Gdx.input.setInputProcessor(input); }
+    @Override public void show() { input.setTouchControls(touchControls);Gdx.input.setInputProcessor(input); }
     @Override public void render(float delta) {
         input.project(viewport,Gdx.graphics.getHeight());
+        if(input.help()) showHelp=!showHelp;
         boolean start=input.start(),pause=input.pause(),restart=input.restart();
         int action=input.action();
         if(restart||(start&&encounter.getState()==BridgeEncounter.State.WON)) {
@@ -39,9 +44,20 @@ public final class BridgeScreen extends ScreenAdapter {
                 accumulator-=BridgeTuning.FIXED_STEP;
             }
         } else accumulator=0;
-        ScreenUtils.clear(.23f,.22f,.36f,1);renderer.render(encounter,viewport,Math.min(.1f,delta));
+        ScreenUtils.clear(.23f,.22f,.36f,1);renderer.render(encounter,viewport,Math.min(.1f,delta),touchControls||smokeTouch,showHelp);
     }
     public void prepareSmokeScene() { prepareSmokeScene(false); }
+    public void prepareSmokeScene(String scenario) {
+        showHelp=scenario.equals("--help");smokeTouch=scenario.equals("--touch");
+        prepareSmokeScene(scenario.equals("--mechanism")||showHelp);
+        if(scenario.equals("--fixed")) {
+            for(int i=0;i<180;i++) encounter.update(1,0,BridgeTuning.FIXED_STEP);
+            for(int i=0;i<80;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+            encounter.interact();
+            for(int i=0;i<120;i++) encounter.update(1,0,BridgeTuning.FIXED_STEP);
+            renderer.snapTo(encounter);
+        }
+    }
     public void prepareSmokeScene(boolean atMechanism) {
         encounter.start();
         for(int i=0;i<300;i++) encounter.update(1,0,BridgeTuning.FIXED_STEP);

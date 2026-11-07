@@ -91,4 +91,12 @@ public class BridgeEncounterTest {
         for(int i=0;i<200;i++) run.update(1,0,BridgeTuning.FIXED_STEP);
         assertFalse(run.hero(0).isMoving());assertEquals(frame,run.frame(0));
     }
+    @Test public void objectiveFollowsActualBridgeStateAndSurvivesNoticeExpiry() {
+        BridgeEncounter run=create();assertEquals(1,run.objectiveStep());assertNull(run.notice());
+        tie(run);assertEquals(2,run.objectiveStep());assertEquals("bridgeHeld",run.notice());
+        run.swap();run.interact();assertEquals(1,run.objectiveStep());
+        run.interact();waitFor(run,120);go(run,980,270);run.interact();
+        assertEquals(3,run.objectiveStep());assertEquals("bridgeFixed",run.notice());
+        waitFor(run,1200);assertNull(run.notice());assertEquals(3,run.objectiveStep());
+    }
 }
