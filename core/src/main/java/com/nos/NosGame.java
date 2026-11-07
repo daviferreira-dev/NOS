@@ -6,6 +6,7 @@ import com.nos.screens.IntroScreen;
 import com.nos.screens.PuzzleScreen;
 import com.nos.screens.BridgeScreen;
 import com.nos.audio.Soundtrack;
+import com.nos.data.SaveData;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
@@ -15,6 +16,7 @@ public class NosGame extends Game {
     private final boolean legacy;
     private final boolean silent;
     private Soundtrack soundtrack;
+    private SaveData progress;
     public NosGame() { this(false); }
     public NosGame(boolean skipIntro) { this(skipIntro,false); }
     public NosGame(boolean skipIntro,boolean legacy) { this(skipIntro,legacy,false); }
@@ -23,14 +25,24 @@ public class NosGame extends Game {
     @Override
     public void create() {
         soundtrack=new Soundtrack(silent);
-        setScreen(legacy ? new GameScreen() : skipIntro ? new BridgeScreen() : new IntroScreen(this));
+        progress=silent||skipIntro||legacy?new SaveData(null):new SaveData();
+        setScreen(legacy ? new GameScreen() : skipIntro ? new BridgeScreen(false,progress,false) : new IntroScreen(this));
         if(skipIntro) soundtrack.journey();
     }
 
     public Soundtrack soundtrack() { return soundtrack; }
-    public void beginJourney() {
+    public SaveData progress() { return progress; }
+    public void returnToTitle() {
+        com.badlogic.gdx.Screen previous=getScreen();IntroScreen menu=new IntroScreen(this);
+        menu.showTitle();setScreen(menu);if(previous!=null) previous.dispose();
+    }
+    public void beginJourney() { beginJourney(progress.canResumeJourney()); }
+    public void beginJourney(boolean resumeCheckpoint) {
+        boolean resume=resumeCheckpoint&&progress.canResumeJourney();
         com.badlogic.gdx.Screen previous=getScreen();
-        setScreen(new BridgeScreen(true));soundtrack.journey();previous.dispose();
+        setScreen(new BridgeScreen(true,progress,resume));
+        if(resume) soundtrack.garden();else soundtrack.journey();
+        if(previous!=null) previous.dispose();
     }
     @Override public void render() {
         if(soundtrack!=null&&Gdx.input.isKeyJustPressed(Input.Keys.M)

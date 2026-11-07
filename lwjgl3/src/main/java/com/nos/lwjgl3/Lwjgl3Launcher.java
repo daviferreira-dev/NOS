@@ -26,7 +26,25 @@ public class Lwjgl3Launcher {
                         if(getScreen() instanceof GameScreen) ((GameScreen)getScreen()).prepareSmokeScene();
                         else if(getScreen() instanceof PuzzleScreen) ((PuzzleScreen)getScreen()).prepareSmokeScene();
                         else if(getScreen() instanceof BridgeScreen) ((BridgeScreen)getScreen()).prepareSmokeScene(args.length>2?args[2]:"");
-                        else ((IntroScreen)getScreen()).prepareSmokeScene(args.length>2?args[2]:"reflection");
+                        else {
+                            String scenario=args.length>2?args[2]:"reflection";
+                            if(scenario.equals("--resume-start")||scenario.equals("--fresh-start")) {
+                                // Nesta aplicação de inspeção, progress usa somente memória.
+                                progress().recordGardenCheckpoint();
+                                ((IntroScreen)getScreen()).prepareSmokeScene("title");
+                                Gdx.input.getInputProcessor().keyDown(scenario.equals("--resume-start")?com.badlogic.gdx.Input.Keys.ENTER:com.badlogic.gdx.Input.Keys.N);
+                                for(int i=0;i<40&&getScreen() instanceof IntroScreen;i++) getScreen().render(.05f);
+                                if(!(getScreen() instanceof BridgeScreen)||!progress().canResumeJourney())
+                                    throw new IllegalStateException("Falha ao iniciar a partir do menu de progresso.");
+                            } else ((IntroScreen)getScreen()).prepareSmokeScene(scenario);
+                        }
+                    }
+                    if(frames==4&&args.length>2&&args[2].equals("--garden-menu")&&getScreen() instanceof BridgeScreen) {
+                        Gdx.input.getInputProcessor().keyDown(com.badlogic.gdx.Input.Keys.ENTER);
+                        getScreen().render(.05f);
+                        if(!(getScreen() instanceof IntroScreen)||!progress().isJourneyComplete())
+                            throw new IllegalStateException("Falha no retorno ao menu após concluir o trecho.");
+                        for(int i=0;i<20;i++) getScreen().render(.05f);
                     }
                     super.render();
                     if (frames == 1) {

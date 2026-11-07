@@ -5,4 +5,5 @@ public final class GardenData {
     public float[] cartStart, helperPlate, weightPlate, gate;
     public float[] checkpointShadow, checkpointReflection;
     public float[][] barriers;
+    public float[][] helperCable,weightCable;
 }

@@ -16,6 +16,23 @@ O usuário aprovou testar uma relação em que se controla apenas uma presença 
 
 **Ampliação jogável autorizada — contrapesos no pátio**
 
+**Refinamento da demo — continuidade e espaço para cooperar (v6)**
+
+O usuário pediu continuar com decisões automáticas e priorizar rapidez. O foco é fechar uma demo curta da primeira fase antes de produzir as treze fases previstas; o interesse da jogabilidade ainda precisa do teste do usuário.
+
+- Ao fixar a ponte, `SaveData` registra um checkpoint do pátio via `Preferences`; ao concluir, registra a conclusão desse trecho. O avanço é monotônico e mantém o recorde legado separado. Valores inválidos de progresso voltam ao início, sem pular desafios.
+- Ao reabrir, o menu oferece Continuar do pátio ou Revisitar pátio, conforme o avanço. Jogar do começo inicia uma sessão nova sem apagar o checkpoint mais avançado. Pular/terminar a abertura continua indo apenas ao menu; cada início exige um novo comando explícito.
+- Depois da conclusão, Enter/clique volta ao menu e R repete o pátio. A tecla mantida da tela anterior não inicia outra partida. Retomar e reiniciar posicionam a câmera imediatamente no trecho correto.
+- Inspeções e testes usam armazenamento em memória, sem alterar o progresso real do jogador. `R` continua reiniciando o trecho atual durante a sessão.
+- Ao mover a jardineira contra Reflexo livre, ele pode dar um passo lateral pelo piso, depois de uma pequena reação. O desvio precisa de caminho seguro e espaço para o jogador; não atravessa jardineira, obstáculos ou água, e não teletransporta. Quando sustenta o pedal, ele permanece ali. Sem rota livre, o jogador pode puxar ou reposicionar a peça.
+- Um bloqueio persistente mostra um aviso curto com intervalo entre repetições. A pausa congela também o desvio. A regra fica em `CompanionClearanceSystem`, independente da apresentação.
+- Cabos com percurso definido em JSON ligam os pedais à grade. A pressão do pedal muda discretamente sua apresentação e a tensão do cabo; o feedback combina deslocamento físico e forma, sem depender de cor. `GardenMechanismRenderer` reúne essa apresentação.
+
+- [x] Implementar checkpoint, início explícito, desvio físico e leitura dos mecanismos.
+- [ ] Validar a demo e o menu de continuidade com o usuário.
+
+**Recorte implementado na v5**
+
 O usuário pediu continuar o jogo com decisões automáticas e trabalho paralelo, depois de rejeitar o teste CGI. O pátio já ilustrado passa a ter uma jardineira com rodas, um pedal pequeno, um pedal largo e uma grade com trava. É um desafio adicional da primeira fase de Água, não a conclusão de M1/M2 ou dos treze níveis.
 
 - `E` perto da jardineira segura/solta; WASD empurra ou puxa a mesma peça, com velocidade menor. A caixa respeita água, obstáculos, canteiros, grade e o corpo de Reflexo. Puxar evita deixar a peça presa num canto.

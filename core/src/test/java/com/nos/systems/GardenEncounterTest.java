@@ -108,4 +108,43 @@ public class GardenEncounterTest {
         assertTrue(text.format("bridgeStageCounter",3,5).contains("5"));
         assertTrue(text.format("bridgeStageCounter",3,3).contains("3"));
     }
+    @Test public void companionPhysicallyYieldsWhenBlockingMovingCart() {
+        BridgeEncounter world=create();go(world,1080,270);world.hero(1).setPosition(1160,270);world.interact();
+        BridgeCollisionSystem geometry=new BridgeCollisionSystem(world.getData());boolean yielded=false;
+        for(int i=0;i<300;i++) {
+            float oldX=world.hero(1).getX(),oldY=world.hero(1).getY();
+            world.update(1,0,BridgeTuning.FIXED_STEP);
+            yielded|=world.garden().isCompanionYielding();
+            assertTrue(Math.hypot(world.hero(1).getX()-oldX,world.hero(1).getY()-oldY)<=BridgeTuning.FOLLOW_SPEED*BridgeTuning.FIXED_STEP+.02f);
+            geometry.setGardenCartPosition(world.garden().cartX(),world.garden().cartY());
+            assertTrue(geometry.walkable(world.hero(1).getX(),world.hero(1).getY(),true));
+        }
+        assertTrue(yielded);assertTrue("A pessoa não deve bloquear indefinidamente a jardineira",world.garden().cartX()>1210);
+    }
+    @Test public void pauseFreezesAnOngoingYield() {
+        BridgeEncounter world=create();go(world,1080,270);world.hero(1).setPosition(1160,270);world.interact();
+        for(int i=0;i<120&&!world.garden().isCompanionYielding();i++) world.update(1,0,BridgeTuning.FIXED_STEP);
+        assertTrue(world.garden().isCompanionYielding());world.togglePause();
+        float x=world.hero(1).getX(),y=world.hero(1).getY(),cart=world.garden().cartX();
+        for(int i=0;i<100;i++) world.update(1,0,.05f);
+        assertEquals(x,world.hero(1).getX(),0);assertEquals(y,world.hero(1).getY(),0);assertEquals(cart,world.garden().cartX(),0);
+    }
+    @Test public void holdingHelperDoesNotAbandonPedalToYield() {
+        BridgeEncounter world=create();ask(world);float x=world.hero(1).getX(),y=world.hero(1).getY();
+        go(world,1080,270);world.interact();go(world,1135,270);
+        for(int i=0;i<120;i++) world.update(0,-1,BridgeTuning.FIXED_STEP);
+        assertTrue(world.garden().isHelperHolding());assertFalse(world.garden().isCompanionYielding());
+        assertEquals(x,world.hero(1).getX(),0);assertEquals(y,world.hero(1).getY(),0);
+    }
+    @Test public void blockedMovementFeedbackIsShortAndDoesNotRepeatEveryFrame() {
+        BridgeEncounter world=create();BridgeData data=world.getData();data.garden.cartStart=new float[]{1350,270};
+        BridgeCollisionSystem collision=new BridgeCollisionSystem(data);GardenGateSystem garden=new GardenGateSystem(data,collision);
+        com.nos.entities.PuzzleHero player=new com.nos.entities.PuzzleHero(1308,270),other=new com.nos.entities.PuzzleHero(1200,196);
+        garden.interact(player,other);garden.pollNotice();int messages=0;
+        for(int i=0;i<240;i++) {
+            garden.movePlayer(player,other,80*BridgeTuning.FIXED_STEP,0,true);garden.update(player,other,true,BridgeTuning.FIXED_STEP);
+            String notice=garden.pollNotice();if(notice!=null) { assertEquals("gardenPathBlocked",notice);messages++; }
+        }
+        assertEquals(1,messages);
+    }
 }

@@ -7,5 +7,9 @@ public final class GardenTuning {
     public static final float HELPER_SPEED=140, HELPER_ARRIVAL=2;
     public static final float HELPER_CLEARANCE=36, PLATE_MARGIN=2, WEIGHT_MARGIN=6;
     public static final float OPEN_SPEED=1.25f, CLOSE_SPEED=1.7f;
+    public static final float YIELD_DISTANCE=48,YIELD_SPEED=105,YIELD_ARRIVAL=2;
+    public static final float YIELD_REACTION=.12f,YIELD_COOLDOWN=.35f,YIELD_MAX_TIME=1.6f;
+    public static final float PERSON_CLEARANCE=23,BLOCKED_DELAY=.55f,BLOCKED_NOTICE_COOLDOWN=5;
+    public static final float MOVEMENT_EPSILON=.001f,BLOCKED_MOVEMENT_RATIO=.15f;
     private GardenTuning() { }
 }

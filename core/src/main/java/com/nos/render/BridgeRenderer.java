@@ -8,8 +8,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.nos.data.BridgeData;
-import com.nos.data.GardenData;
-import com.nos.systems.GardenGateSystem;
 import com.nos.entities.PuzzleHero;
 import com.nos.world.BridgeEncounter;
 
@@ -19,12 +17,12 @@ public final class BridgeRenderer implements Disposable {
     private final SpriteBatch batch=new SpriteBatch();
     private final ShapeRenderer shapes=new ShapeRenderer();
     private final BridgeHudRenderer hud=new BridgeHudRenderer(assets,batch,shapes);
+    private final GardenMechanismRenderer gardenRenderer=new GardenMechanismRenderer(assets,batch,shapes);
     private final BridgeUiState ui=new BridgeUiState();
     private final TextureRegion bridgeRock=assets.bridgeStone;
     private final Matrix4 scene=new Matrix4();
     private final GlyphLayout layout=new GlyphLayout();
     private final Color ink=new Color(.23f,.22f,.36f,1),paper=new Color(.98f,.95f,.87f,1),gold=new Color(.64f,.45f,.22f,1);
-    private final Color pressedPedal=new Color(.78f,.72f,.60f,1);
     private float camera,time;
     private final int[] actorOrder={0,1,2};
     public BridgeUiState ui() { return ui; }
@@ -45,13 +43,14 @@ public final class BridgeRenderer implements Disposable {
         batch.setProjectionMatrix(scene);shapes.setProjectionMatrix(scene);
         batch.begin();batch.setColor(Color.WHITE);batch.draw(assets.bridgeBackground,0,0,data.width,data.height);
         for(float[] obstacle:data.obstacles) batch.draw(bridgeRock,obstacle[0],obstacle[1],obstacle[2],obstacle[3]);
-        if(encounter.hasGarden()) gardenFloor(encounter);
         batch.setColor(Color.WHITE);batch.end();
         blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
+        if(encounter.hasGarden()) gardenRenderer.cables(encounter);
         float[] bridge=data.bridge;
         shapes.setColor(.16f,.20f,.22f,.2f);
         shapes.rect(bridge[0],bridge[1]-4,bridge[2]*encounter.getSupport(),bridge[3]+8);
         shapes.end();
+        if(encounter.hasGarden()) { batch.begin();gardenRenderer.floor(encounter);batch.end(); }
         blend();shapes.begin(ShapeRenderer.ShapeType.Line);
         if(encounter.getSupport()>.05f) {
             shapes.setColor(.45f,.36f,.23f,.85f);
@@ -139,23 +138,6 @@ public final class BridgeRenderer implements Disposable {
         batch.draw(assets.mechanisms[active?1:0][type],point[0]-33,point[1]-10,66,66);
     }
     private float actorY(BridgeEncounter encounter,int index) { return index<2?encounter.hero(index).getY():encounter.garden().cartY(); }
-    private void gardenFloor(BridgeEncounter encounter) {
-        GardenData data=encounter.getData().garden;GardenGateSystem garden=encounter.garden();
-        for(float[] bed:data.barriers) batch.draw(assets.gardenFlowerbed,bed[0]-3,bed[1]-4,bed[2]+6,bed[3]+15);
-        pedal(data.helperPlate,garden.helperPressed());pedal(data.weightPlate,garden.weightPressed());
-        float baseX=data.gate[0]-39,baseY=data.gate[1]-6,opening=garden.getOpening();
-        if(opening<1) {
-            TextureRegion panel=assets.gardenGatePanel;
-            int cut=Math.min(panel.getRegionHeight()-1,(int)(opening*panel.getRegionHeight()));
-            batch.draw(panel.getTexture(),baseX+20,baseY+opening*90,61,90*(1-opening),
-                panel.getRegionX(),panel.getRegionY()+cut,panel.getRegionWidth(),panel.getRegionHeight()-cut,false,false);
-        }
-        batch.draw(assets.gardenGateFrame,baseX,baseY,101,118);
-    }
-    private void pedal(float[] box,boolean pressed) {
-        batch.setColor(pressed?pressedPedal:Color.WHITE);
-        batch.draw(assets.gardenPedal,box[0]-3,box[1]-(pressed?2:0),box[2]+6,box[3]);batch.setColor(Color.WHITE);
-    }
     private void hero(BridgeEncounter encounter,int index) {
         PuzzleHero hero=encounter.hero(index);
         HeroFrame frame=encounter.getBound()==index?assets.poses[index][1]

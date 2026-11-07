@@ -11,15 +11,19 @@ public final class GardenGateSystem {
     private final GardenData data;
     private final BridgeCollisionSystem collision;
     private final CompanionFollowSystem navigation;
+    private final CompanionClearanceSystem clearance;
     private final float[] cart=new float[2],helperCenter=new float[2];
     private boolean dragging,requested,holding,needsRoom,smallPressed,largePressed,open;
     private float opening;
+    private float attemptedX,attemptedY,advanced,blockedTime,noticeCooldown;
+    private boolean blockedByCompanion;
     private String notice;
 
     public GardenGateSystem(BridgeData bridge,BridgeCollisionSystem collision) {
         if(bridge.garden==null) throw new IllegalArgumentException("Planta do pátio ausente.");
         data=bridge.garden;this.collision=collision;
         navigation=new CompanionFollowSystem(bridge,collision);
+        clearance=new CompanionClearanceSystem(collision);
         cart[0]=data.cartStart[0];cart[1]=data.cartStart[1];
         helperCenter[0]=data.helperPlate[0]+data.helperPlate[2]/2;
         helperCenter[1]=data.helperPlate[1]+data.helperPlate[3]/2;
@@ -46,6 +50,7 @@ public final class GardenGateSystem {
     }
     public void movePlayer(PuzzleHero player,PuzzleHero other,float dx,float dy,boolean bridgeOpen) {
         if(!Float.isFinite(dx)||!Float.isFinite(dy)) throw new IllegalArgumentException("Movimento inválido.");
+        attemptedX=dx;attemptedY=dy;advanced=0;blockedByCompanion=false;
         if(!dragging) { collision.move(player,dx,dy,bridgeOpen);return; }
         float startX=player.getX(),startY=player.getY();
         int steps=Math.max(1,(int)Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/GardenTuning.COLLISION_STEP));
@@ -54,18 +59,25 @@ public final class GardenGateSystem {
             translate(player,other,0,dy/steps,bridgeOpen);
         }
         player.setMotion(player.getX()-startX,player.getY()-startY);
+        advanced=(float)Math.hypot(player.getX()-startX,player.getY()-startY);
     }
     private void translate(PuzzleHero player,PuzzleHero other,float dx,float dy,boolean bridgeOpen) {
         float nextX=cart[0]+dx,nextY=cart[1]+dy;
         if(!collision.walkableIgnoringCart(player.getX()+dx,player.getY()+dy,bridgeOpen)
-            ||!collision.boxWalkableIgnoringCart(nextX,nextY,GardenTuning.CART_WIDTH,GardenTuning.CART_HEIGHT,bridgeOpen)
-            ||BridgeCollisionSystem.circleTouchesBox(other.getX(),other.getY(),BridgeTuning.RADIUS,
-                nextX-GardenTuning.CART_WIDTH/2,nextY-GardenTuning.CART_HEIGHT/2,GardenTuning.CART_WIDTH,GardenTuning.CART_HEIGHT)) return;
+            ||!collision.boxWalkableIgnoringCart(nextX,nextY,GardenTuning.CART_WIDTH,GardenTuning.CART_HEIGHT,bridgeOpen)) return;
+        if(BridgeCollisionSystem.circleTouchesBox(other.getX(),other.getY(),BridgeTuning.RADIUS,
+            nextX-GardenTuning.CART_WIDTH/2,nextY-GardenTuning.CART_HEIGHT/2,GardenTuning.CART_WIDTH,GardenTuning.CART_HEIGHT)) {
+            blockedByCompanion=true;return;
+        }
         player.setPosition(player.getX()+dx,player.getY()+dy);
         cart[0]=nextX;cart[1]=nextY;collision.setGardenCartPosition(nextX,nextY);
     }
     public void update(PuzzleHero player,PuzzleHero other,boolean bridgeOpen,float delta) {
         if(!Float.isFinite(delta)||delta<0||delta>.1f) throw new IllegalArgumentException("Intervalo inválido.");
+        if(dragging&&!requested) {
+            clearance.update(other,player,attemptedX,attemptedY,blockedByCompanion,bridgeOpen,delta);
+        } else clearance.cancel();
+        updateBlockedFeedback(delta);
         if(requested) {
             other.setMotion(0,0);
             needsRoom=!holding&&distance(player.getX(),player.getY(),helperCenter[0],helperCenter[1])<GardenTuning.HELPER_CLEARANCE;
@@ -85,17 +97,29 @@ public final class GardenGateSystem {
             navigation.reset();collision.setGardenGateOpen(true);notice="gardenOpened";
         }
     }
+    private void updateBlockedFeedback(float delta) {
+        noticeCooldown=Math.max(0,noticeCooldown-delta);
+        float attempted=(float)Math.hypot(attemptedX,attemptedY);
+        boolean blocked=dragging&&attempted>GardenTuning.MOVEMENT_EPSILON
+            &&advanced<attempted*GardenTuning.BLOCKED_MOVEMENT_RATIO;
+        blockedTime=blocked?blockedTime+delta:0;
+        if(blockedTime>=GardenTuning.BLOCKED_DELAY&&noticeCooldown<=0) {
+            notice=blockedByCompanion?"gardenCompanionBlocked":"gardenPathBlocked";
+            noticeCooldown=GardenTuning.BLOCKED_NOTICE_COOLDOWN;blockedTime=0;
+        }
+    }
     private static boolean contains(float[] box,float x,float y,float margin) {
         return x>=box[0]+margin&&x<=box[0]+box[2]-margin&&y>=box[1]+margin&&y<=box[1]+box[3]-margin;
     }
     private static float distance(float x,float y,float otherX,float otherY) { return (float)Math.hypot(x-otherX,y-otherY); }
-    public boolean controlsCompanion() { return requested; }
+    public boolean controlsCompanion() { return requested||dragging&&(clearance.isControlling()||blockedByCompanion); }
     public void resetNavigation() { navigation.reset(); }
     public boolean isDragging() { return dragging; }
     public boolean isOpen() { return open; }
     public float getOpening() { return opening; }
     public boolean isHelperHolding() { return holding; }
     public boolean isHelperRequested() { return requested; }
+    public boolean isCompanionYielding() { return clearance.isActive(); }
     public boolean helperPressed() { return smallPressed; }
     public boolean weightPressed() { return largePressed; }
     public float cartX() { return cart[0]; }
@@ -115,6 +139,7 @@ public final class GardenGateSystem {
     }
     public int objectiveStep() { return open?5:smallPressed?4:3; }
     public String companionStatus() {
+        if(!requested&&clearance.isActive()) return "gardenCompanionYielding";
         return !requested?null:holding?"gardenCompanionHolding":needsRoom?"gardenCompanionNeedsRoom":"gardenCompanionApproaching";
     }
     public String pollNotice() { String result=notice;notice=null;return result; }

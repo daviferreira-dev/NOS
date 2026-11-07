@@ -141,7 +141,8 @@ final class BridgeHudRenderer {
         } else {
             String result=encounter.hasGarden()?"gardenWon":"bridgeWon";
             centeredTitle(assets.text.get(result),480,340,.54f,ink);centered(assets.text.get(result+"Detail"),480,267,.36f,ink);
-            centered(localized(encounter.hasGarden()?"gardenAgain":"bridgeAgain",ui),480,192,.33f*ui.textScale,gold);
+            centered(localized(encounter.hasGarden()?"gardenReturnToMenu":"bridgeAgain",ui),480,192,.33f*ui.textScale,gold);
+            if(encounter.hasGarden()) centered(localized("gardenReplayShort",ui),480,162,.27f*ui.textScale,ink);
         }
         batch.end();
     }

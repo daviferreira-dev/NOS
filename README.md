@@ -15,7 +15,10 @@ Você controla somente Sombra. Reflexo tem o mesmo rosto, mas seu próprio ritmo
 
 Perto do guincho da primeira margem, peça ajuda e dê espaço. Reflexo caminha até o mecanismo e só então sustenta a ponte. Atravesse com Sombra e fixe a escora na outra margem; ele se solta e vem ao seu encontro pela ponte. Perto do guincho, uma nova interação chama Reflexo de volta e pode recolher a ponte enquanto não estiver fixa. Quem ficar sem piso retorna à última margem segura.
 
-No pátio, os dois pedais liberam a grade. Peça ajuda no menor e posicione a jardineira sobre o mais largo. E segura/solta a peça; WASD permite empurrar e puxar. A grade fica travada aberta e Reflexo se reúne pelo caminho real. Ambos precisam atravessá-la para concluir. Não há prazo nem punição por reposicionar o peso.
+No pátio, os dois pedais liberam a grade. Peça ajuda no menor e posicione a jardineira sobre o mais largo. E segura/solta a peça; WASD permite empurrar e puxar. A grade fica travada aberta e Reflexo se reúne pelo caminho real. Ambos precisam atravessá-la para concluir. Não há prazo nem punição por reposicionar o peso. Os cabos mostram a ligação com a grade; se Reflexo livre bloqueia a peça, ele pode sair da frente por uma rota segura. Um bloqueio persistente dá uma dica curta para reposicionar.
+
+O jogo guarda o checkpoint ao fixar a ponte e a conclusão do trecho. Ao reabrir, o menu permite continuar ou revisitar o pátio. N / Jogar do começo reinicia a sessão sem apagar o avanço mais distante. A abertura nunca inicia a partida sozinha. Testes e inspeções usam progresso em memória para preservar o save real.
+Depois de concluir, Enter/clique volta ao menu e R repete o pátio. Retomar já enquadra o trecho correto, sem atravessar a cena com a câmera.
 
 A câmera acompanha Sombra, identificada por um marcador por forma e pelo contato dos pés. Há quatro quadros de caminhada, poses próprias de repouso e sustentação, registrados nos pés e em altura comum. Reflexo contorna obstáculos e procura a ponte aberta para reunir-se a você. A tecla de interação atual aparece sobre o mecanismo próximo. Ainda não há animação completa em oito direções.
 
@@ -25,7 +28,7 @@ A abertura usa enquadramentos ilustrados. Terminar ou pular leva ao menu; soment
 
 ## Jogar
 
-Dê dois cliques em `outputs/Jogar-NOS-Ponte-Jardim-v5.bat`, mantendo `NOS-Ponte-Jardim-v5.jar` ao lado. O iniciador usa o JDK 17 já instalado neste computador. O executável empacotado não requer Gradle nem downloads. A v4 continua preservada.
+Dê dois cliques em `outputs/Jogar-NOS-Demo-v6.bat`, mantendo `NOS-Demo-v6.jar` ao lado. O iniciador usa o JDK 17 já instalado neste computador. O executável empacotado não requer Gradle nem downloads. A v5 continua preservada.
 
 ## Desenvolvimento
 
@@ -50,7 +53,7 @@ $env:GRADLE_USER_HOME = "C:\Users\PC Gamer\Documents\Codex\2026-11-06\instale-o-
 - `--legacy`: travessia de tempo, tinta e harmonia.
 - A pasta anterior em Documents/Codex não foi alterada. O histórico Git foi importado para esta pasta, incluindo os commits locais.
 
-Exemplo: `java -jar outputs/NOS-Ponte-Jardim-v5.jar --mirror-room`.
+Exemplo: `java -jar outputs/NOS-Demo-v6.jar --mirror-room`.
 
 ## Organização
 
@@ -59,6 +62,8 @@ Exemplo: `java -jar outputs/NOS-Ponte-Jardim-v5.jar --mirror-room`.
 - `CompanionFollowSystem`: seguimento com busca de desvios caminháveis.
 - `CompanionBehaviorSystem`: percepção, reação, pedido de ajuda, sustentação e reencontro de Reflexo.
 - `GardenGateSystem`: jardineira, pedais, ajuda física e trava da grade.
+- `CompanionClearanceSystem`: desvio físico de Reflexo livre para ceder passagem à peça.
+- `SaveData`: recorde legado e checkpoints monotônicos via Preferences.
 - `GardenData` / `GardenTuning`: planta opcional e ajustes dos contrapesos.
 - `BridgeKeyBindings`: teclas remapeáveis e aliases.
 - `BridgeInput`: teclado e botões de toque.

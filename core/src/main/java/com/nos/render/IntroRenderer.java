@@ -18,8 +18,11 @@ public final class IntroRenderer implements Disposable {
     private final GlyphLayout layout=new GlyphLayout();
     private final Color paper=new Color(.975f,.95f,.88f,1),ink=new Color(.19f,.20f,.32f,1),gold=new Color(.56f,.39f,.21f,1);
     public void render(OpeningSequence sequence,Soundtrack music,Viewport viewport) {
+        render(sequence,music,viewport,0);
+    }
+    public void render(OpeningSequence sequence,Soundtrack music,Viewport viewport,int progress) {
         viewport.apply();batch.setProjectionMatrix(viewport.getCamera().combined);shapes.setProjectionMatrix(viewport.getCamera().combined);
-        if(sequence.getState()==OpeningSequence.State.CUTSCENE) cutscene(sequence);else title(sequence,music);
+        if(sequence.getState()==OpeningSequence.State.CUTSCENE) cutscene(sequence);else title(sequence,music,progress);
     }
     private void cutscene(OpeningSequence sequence) {
         float p=sequence.shotProgress();int shot=sequence.shot();Texture frame=shot==1?assets.reflection:assets.wide;
@@ -31,21 +34,27 @@ public final class IntroRenderer implements Disposable {
         batch.begin();centered(assets.text.get("openingVerse"+(shot+1)),480,42,.40f,new Color(paper.r,paper.g,paper.b,sequence.sceneVisibility()));
         text(assets.text.get("openingSkip"),26,531,.28f,paper);batch.end();
     }
-    private void title(OpeningSequence sequence,Soundtrack music) {
+    private void title(OpeningSequence sequence,Soundtrack music,int progress) {
+        boolean saved=progress>0&&progress<=2;
         batch.begin();batch.setColor(Color.WHITE);batch.draw(assets.wide,0,0,960,540,0,0,assets.wide.getWidth(),assets.wide.getHeight(),true,false);batch.end();
         fill();shapes.setColor(paper.r,paper.g,paper.b,.97f);shapes.rect(0,0,385,540);
         Color edge=new Color(paper.r,paper.g,paper.b,.97f),clear=new Color(paper.r,paper.g,paper.b,0);
         shapes.rect(385,0,180,540,edge,clear,clear,edge);
-        shapes.setColor(ink);float[] start=OpeningTuning.START;shapes.rect(start[0],start[1],start[2],start[3]);
-        shapes.setColor(gold.r,gold.g,gold.b,.55f);shapes.rect(76,179,264,1);shapes.end();
+        shapes.setColor(ink);float[] start=saved?OpeningTuning.RESUME_START:OpeningTuning.START;shapes.rect(start[0],start[1],start[2],start[3]);
+        shapes.setColor(gold.r,gold.g,gold.b,.55f);shapes.rect(76,saved?175:179,264,1);shapes.end();
         batch.begin();batch.setColor(Color.WHITE);batch.draw(assets.logo,76,310,264,132);
         assets.title.getData().setScale(.45f);assets.title.setColor(ink);assets.title.draw(batch,assets.text.get("openingTagline"),78,304);
-        centered(assets.text.get("openingStart"),208,223,.43f,paper);
+        centered(assets.text.get(!saved?"openingStart":progress==2?"openingRevisit":"openingContinue"),208,start[1]+35,.43f,paper);
+        if(saved) {
+            text(assets.text.get("openingFromBeginning"),91,198,.33f,ink);
+            text(assets.text.get("openingFromBeginningKey"),315,198,.33f,gold);
+        }
         text(assets.text.get("openingReplay"),91,166,.35f,ink);
         text(assets.text.get("openingReplayKey"),315,166,.35f,gold);
         text(assets.text.get(!music.isAvailable()?"openingAudioUnavailable":music.isMuted()?"openingMusicOff":"openingMusicOn"),91,116,.31f,ink);
         text(assets.text.get("openingMusicKey"),315,116,.31f,gold);
-        text(assets.text.get("openingWait"),76,62,.28f,ink);text(assets.text.get("openingMenuKeys"),76,38,.27f,ink);batch.end();
+        text(assets.text.get(saved?"openingProgressHint":"openingWait"),76,62,.28f,ink);
+        text(assets.text.get(!saved?"openingMenuKeys":progress==2?"openingMenuKeysComplete":"openingMenuKeysSaved"),76,38,.27f,ink);batch.end();
         float darkness=Math.max(1-sequence.titleVisibility(),sequence.startFade());
         if(darkness>0) { fill();shapes.setColor(ink.r*.35f,ink.g*.35f,ink.b*.35f,darkness);shapes.rect(0,0,960,540);shapes.end(); }
     }

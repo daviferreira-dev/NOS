@@ -20,9 +20,11 @@ public final class BridgeScreen extends ScreenAdapter {
     private final BridgeUiState ui=renderer.ui();
     private final FitViewport viewport=new FitViewport(960,540);
     private final Preferences preferences=Gdx.app.getPreferences("nos-controls");
+    private final SaveData progress;
     private final Vector2 pointer=new Vector2();
     private float accumulator;
     private boolean showHelp,smokeTouch,settingsKeyFrame;
+    private boolean gardenRecorded,journeyRecorded;
     private final boolean[] settingsHeld=new boolean[256];
     private int windowWidth=1280,windowHeight=720;
     private final boolean touchControls=Gdx.app.getType()==Application.ApplicationType.Android||Gdx.input.isPeripheralAvailable(Input.Peripheral.MultitouchScreen);
@@ -59,10 +61,15 @@ public final class BridgeScreen extends ScreenAdapter {
         }
     };
     public BridgeScreen() { this(false); }
-    public BridgeScreen(boolean begin) {
+    public BridgeScreen(boolean begin) { this(begin,null,false); }
+    public BridgeScreen(boolean begin,SaveData progress,boolean resumeCheckpoint) {
+        this.progress=progress;
         ui.bindings.load(preferences);input.setBindings(ui.bindings);
         ui.textScale=Math.max(1,Math.min(1.3f,preferences.getFloat("textScale",1)));
-        if(begin) encounter.start();
+        if(begin) {
+            if(resumeCheckpoint&&encounter.hasGarden()) encounter.startAtGardenCheckpoint();else encounter.start();
+            renderer.snapTo(encounter);
+        }
     }
     public boolean isConfiguringControls() { return ui.settings||settingsKeyFrame; }
     @Override public void show() { input.setTouchControls(touchControls);Gdx.input.setInputProcessor(input); }
@@ -70,6 +77,10 @@ public final class BridgeScreen extends ScreenAdapter {
         input.project(viewport,Gdx.graphics.getHeight());
         boolean start=input.start(),pause=input.pause(),help=input.help(),restart=input.restart();
         int action=input.action();
+        if(!ui.settings&&start&&!restart&&encounter.getState()==BridgeEncounter.State.WON&&encounter.hasGarden()
+            &&Gdx.app.getApplicationListener() instanceof NosGame) {
+            ((NosGame)Gdx.app.getApplicationListener()).returnToTitle();return;
+        }
         if(!ui.settings&&!settingsKeyFrame) {
             if(Gdx.input.isKeyJustPressed(Input.Keys.F11)) toggleFullscreen();
             if(Gdx.input.isKeyJustPressed(Input.Keys.F6)) cycleTextSize();
@@ -89,6 +100,7 @@ public final class BridgeScreen extends ScreenAdapter {
             accumulator+=Math.min(.1f,delta);
             while(accumulator>=BridgeTuning.FIXED_STEP) { encounter.update(input.x(),input.y(),BridgeTuning.FIXED_STEP);accumulator-=BridgeTuning.FIXED_STEP; }
         } else accumulator=0;
+        recordProgress();
         if(encounter.isLocked()&&encounter.hasGarden()&&Gdx.app.getApplicationListener() instanceof NosGame) {
             NosGame game=(NosGame)Gdx.app.getApplicationListener();
             if(game.soundtrack()!=null) game.soundtrack().garden();
@@ -96,10 +108,17 @@ public final class BridgeScreen extends ScreenAdapter {
         ScreenUtils.clear(.30f,.32f,.28f,1);
         renderer.render(encounter,viewport,Math.min(.1f,delta),touchControls||smokeTouch,showHelp);
     }
+    private void recordProgress() {
+        if(progress==null) return;
+        if(!gardenRecorded&&encounter.isLocked()&&encounter.hasGarden()) { progress.recordGardenCheckpoint();gardenRecorded=true; }
+        if(!journeyRecorded&&encounter.hasGarden()&&encounter.getState()==BridgeEncounter.State.WON) { progress.recordJourneyComplete();journeyRecorded=true; }
+    }
     private void restart() {
         boolean gardenCheckpoint=encounter.isLocked()&&encounter.hasGarden();
         encounter=new BridgeEncounter(new LevelLoader().readBridge("levels/bridge-encounter.json"));
         if(gardenCheckpoint&&encounter.hasGarden()) encounter.startAtGardenCheckpoint();else encounter.start();
+        renderer.snapTo(encounter);
+        gardenRecorded=false;journeyRecorded=false;
         input.clearForMenu();accumulator=0;showHelp=false;ui.settings=false;ui.awaitingKey=false;ui.resetPresentation();Gdx.input.setInputProcessor(input);
     }
     private void toggleMenu() {
@@ -140,7 +159,12 @@ public final class BridgeScreen extends ScreenAdapter {
                 float[] cart=encounter.getData().garden.cartStart;
                 walkTo(cart[0]-42,cart[1]);encounter.interact();
             }
-            if(scenario.equals("--garden-open")) {
+            if(scenario.equals("--garden-yield")) {
+                // Fixture de inspeção; o desvio posterior usa a simulação física normal.
+                walkTo(1080,270);encounter.hero(1).setPosition(1160,270);encounter.interact();
+                for(int i=0;i<50;i++) encounter.update(1,0,BridgeTuning.FIXED_STEP);
+            }
+            if(scenario.equals("--garden-open")||scenario.equals("--garden-won")||scenario.equals("--garden-menu")) {
                 float[] pedal=encounter.getData().garden.helperPlate;
                 walkTo(pedal[0]+pedal[2]/2-42,pedal[1]+pedal[3]/2);encounter.interact();
                 for(int i=0;i<600;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
@@ -150,6 +174,11 @@ public final class BridgeScreen extends ScreenAdapter {
                 for(int i=0;i<300;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
                 if(!encounter.garden().isOpen()) throw new IllegalStateException("O percurso de inspeção não abriu a grade.");
                 walkTo(1236,248);
+                if(scenario.equals("--garden-won")||scenario.equals("--garden-menu")) {
+                    walkTo(1490,270);
+                    for(int i=0;i<900&&encounter.getState()!=BridgeEncounter.State.WON;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+                    if(encounter.getState()!=BridgeEncounter.State.WON) throw new IllegalStateException("A dupla não concluiu o percurso de inspeção.");
+                }
             }
             if(scenario.equals("--garden-compact")||scenario.equals("--garden-compact-large")) ui.update(encounter,60);
             if(scenario.equals("--garden-help")||scenario.equals("--garden-help-large")) { encounter.togglePause();showHelp=true; }
