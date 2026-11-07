@@ -14,10 +14,11 @@ import com.nos.world.BridgeEncounter;
 
 /** Coordena entrada, encontro e menus modais; a simulação para enquanto o jogador lê. */
 public final class BridgeScreen extends ScreenAdapter {
-    private BridgeEncounter encounter=new BridgeEncounter(new LevelLoader().readBridge("levels/bridge-encounter.json"));
+    private BridgeEncounter encounter;
+    private final String levelPath;
     private final BridgeInput input=new BridgeInput();
-    private final BridgeRenderer renderer=new BridgeRenderer();
-    private final BridgeUiState ui=renderer.ui();
+    private final BridgeRenderer renderer;
+    private final BridgeUiState ui;
     private final FitViewport viewport=new FitViewport(960,540);
     private final Preferences preferences=Gdx.app.getPreferences("nos-controls");
     private final SaveData progress;
@@ -63,7 +64,13 @@ public final class BridgeScreen extends ScreenAdapter {
     public BridgeScreen() { this(false); }
     public BridgeScreen(boolean begin) { this(begin,null,false); }
     public BridgeScreen(boolean begin,SaveData progress,boolean resumeCheckpoint) {
+        this(begin,progress,resumeCheckpoint,false);
+    }
+    public BridgeScreen(boolean begin,SaveData progress,boolean resumeCheckpoint,boolean waterTwo) {
         this.progress=progress;
+        levelPath=waterTwo?LevelLoader.SECOND_WATER:LevelLoader.FIRST_WATER;
+        encounter=new BridgeEncounter(new LevelLoader().readBridge(levelPath));
+        renderer=new BridgeRenderer(encounter.getData().backgroundPath);ui=renderer.ui();
         ui.bindings.load(preferences);input.setBindings(ui.bindings);
         ui.textScale=Math.max(1,Math.min(1.3f,preferences.getFloat("textScale",1)));
         if(begin) {
@@ -72,6 +79,7 @@ public final class BridgeScreen extends ScreenAdapter {
         }
     }
     public boolean isConfiguringControls() { return ui.settings||settingsKeyFrame; }
+    public boolean isWaterTwo() { return encounter.getData().gardenOnly; }
     @Override public void show() { input.setTouchControls(touchControls);Gdx.input.setInputProcessor(input); }
     @Override public void render(float delta) {
         input.project(viewport,Gdx.graphics.getHeight());
@@ -79,7 +87,9 @@ public final class BridgeScreen extends ScreenAdapter {
         int action=input.action();
         if(!ui.settings&&start&&!restart&&encounter.getState()==BridgeEncounter.State.WON&&encounter.hasGarden()
             &&Gdx.app.getApplicationListener() instanceof NosGame) {
-            ((NosGame)Gdx.app.getApplicationListener()).returnToTitle();return;
+            NosGame game=(NosGame)Gdx.app.getApplicationListener();
+            if(encounter.getData().gardenOnly) game.returnToTitle();else game.beginWaterTwo();
+            return;
         }
         if(!ui.settings&&!settingsKeyFrame) {
             if(Gdx.input.isKeyJustPressed(Input.Keys.F11)) toggleFullscreen();
@@ -110,12 +120,16 @@ public final class BridgeScreen extends ScreenAdapter {
     }
     private void recordProgress() {
         if(progress==null) return;
+        if(encounter.getData().gardenOnly) {
+            if(!journeyRecorded&&encounter.getState()==BridgeEncounter.State.WON) { progress.recordSecondJourneyComplete();journeyRecorded=true; }
+            return;
+        }
         if(!gardenRecorded&&encounter.isLocked()&&encounter.hasGarden()) { progress.recordGardenCheckpoint();gardenRecorded=true; }
         if(!journeyRecorded&&encounter.hasGarden()&&encounter.getState()==BridgeEncounter.State.WON) { progress.recordJourneyComplete();journeyRecorded=true; }
     }
     private void restart() {
         boolean gardenCheckpoint=encounter.isLocked()&&encounter.hasGarden();
-        encounter=new BridgeEncounter(new LevelLoader().readBridge("levels/bridge-encounter.json"));
+        encounter=new BridgeEncounter(new LevelLoader().readBridge(levelPath));
         if(gardenCheckpoint&&encounter.hasGarden()) encounter.startAtGardenCheckpoint();else encounter.start();
         renderer.snapTo(encounter);
         gardenRecorded=false;journeyRecorded=false;
@@ -152,6 +166,7 @@ public final class BridgeScreen extends ScreenAdapter {
     public void prepareSmokeScene() { prepareSmokeScene(false); }
     public void prepareSmokeScene(String scenario) {
         smokeTouch=scenario.equals("--touch");
+        if(scenario.startsWith("--water-two")) { prepareWaterTwoSmoke(scenario);return; }
         if(scenario.startsWith("--garden")) {
             encounter.startAtGardenCheckpoint();
             if(scenario.endsWith("-large")) ui.textScale=1.3f;
@@ -204,6 +219,29 @@ public final class BridgeScreen extends ScreenAdapter {
         for(int i=0;i<1200&&encounter.getBound()<0;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
         for(int i=0;i<120;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
         walkTo(encounter.getData().bridge[0]+encounter.getData().bridge[2]/2,encounter.getData().winch[1]);renderer.snapTo(encounter);
+    }
+    private void prepareWaterTwoSmoke(String scenario) {
+        encounter.start();
+        if(!scenario.equals("--water-two-start")) {
+            walkTo(290,270);encounter.interact();walkTo(658,272);encounter.interact();
+            for(int i=0;i<200;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+            walkTo(658,218);walkTo(760,218);walkTo(760,270);walkTo(930,270);walkTo(982,186);encounter.interact();
+            for(int i=0;i<1800;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+            if(!encounter.garden().isTransferLatched()) throw new IllegalStateException("Reflexo não alcançou o mecanismo da segunda fase.");
+            if(!scenario.equals("--water-two-transfer")) {
+                walkTo(930,270);walkTo(760,270);walkTo(760,218);walkTo(658,218);walkTo(658,272);encounter.interact();
+                walkTo(1178,309);encounter.interact();
+                for(int i=0;i<300;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+                if(!encounter.garden().isOpen()) throw new IllegalStateException("A transferência de peso não abriu a saída.");
+                if(scenario.equals("--water-two-won")||scenario.equals("--water-two-menu")) {
+                    walkTo(1230,248);walkTo(1490,270);
+                    for(int i=0;i<1200&&encounter.getState()!=BridgeEncounter.State.WON;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+                    if(encounter.getState()!=BridgeEncounter.State.WON) throw new IllegalStateException("A dupla não concluiu a segunda fase.");
+                }
+            }
+        }
+        if(scenario.equals("--water-two-large")) ui.textScale=1.3f;
+        renderer.snapTo(encounter);
     }
     private void walkTo(float x,float y) {
         for(int i=0;i<6000&&encounter.getState()==BridgeEncounter.State.PLAYING;i++) {

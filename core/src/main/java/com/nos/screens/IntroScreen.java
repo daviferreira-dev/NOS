@@ -39,13 +39,13 @@ public final class IntroScreen extends ScreenAdapter {
         if(sequence.getState()==OpeningSequence.State.READY_TO_PLAY) { game.beginJourney(resumeCheckpoint);return; }
         ScreenUtils.clear(.055f,.065f,.10f,1);renderer.render(sequence,game.soundtrack(),viewport,progress);
     }
-    private int menuProgress() { return previewProgress>=0?previewProgress:game.progress().journeyProgress(); }
+    private int menuProgress() { return previewProgress>=0?previewProgress:game.progress().menuProgress(); }
     public void prepareSmokeScene() { prepareSmokeScene("reflection"); }
     public void prepareSmokeScene(String shot) {
-        previewProgress=shot.equals("continue")?1:shot.equals("complete")?2:-1;
+        previewProgress=shot.equals("continue")?1:shot.equals("complete")?2:shot.equals("all-complete")?3:-1;
         resumeCheckpoint=false;
         if(shot.equals("natural")) { for(int i=0;i<1200;i++) sequence.update(.05f); }
-        else if(shot.equals("title")||shot.equals("start")||shot.equals("continue")||shot.equals("complete")) {
+        else if(shot.equals("title")||shot.equals("start")||shot.equals("continue")||shot.equals("complete")||shot.equals("all-complete")) {
             sequence.skip();for(int i=0;i<20;i++) sequence.update(.05f);
             if(shot.equals("start")) { sequence.start();for(int i=0;i<30;i++) sequence.update(.05f); }
         }

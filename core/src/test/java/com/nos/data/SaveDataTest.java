@@ -66,6 +66,66 @@ public class SaveDataTest {
         assertFalse(anotherSmoke.canResumeJourney());
     }
 
+    @Test public void secondJourneyRequiresFirstCompletionAndSurvivesReload() {
+        MemoryPreferences preferences=new MemoryPreferences();
+        SaveData save=new SaveData(preferences);
+        save.recordSecondJourneyComplete();
+        assertFalse(save.isSecondJourneyAvailable());assertFalse(save.isSecondJourneyComplete());
+        assertEquals(0,save.menuProgress());assertEquals(0,preferences.flushes);
+        save.recordGardenCheckpoint();save.recordSecondJourneyComplete();
+        assertEquals(1,save.menuProgress());assertFalse(save.isSecondJourneyAvailable());
+        assertEquals(1,preferences.flushes);
+        save.recordJourneyComplete();
+        assertTrue(save.isSecondJourneyAvailable());assertFalse(save.isSecondJourneyComplete());
+        assertEquals(2,save.menuProgress());
+        save.recordSecondJourneyComplete();
+        SaveData reloaded=new SaveData(preferences);
+        assertTrue(reloaded.isSecondJourneyComplete());assertEquals(3,reloaded.menuProgress());
+        assertEquals(SaveData.JOURNEY_COMPLETE,reloaded.journeyProgress());
+        assertEquals(3,preferences.flushes);
+        reloaded.recordGardenCheckpoint();reloaded.recordJourneyComplete();reloaded.recordSecondJourneyComplete();
+        assertEquals(3,preferences.flushes);assertEquals(3,reloaded.menuProgress());
+    }
+
+    @Test public void orphanSecondCompletionDoesNotUnlockOrSkipFirstJourney() {
+        Object[] invalidFirst={-1,3,Integer.MAX_VALUE,"corrompido",2.0f};
+        for(Object value:invalidFirst) {
+            MemoryPreferences preferences=new MemoryPreferences();
+            preferences.values.put("water01.journey",value);
+            preferences.values.put("water02.journey",1);
+            SaveData save=new SaveData(preferences);
+            assertFalse(save.isSecondJourneyAvailable());assertFalse(save.isSecondJourneyComplete());
+            assertEquals(0,save.menuProgress());assertEquals(0,preferences.flushes);
+        }
+        MemoryPreferences preferences=new MemoryPreferences();
+        preferences.values.put("water01.journey",SaveData.GARDEN_REACHED);
+        preferences.values.put("water02.journey",1);
+        SaveData save=new SaveData(preferences);
+        assertFalse(save.isSecondJourneyAvailable());assertFalse(save.isSecondJourneyComplete());
+        assertEquals(1,save.menuProgress());
+    }
+
+    @Test public void invalidSecondValuesNeverGrantCompletionAndCanBeRepairedByFinishing() {
+        Object[] invalid={-1,2,Integer.MIN_VALUE,Integer.MAX_VALUE,"corrompido",1.0f,true};
+        for(Object value:invalid) {
+            MemoryPreferences preferences=new MemoryPreferences();
+            preferences.values.put("water01.journey",SaveData.JOURNEY_COMPLETE);
+            preferences.values.put("water02.journey",value);
+            SaveData save=new SaveData(preferences);
+            assertTrue(save.isSecondJourneyAvailable());assertFalse(save.isSecondJourneyComplete());
+            assertEquals(2,save.menuProgress());assertEquals(0,preferences.flushes);
+            save.recordSecondJourneyComplete();
+            assertTrue(new SaveData(preferences).isSecondJourneyComplete());assertEquals(1,preferences.flushes);
+        }
+    }
+
+    @Test public void secondJourneyMemoryDoesNotLeakBetweenSmokeApplications() {
+        SaveData first=new SaveData(null);first.recordJourneyComplete();first.recordSecondJourneyComplete();
+        assertEquals(3,first.menuProgress());assertTrue(first.isSecondJourneyComplete());
+        SaveData second=new SaveData(null);
+        assertEquals(0,second.menuProgress());assertFalse(second.isSecondJourneyComplete());
+    }
+
     private static final class MemoryPreferences implements Preferences {
         final Map<String,Object> values=new HashMap<>();int flushes;
         @Override public Preferences putBoolean(String key,boolean value) { values.put(key,value);return this; }

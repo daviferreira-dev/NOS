@@ -21,6 +21,10 @@ public class Lwjgl3Launcher {
             config.disableAudio(true);
             new Lwjgl3Application(new NosGame(args[0].equals("--smoke-test"),false,true) {
                 private int frames;
+                @Override public void create() {
+                    super.create();
+                    if(args.length>2&&args[2].startsWith("--water-two")) { progress().recordJourneyComplete();beginWaterTwo(); }
+                }
                 @Override public void render() {
                     if (frames == 3) {
                         if(getScreen() instanceof GameScreen) ((GameScreen)getScreen()).prepareSmokeScene();
@@ -28,22 +32,27 @@ public class Lwjgl3Launcher {
                         else if(getScreen() instanceof BridgeScreen) ((BridgeScreen)getScreen()).prepareSmokeScene(args.length>2?args[2]:"");
                         else {
                             String scenario=args.length>2?args[2]:"reflection";
-                            if(scenario.equals("--resume-start")||scenario.equals("--fresh-start")) {
+                            if(scenario.equals("--resume-start")||scenario.equals("--fresh-start")||scenario.equals("--resume-water-two")) {
                                 // Nesta aplicação de inspeção, progress usa somente memória.
-                                progress().recordGardenCheckpoint();
+                                if(scenario.equals("--resume-water-two")) progress().recordJourneyComplete();else progress().recordGardenCheckpoint();
                                 ((IntroScreen)getScreen()).prepareSmokeScene("title");
-                                Gdx.input.getInputProcessor().keyDown(scenario.equals("--resume-start")?com.badlogic.gdx.Input.Keys.ENTER:com.badlogic.gdx.Input.Keys.N);
+                                Gdx.input.getInputProcessor().keyDown(scenario.equals("--fresh-start")?com.badlogic.gdx.Input.Keys.N:com.badlogic.gdx.Input.Keys.ENTER);
                                 for(int i=0;i<40&&getScreen() instanceof IntroScreen;i++) getScreen().render(.05f);
                                 if(!(getScreen() instanceof BridgeScreen)||!progress().canResumeJourney())
                                     throw new IllegalStateException("Falha ao iniciar a partir do menu de progresso.");
+                                if(scenario.equals("--resume-water-two")&&!((BridgeScreen)getScreen()).isWaterTwo())
+                                    throw new IllegalStateException("A continuação não abriu Água 02.");
                             } else ((IntroScreen)getScreen()).prepareSmokeScene(scenario);
                         }
                     }
-                    if(frames==4&&args.length>2&&args[2].equals("--garden-menu")&&getScreen() instanceof BridgeScreen) {
+                    if(frames==4&&args.length>2&&(args[2].equals("--garden-menu")||args[2].equals("--water-two-menu"))&&getScreen() instanceof BridgeScreen) {
                         Gdx.input.getInputProcessor().keyDown(com.badlogic.gdx.Input.Keys.ENTER);
                         getScreen().render(.05f);
-                        if(!(getScreen() instanceof IntroScreen)||!progress().isJourneyComplete())
-                            throw new IllegalStateException("Falha no retorno ao menu após concluir o trecho.");
+                        if(args[2].equals("--garden-menu")) {
+                            if(!(getScreen() instanceof BridgeScreen)||!((BridgeScreen)getScreen()).isWaterTwo())
+                                throw new IllegalStateException("Falha ao seguir da primeira para a segunda fase.");
+                        } else if(!(getScreen() instanceof IntroScreen)||!progress().isSecondJourneyComplete())
+                            throw new IllegalStateException("Falha no retorno ao menu após concluir a segunda fase.");
                         for(int i=0;i<20;i++) getScreen().render(.05f);
                     }
                     super.render();

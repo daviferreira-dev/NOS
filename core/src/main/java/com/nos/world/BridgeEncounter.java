@@ -24,9 +24,10 @@ public final class BridgeEncounter {
         companion=new CompanionBehaviorSystem(data,collision);
         garden=data.garden==null?null:new GardenGateSystem(data,collision);
         heroes=new PuzzleHero[] {new PuzzleHero(data.shadowStart[0],data.shadowStart[1]),new PuzzleHero(data.reflectionStart[0],data.reflectionStart[1])};
+        if(data.gardenOnly) { locked=true;support=1; }
         for(int i=0;i<2;i++) { safeX[i]=heroes[i].getX();safeY[i]=heroes[i].getY(); }
     }
-    public void start() { if(state==State.READY) state=State.PLAYING; }
+    public void start() { if(state==State.READY) { state=State.PLAYING;if(data.gardenOnly) notify("transferWelcome"); } }
     /** Reinício explícito do trecho já alcançado; não é um comando de ajuda. */
     public void startAtGardenCheckpoint() {
         if(garden==null) { start();return; }
@@ -35,7 +36,7 @@ public final class BridgeEncounter {
         heroes[0].setPosition(data.garden.checkpointShadow[0],data.garden.checkpointShadow[1]);
         heroes[1].setPosition(data.garden.checkpointReflection[0],data.garden.checkpointReflection[1]);
         for(int i=0;i<2;i++) { safeX[i]=heroes[i].getX();safeY[i]=heroes[i].getY(); }
-        stop();notify("gardenCheckpoint");
+        stop();notify(data.gardenOnly?"transferWelcome":"gardenCheckpoint");
     }
     public void togglePause() {
         if(state==State.PLAYING) state=State.PAUSED;
@@ -116,7 +117,7 @@ public final class BridgeEncounter {
     public String notice() { return noticeTime>0?notice:null; }
     public float noticeVisibility() { return Math.min(1,noticeTime/.5f); }
     public int objectiveStep() { return locked&&garden!=null?garden.objectiveStep():locked?3:companion.isHolding()?2:1; }
-    public int objectiveCount() { return garden==null?3:5; }
+    public int objectiveCount() { return data.gardenOnly?4:garden==null?3:5; }
     public String objectiveKey() {
         if(locked&&garden!=null) return garden.objectiveKey();
         if(companion.getState()==CompanionBehaviorSystem.State.APPROACHING_WINCH)

@@ -2,6 +2,22 @@
 
 ## Revisão ativa — Uma presença controlável, duas pessoas (07/11/2026)
 
+**Ampliação autorizada — Água 02, transferência de contrapeso (v7)**
+
+O usuário pediu avançar para as próximas fases com trabalho paralelo, após fechar a demo. A primeira nova entrega acrescenta Água 02; os treze níveis não ficam concluídos por essa ampliação. Esta revisão substitui a volta ao menu no fim de Água 01: a conclusão agora espera Enter/clique para seguir à segunda fase, nunca avança automaticamente. O fim de Água 02 espera Enter/clique para voltar ao menu. A abertura continua terminando no menu.
+
+- Água 02 usa `levels/water-transfer.json` e uma nova varanda de estufa em aquarela. A personagem controlável, sprites, controles e regras de ausência de dano/cronômetro permanecem.
+- Uma primeira grade abre enquanto a jardineira pressiona seu pedal largo. Sombra atravessa e pede ajuda no pedal menor além dela. Reflexo chega pelo piso real; somente sua chegada e sustentação travam a primeira grade aberta. Sombra pode então recuperar a mesma jardineira e levá-la ao pedal largo da saída. Os dois pesos e a trava anterior liberam a saída permanente.
+- A grade temporária espera pessoas ou a peça saírem do vão antes de fechar. Não esmaga, teletransporta nem pune. A variante é opcional em `GardenData`; sem `transferPlate/transferGate`, Água 01 conserva a solução anterior. Os cabos físicos também ficam no JSON.
+- `BridgeEncounter` recebe a variante `gardenOnly` por dados; regras continuam em `GardenGateSystem` e `BridgeCollisionSystem`. A tela seleciona o mapa e orquestra. A sequência da solução é testada no JSON distribuído, sem OpenGL e sem reposicionar personagens durante o percurso.
+- `SaveData` preserva `water01.journey` e registra conclusão de Água 02 separadamente. `JourneyProgress` escolhe o trecho a continuar. O menu oferece Água 02 depois da primeira conclusão; recomeçar não apaga progresso. A segunda fase pode ser repetida. `R` reinicia somente a fase/trecho atual.
+- Correção de entrada: aliases físicos de WASD/setas permanecem independentes, inclusive remapeados. Soltar uma tecla não cancela a outra mantida; abrir a ajuda não rearma movimento pela autorrepetição.
+
+**Decisões em aberto desta ampliação**
+- [x] Implementar transferência de peso, sequência entre fases e persistência compatível.
+- [ ] Validar com o usuário interesse do novo desafio, leitura dos três pedais e ritmo do retorno à jardineira.
+- [ ] Projetar Água 03 e 04 a partir do teste das duas primeiras; ainda não implementadas.
+
 O usuário aprovou testar uma relação em que se controla apenas uma presença e se percebe a outra como pessoa distinta, apesar do mesmo rosto. O recorte continua sendo a ponte; não se antecipa a história completa nem se explica o mistério. Esta revisão substitui a troca por Tab da versão anterior.
 
 - O jogador move somente Sombra (WASD/setas por padrão). Reflexo não é selecionável. Câmera, marcador por forma e sombra de contato identificam Sombra sem depender apenas da cor.

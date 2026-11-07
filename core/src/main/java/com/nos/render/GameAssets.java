@@ -15,12 +15,14 @@ public final class GameAssets implements Disposable {
     public final HeroFrame[][] walk=new HeroFrame[2][4],poses=new HeroFrame[2][2];
     public final TextureRegion[][] mechanisms=new TextureRegion[2][2];
     public final TextureRegion shadow, reflection, driftwood, rock,bridgeStone;
-    public final TextureRegion gardenPlanter,gardenPedal,gardenGateFrame,gardenGatePanel,gardenFlowerbed;
+    public final TextureRegion gardenPlanter,gardenPedal,gardenGateFrame,gardenGatePanel,gardenFlowerbed,gardenNarrowBed;
     public final BitmapFont font, title;
     public final I18NBundle text;
-    public GameAssets() {
+    public GameAssets() { this(null); }
+    public GameAssets(String backgroundPath) {
+        String background=backgroundPath==null?"art/bridge-bank-v1.png":backgroundPath;
         manager.load("art/journey.png", Texture.class);
-        manager.load("art/bridge-bank-v1.png",Texture.class);
+        manager.load(background,Texture.class);
         manager.load("art/bridge-deck-v1.png",Texture.class);
         manager.load("art/walk-cycle-v1.png",Texture.class);
         manager.load("art/idle-hold-v1.png",Texture.class);
@@ -33,6 +35,7 @@ public final class GameAssets implements Disposable {
         manager.load("art/garden-pedal-v1.png",Texture.class);
         manager.load("art/garden-gate-v1.png",Texture.class);
         manager.load("art/garden-flowerbed-v1.png",Texture.class);
+        manager.load("art/garden-small-bed-v1.png",Texture.class);
         manager.load("art/logo.png", Texture.class);
         manager.load("art/knot.png", Texture.class);
         manager.load("ui/body.fnt", BitmapFont.class);
@@ -40,7 +43,7 @@ public final class GameAssets implements Disposable {
         manager.load("ui/strings", I18NBundle.class);
         manager.finishLoading();
         garden = manager.get("art/journey.png", Texture.class);
-        bridgeBackground=manager.get("art/bridge-bank-v1.png",Texture.class);
+        bridgeBackground=manager.get(background,Texture.class);
         bridgeDeck=manager.get("art/bridge-deck-v1.png",Texture.class);
         bridgeDeck.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
         bridgeBackground.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
@@ -75,6 +78,9 @@ public final class GameAssets implements Disposable {
         gardenGateFrame=region("art/garden-gate-v1.png",88,30,752,807);
         gardenGatePanel=region("art/garden-gate-v1.png",1040,124,580,703);
         gardenFlowerbed=region("art/garden-flowerbed-v1.png",52,97,2049,510);
+        Texture smallBed=manager.get("art/garden-small-bed-v1.png",Texture.class);
+        smallBed.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
+        gardenNarrowBed=new TextureRegion(smallBed,120,65,1050,1040);
         heroes.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         garden.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         logo.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);

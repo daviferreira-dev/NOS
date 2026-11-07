@@ -15,6 +15,8 @@ public final class GardenGateSystem {
     private final float[] cart=new float[2],helperCenter=new float[2];
     private boolean dragging,requested,holding,needsRoom,smallPressed,largePressed,open;
     private float opening;
+    private boolean transferPressed,transferLatched;
+    private float transferOpening;
     private float attemptedX,attemptedY,advanced,blockedTime,noticeCooldown;
     private boolean blockedByCompanion;
     private String notice;
@@ -22,12 +24,14 @@ public final class GardenGateSystem {
     public GardenGateSystem(BridgeData bridge,BridgeCollisionSystem collision) {
         if(bridge.garden==null) throw new IllegalArgumentException("Planta do pátio ausente.");
         data=bridge.garden;this.collision=collision;
+        if((data.transferPlate==null)!=(data.transferGate==null))
+            throw new IllegalArgumentException("A passagem de transferência exige pedal e grade.");
         navigation=new CompanionFollowSystem(bridge,collision);
         clearance=new CompanionClearanceSystem(collision);
         cart[0]=data.cartStart[0];cart[1]=data.cartStart[1];
         helperCenter[0]=data.helperPlate[0]+data.helperPlate[2]/2;
         helperCenter[1]=data.helperPlate[1]+data.helperPlate[3]/2;
-        collision.setGardenCartPosition(cart[0],cart[1]);collision.setGardenGateOpen(false);
+        collision.setGardenCartPosition(cart[0],cart[1]);collision.setGardenGateOpen(false);collision.setTransferGateOpen(false);
     }
     public boolean interact(PuzzleHero player,PuzzleHero other) {
         int target=target(player);
@@ -90,12 +94,37 @@ public final class GardenGateSystem {
         smallPressed=contains(data.helperPlate,player.getX(),player.getY(),GardenTuning.PLATE_MARGIN)
             ||contains(data.helperPlate,other.getX(),other.getY(),GardenTuning.PLATE_MARGIN);
         largePressed=contains(data.weightPlate,cart[0],cart[1],GardenTuning.WEIGHT_MARGIN);
+        updateTransfer(player,other,delta);
         if(open) return;
-        opening=Math.max(0,Math.min(1,opening+(smallPressed&&largePressed?GardenTuning.OPEN_SPEED:-GardenTuning.CLOSE_SPEED)*delta));
+        boolean exitWeighted=smallPressed&&largePressed&&(!hasTransfer()||transferLatched);
+        opening=Math.max(0,Math.min(1,opening+(exitWeighted?GardenTuning.OPEN_SPEED:-GardenTuning.CLOSE_SPEED)*delta));
         if(opening>=1) {
             open=true;requested=false;holding=false;needsRoom=false;
             navigation.reset();collision.setGardenGateOpen(true);notice="gardenOpened";
         }
+    }
+    private void updateTransfer(PuzzleHero player,PuzzleHero other,float delta) {
+        if(!hasTransfer()) return;
+        transferPressed=contains(data.transferPlate,cart[0],cart[1],GardenTuning.WEIGHT_MARGIN);
+        boolean wasOpen=transferOpening>=BridgeTuning.OPEN_THRESHOLD;
+        if(!transferLatched&&holding&&wasOpen) {
+            transferLatched=true;notice="transferLatched";
+        }
+        // A grade espera quem já ocupa o vão; não fecha sobre corpos nem sobre a jardineira.
+        boolean occupied=wasOpen&&transferOccupied(player,other);
+        boolean raise=transferPressed||transferLatched||occupied;
+        transferOpening=Math.max(0,Math.min(1,transferOpening+(raise?GardenTuning.OPEN_SPEED:-GardenTuning.CLOSE_SPEED)*delta));
+        boolean isOpen=transferOpening>=BridgeTuning.OPEN_THRESHOLD;
+        if(!wasOpen&&isOpen&&!transferLatched) notice="transferOpened";
+        if(wasOpen!=isOpen) navigation.reset();
+        collision.setTransferGateOpen(isOpen);
+    }
+    private boolean transferOccupied(PuzzleHero player,PuzzleHero other) {
+        float[] gate=data.transferGate;
+        if(BridgeCollisionSystem.circleTouchesBox(player.getX(),player.getY(),BridgeTuning.RADIUS,gate[0],gate[1],gate[2],gate[3])
+            ||BridgeCollisionSystem.circleTouchesBox(other.getX(),other.getY(),BridgeTuning.RADIUS,gate[0],gate[1],gate[2],gate[3])) return true;
+        return cart[0]-GardenTuning.CART_WIDTH/2<gate[0]+gate[2]&&cart[0]+GardenTuning.CART_WIDTH/2>gate[0]
+            &&cart[1]-GardenTuning.CART_HEIGHT/2<gate[1]+gate[3]&&cart[1]+GardenTuning.CART_HEIGHT/2>gate[1];
     }
     private void updateBlockedFeedback(float delta) {
         noticeCooldown=Math.max(0,noticeCooldown-delta);
@@ -116,6 +145,10 @@ public final class GardenGateSystem {
     public void resetNavigation() { navigation.reset(); }
     public boolean isDragging() { return dragging; }
     public boolean isOpen() { return open; }
+    public boolean hasTransfer() { return data.transferGate!=null; }
+    public float transferOpening() { return transferOpening; }
+    public boolean transferPressed() { return transferPressed; }
+    public boolean isTransferLatched() { return transferLatched; }
     public float getOpening() { return opening; }
     public boolean isHelperHolding() { return holding; }
     public boolean isHelperRequested() { return requested; }
@@ -134,10 +167,15 @@ public final class GardenGateSystem {
     }
     public String objectiveKey() {
         if(open) return "gardenGoalExit";
+        if(hasTransfer()&&!transferLatched&&!transferPressed&&transferOpening<BridgeTuning.OPEN_THRESHOLD) return "transferGoalLoad";
         if(requested&&!holding) return needsRoom?"gardenGoalMakeRoom":"gardenGoalWaiting";
+        if(hasTransfer()) return transferLatched?"transferGoalMove":"transferGoalHelp";
         return smallPressed?"gardenGoalWeight":"gardenGoalAsk";
     }
-    public int objectiveStep() { return open?5:smallPressed?4:3; }
+    public int objectiveStep() {
+        if(hasTransfer()) return open?4:transferLatched?3:transferPressed||transferOpening>=BridgeTuning.OPEN_THRESHOLD?2:1;
+        return open?5:smallPressed?4:3;
+    }
     public String companionStatus() {
         if(!requested&&clearance.isActive()) return "gardenCompanionYielding";
         return !requested?null:holding?"gardenCompanionHolding":needsRoom?"gardenCompanionNeedsRoom":"gardenCompanionApproaching";

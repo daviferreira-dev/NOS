@@ -21,6 +21,7 @@ final class GardenMechanismRenderer {
     void cables(BridgeEncounter encounter) {
         GardenData data=encounter.getData().garden;GardenGateSystem garden=encounter.garden();
         cable(data.helperCable,garden.helperPressed());cable(data.weightCable,garden.weightPressed());
+        if(garden.hasTransfer()) cable(data.transferCable,garden.transferPressed()||garden.isTransferLatched());
     }
     private void cable(float[][] points,boolean taut) {
         if(points==null) return;
@@ -39,9 +40,13 @@ final class GardenMechanismRenderer {
     /** Chamado com SpriteBatch aberto; tintura é restaurada ao terminar. */
     void floor(BridgeEncounter encounter) {
         GardenData data=encounter.getData().garden;GardenGateSystem garden=encounter.garden();
-        for(float[] bed:data.barriers) batch.draw(assets.gardenFlowerbed,bed[0]-3,bed[1]-4,bed[2]+6,bed[3]+15);
+        for(float[] bed:data.barriers) flowerbed(bed);
         pedal(data.helperPlate,garden.helperPressed());pedal(data.weightPlate,garden.weightPressed());
-        float baseX=data.gate[0]-39,baseY=data.gate[1]-6,opening=garden.getOpening();
+        if(garden.hasTransfer()) { pedal(data.transferPlate,garden.transferPressed());gate(data.transferGate,garden.transferOpening()); }
+        gate(data.gate,garden.getOpening());
+    }
+    private void gate(float[] box,float opening) {
+        float baseX=box[0]-39,baseY=box[1]-6;
         if(opening<1) {
             TextureRegion panel=assets.gardenGatePanel;
             int cut=Math.min(panel.getRegionHeight()-1,(int)(opening*panel.getRegionHeight()));
@@ -53,5 +58,11 @@ final class GardenMechanismRenderer {
     private void pedal(float[] box,boolean down) {
         batch.setColor(down?pressed:Color.WHITE);
         batch.draw(assets.gardenPedal,box[0]-3,box[1]-(down?2:0),box[2]+6,box[3]);batch.setColor(Color.WHITE);
+    }
+    private void flowerbed(float[] box) {
+        // Canteiros estreitos têm uma silhueta própria, sem cortar as bordas da aquarela.
+        TextureRegion art=box[2]<box[3]*1.5f?assets.gardenNarrowBed:assets.gardenFlowerbed;
+        batch.setColor(Color.WHITE);
+        batch.draw(art,box[0]-3,box[1]-4,box[2]+6,box[3]+15);
     }
 }

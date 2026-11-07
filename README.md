@@ -2,7 +2,7 @@
 
 Um puzzle de exploração sobre duas presenças e o vínculo entre elas, em libGDX.
 
-## Experiência atual: ponte e contrapesos no jardim
+## Experiência atual: Água 01 e Água 02
 
 Você controla somente Sombra. Reflexo tem o mesmo rosto, mas seu próprio ritmo: observa a água, reage e coopera quando você pede ajuda. A primeira fase inclui a ponte e um desafio de posicionamento no pátio seguinte. A relação e a diversão continuam em validação. As versões anteriores permanecem nos executáveis antigos.
 
@@ -17,8 +17,10 @@ Perto do guincho da primeira margem, peça ajuda e dê espaço. Reflexo caminha 
 
 No pátio, os dois pedais liberam a grade. Peça ajuda no menor e posicione a jardineira sobre o mais largo. E segura/solta a peça; WASD permite empurrar e puxar. A grade fica travada aberta e Reflexo se reúne pelo caminho real. Ambos precisam atravessá-la para concluir. Não há prazo nem punição por reposicionar o peso. Os cabos mostram a ligação com a grade; se Reflexo livre bloqueia a peça, ele pode sair da frente por uma rota segura. Um bloqueio persistente dá uma dica curta para reposicionar.
 
-O jogo guarda o checkpoint ao fixar a ponte e a conclusão do trecho. Ao reabrir, o menu permite continuar ou revisitar o pátio. N / Jogar do começo reinicia a sessão sem apagar o avanço mais distante. A abertura nunca inicia a partida sozinha. Testes e inspeções usam progresso em memória para preservar o save real.
-Depois de concluir, Enter/clique volta ao menu e R repete o pátio. Retomar já enquadra o trecho correto, sem atravessar a cena com a câmera.
+Depois da ponte e do pátio de Água 01, Enter/clique segue à segunda fase. Água 02 se passa numa varanda de estufa e exige transferir a mesma jardineira: primeiro abre uma passagem, depois Reflexo sustenta o mecanismo do outro lado e permite recuperar o peso para a saída. A primeira grade espera os corpos e a jardineira saírem do vão antes de fechar. A solução completa é testada com movimento físico no mapa distribuído.
+
+O jogo guarda o checkpoint ao fixar a ponte, a conclusão de Água 01 e a de Água 02. Ao reabrir, o menu permite continuar do pátio ou da segunda fase, conforme o avanço. N / Jogar do começo reinicia a sessão sem apagar o avanço mais distante. A abertura nunca inicia a partida sozinha. Testes e inspeções usam progresso em memória para preservar o save real.
+No fim de Água 02, Enter/clique volta ao menu. R repete somente o trecho/fase atual. Retomar já enquadra o trecho correto, sem atravessar a cena com a câmera.
 
 A câmera acompanha Sombra, identificada por um marcador por forma e pelo contato dos pés. Há quatro quadros de caminhada, poses próprias de repouso e sustentação, registrados nos pés e em altura comum. Reflexo contorna obstáculos e procura a ponte aberta para reunir-se a você. A tecla de interação atual aparece sobre o mecanismo próximo. Ainda não há animação completa em oito direções.
 
@@ -28,7 +30,7 @@ A abertura usa enquadramentos ilustrados. Terminar ou pular leva ao menu; soment
 
 ## Jogar
 
-Dê dois cliques em `outputs/Jogar-NOS-Demo-v6.bat`, mantendo `NOS-Demo-v6.jar` ao lado. O iniciador usa o JDK 17 já instalado neste computador. O executável empacotado não requer Gradle nem downloads. A v5 continua preservada.
+Dê dois cliques em `outputs/Jogar-NOS-Demo-v7.bat`, mantendo `NOS-Demo-v7.jar` ao lado. O iniciador usa o JDK 17 já instalado neste computador. O executável empacotado não requer Gradle nem downloads. As versões anteriores continuam preservadas.
 
 ## Desenvolvimento
 
@@ -53,7 +55,7 @@ $env:GRADLE_USER_HOME = "C:\Users\PC Gamer\Documents\Codex\2026-11-06\instale-o-
 - `--legacy`: travessia de tempo, tinta e harmonia.
 - A pasta anterior em Documents/Codex não foi alterada. O histórico Git foi importado para esta pasta, incluindo os commits locais.
 
-Exemplo: `java -jar outputs/NOS-Demo-v6.jar --mirror-room`.
+Exemplo: `java -jar outputs/NOS-Demo-v7.jar --mirror-room`.
 
 ## Organização
 
@@ -71,12 +73,16 @@ Exemplo: `java -jar outputs/NOS-Demo-v6.jar --mirror-room`.
 - `BridgeRenderer`: apresentação e câmera.
 - `BridgeUiState` / `BridgeHudRenderer`: objetivo, avisos, identificação, leitura e menus modais; tempos de apresentação separados da simulação.
 - `levels/bridge-encounter.json`: planta do encontro.
+- `levels/water-transfer.json`: segunda fase, com transferência do peso.
+- `JourneyProgress`: escolha do trecho de continuação sem dependências gráficas.
 - `BridgeTuning`: movimento, distâncias e tempos de resposta.
 
-Os testes JUnit verificam os protótipos preservados e o percurso completo da ponte ao jardim, controlando só Sombra. Incluem chegada física, espera por espaço, arrastar/puxar, peso insuficiente de pessoas, bloqueio da caixa por Reflexo, pausa, independência de frames e abertura permanente. `--smoke-test CAMINHO_ABSOLUTO --garden|--garden-grab|--garden-open|--garden-large` inspeciona situações do pátio sem janela visível. Os cenários anteriores continuam disponíveis. `--audio-check` verifica as três faixas com volume zero. Essas verificações não substituem jogar e ouvir a música.
+Os testes JUnit verificam os protótipos preservados e os percursos das duas primeiras fases, controlando só Sombra. Incluem chegada física, espera por espaço, arrastar/puxar, peso insuficiente de pessoas, bloqueio da caixa por Reflexo, pausa, independência de frames, transferência e abertura permanente. `--smoke-test CAMINHO_ABSOLUTO --garden|--garden-grab|--garden-open|--garden-large` inspeciona situações do pátio sem janela visível. Para Água 02: `--water-two-start`, `--water-two-transfer`, `--water-two-open`, `--water-two-won`, `--water-two-menu`. `--garden-menu` verifica a passagem de Água 01 para Água 02. `--intro-smoke CAMINHO_ABSOLUTO --resume-water-two` verifica a continuação pelo menu. Os cenários anteriores continuam disponíveis. `--audio-check` verifica as três faixas com volume zero. Essas verificações não substituem jogar e ouvir a música.
 
 ## Arte e direção
 
 Personagens e logo foram aprovados pelo usuário. Cenário, ponte, mecanismos e poses foram criados com geração de imagens e integrados ao jogo; referências originais em `design/`. Tipografia Cormorant Garamond e Atkinson Hyperlegible, com licenças OFL em `assets/ui/`. Notas e prompts em `design/BRIDGE-ARTS.md` e `design/SPRITE-REFINEMENT.md`, também entregues em `outputs/`; gerador dos atlas em `tools/`.
+
+Água 02 recebe cenário de estufa e canteiro estreito com transparência próprios. Arquivos e prompts finais em `design/WATER02-ARTS.md`.
 
 O GDD registra a revisão ativa e preserva as concepções anteriores como histórico. Os 13 níveis e capítulos da concepção original não estão implementados.

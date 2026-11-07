@@ -13,18 +13,24 @@ import com.nos.world.BridgeEncounter;
 
 /** A ponte, cordas e corpos compartilham a planta usada pela física. */
 public final class BridgeRenderer implements Disposable {
-    private final GameAssets assets=new GameAssets();
+    private final GameAssets assets;
     private final SpriteBatch batch=new SpriteBatch();
     private final ShapeRenderer shapes=new ShapeRenderer();
-    private final BridgeHudRenderer hud=new BridgeHudRenderer(assets,batch,shapes);
-    private final GardenMechanismRenderer gardenRenderer=new GardenMechanismRenderer(assets,batch,shapes);
+    private final BridgeHudRenderer hud;
+    private final GardenMechanismRenderer gardenRenderer;
     private final BridgeUiState ui=new BridgeUiState();
-    private final TextureRegion bridgeRock=assets.bridgeStone;
+    private final TextureRegion bridgeRock;
     private final Matrix4 scene=new Matrix4();
     private final GlyphLayout layout=new GlyphLayout();
     private final Color ink=new Color(.23f,.22f,.36f,1),paper=new Color(.98f,.95f,.87f,1),gold=new Color(.64f,.45f,.22f,1);
     private float camera,time;
     private final int[] actorOrder={0,1,2};
+    public BridgeRenderer() { this(null); }
+    public BridgeRenderer(String background) {
+        assets=new GameAssets(background);bridgeRock=assets.bridgeStone;
+        hud=new BridgeHudRenderer(assets,batch,shapes);
+        gardenRenderer=new GardenMechanismRenderer(assets,batch,shapes);
+    }
     public BridgeUiState ui() { return ui; }
     public void snapTo(BridgeEncounter encounter) {
         camera=Math.max(0,Math.min(encounter.getData().width-960,encounter.hero(encounter.getActive()).getX()-360));
@@ -74,8 +80,10 @@ public final class BridgeRenderer implements Disposable {
             shapes.ellipse(interaction[0]-28,interaction[1]-8,56,18);shapes.end();
         }
         batch.begin();batch.setColor(Color.WHITE);
-        mechanism(data.winch,0,encounter.getBound()>=0);
-        mechanism(data.latch,1,encounter.isLocked());
+        if(!data.gardenOnly) {
+            mechanism(data.winch,0,encounter.getBound()>=0);
+            mechanism(data.latch,1,encounter.isLocked());
+        }
         batch.end();
         blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
         for(int i=0;i<2;i++) {
@@ -123,7 +131,7 @@ public final class BridgeRenderer implements Disposable {
             float destinationX=data.exit[0]+data.exit[2]/2,destinationY=data.exit[1]+32;
             blend();shapes.begin(ShapeRenderer.ShapeType.Filled);shapes.setColor(paper.r,paper.g,paper.b,.9f);
             shapes.rect(destinationX-51,destinationY,102,26);shapes.end();
-            batch.begin();centered(assets.text.get("bridgeGardenLabel"),destinationX,destinationY+13+UiTypography.BODY_VISUAL_CENTER*.33f*ui.textScale,.33f*ui.textScale,ink);batch.end();
+            batch.begin();centered(assets.text.get(data.destinationKey),destinationX,destinationY+13+UiTypography.BODY_VISUAL_CENTER*.33f*ui.textScale,.33f*ui.textScale,ink);batch.end();
         }
         batch.setProjectionMatrix(viewport.getCamera().combined);shapes.setProjectionMatrix(viewport.getCamera().combined);
         hud.render(encounter,touchControls,help,ui);

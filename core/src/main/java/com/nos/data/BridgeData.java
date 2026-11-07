@@ -6,4 +6,7 @@ public final class BridgeData {
     public float[] ground,river,bridge,winch,latch,shadowStart,reflectionStart,exit;
     public float[][] obstacles;
     public GardenData garden;
+    public boolean gardenOnly;
+    public String backgroundPath;
+    public String destinationKey="bridgeGardenLabel";
 }
