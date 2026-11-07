@@ -5,6 +5,8 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.nos.NosGame;
 import com.nos.screens.GameScreen;
 import com.nos.screens.IntroScreen;
+import com.nos.screens.PuzzleScreen;
+import com.nos.screens.BridgeScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
@@ -20,6 +22,8 @@ public class Lwjgl3Launcher {
                 @Override public void render() {
                     if (frames == 3) {
                         if(getScreen() instanceof GameScreen) ((GameScreen)getScreen()).prepareSmokeScene();
+                        else if(getScreen() instanceof PuzzleScreen) ((PuzzleScreen)getScreen()).prepareSmokeScene();
+                        else if(getScreen() instanceof BridgeScreen) ((BridgeScreen)getScreen()).prepareSmokeScene();
                         else ((IntroScreen)getScreen()).prepareSmokeScene();
                     }
                     super.render();
@@ -40,6 +44,14 @@ public class Lwjgl3Launcher {
             return;
         }
         if (StartupHelper.startNewJvmIfRequired()) return;
+        if(args.length>0&&args[0].equals("--mirror-room")) {
+            new Lwjgl3Application(new NosGame(true) {
+                @Override public void create() { setScreen(new PuzzleScreen()); }
+            },getDefaultConfiguration());return;
+        }
+        if(args.length>0&&args[0].equals("--legacy")) {
+            new Lwjgl3Application(new NosGame(true,true),getDefaultConfiguration());return;
+        }
         new Lwjgl3Application(new NosGame(), getDefaultConfiguration());
     }
 

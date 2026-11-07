@@ -1,56 +1,64 @@
 # NÓS
 
-*Um puzzle de fluxo sobre tempo, olhar e existência, pintado em aquarela.*
+Um puzzle de exploração sobre duas presenças e o vínculo entre elas, em libGDX.
 
-## Mecânica central
-Você não controla os heróis: controla o tempo de dois mundos sobrepostos em aquarela. O mundo que você observa com o pincel desacelera; o outro acelera, desbota e esquece o próprio caminho. A graça é dividir o olhar: guiar duas existências ao mesmo tempo, desviar dos perigos e fazê-las chegar juntas, antes que alguma deixe de existir.
+## Experiência atual: o encontro da ponte
 
-## Restrição: Espelho
-Cada ação afeta os dois mundos ao mesmo tempo: acelerar um é desacelerar o outro. Nenhuma decisão é local. Salvar um herói sempre cobra algo do outro, e é daí que nascem os três objetivos de cada fase: sobreviver, manter a harmonia e chegar juntos.
+Esta é a nova experiência curta, criada após estudar princípios de Unravel Two, COCOON e GRIS. Um sustenta a passagem, o outro atravessa e fixa a escora. Depois os dois podem seguir ao jardim. O objetivo é validar controle, animação e interação ambiental, antes de ampliar o jogo.
 
-## Como jogar
-| Ação | Desktop / Web | Android |
-|---|---|---|
-| Observar (modo horizontal padrão) | Cursor à esquerda: Sombra; à direita: Reflexo | Arrastar para a esquerda/direita |
-| Comparar com proximidade | `Tab` | — |
-| Pausar | `Espaço` / `Esc` | — |
-| Recomeçar | `R` | Toque após o resultado |
+- WASD/setas: mover a presença ativa.
+- Tab: trocar Sombra/Reflexo.
+- E: usar o mecanismo próximo.
+- Espaço/Esc: pausa. R: reiniciar.
+- O parceiro acompanha quando está solto. Não há movimento automático por trilhas, dano, tinta ou cronômetro neste encontro.
 
-- **Harmonia:** não deixe os mundos se desequilibrarem demais.
-- **Pote de tinta:** cada volta ao ponto de controle gasta tinta. Pote vazio é fim de jogo.
-- **Encontros de tinta:** fazer os heróis passarem juntos pelos cruzamentos multiplica a pontuação.
+Perto do mecanismo da primeira margem, E ata a presença e passa o controle à outra. A ponte se estende. Na margem oposta, E fixa a escora e solta o vínculo. A vitória exige as duas presenças no jardim adiante. Soltar cedo pode recolher a ponte; quem estiver sem piso retorna à última margem segura, sem morte.
 
-## Estrutura planejada
-- **3 capítulos** (Água, Fogo, Vento) com 4 fases cada, mais o capítulo final.
-- **3 dificuldades:** Brisa, Maré e Tormenta.
-- **Telas:** menu inicial, game over e pontuação por fase, com recorde local.
+A câmera acompanha quem você controla. Há um ciclo inicial de quatro quadros por personagem, ainda não uma animação completa em oito direções. Abertura pulável preservada; áudio não implementado.
 
-## Executar
-Requer JDK 17 ou superior.
-```bash
-./gradlew lwjgl3:run      # desktop
-./gradlew core:test       # testes
+## Jogar
+
+Dê dois cliques em `outputs/Jogar-NOS-Ponte.bat`, mantendo `NOS-Ponte.jar` ao lado. O iniciador usa o JDK 17 já instalado neste computador. O executável empacotado não requer Gradle nem downloads.
+
+## Desenvolvimento
+
+Requer JDK 17 ou superior. Na raiz:
+
+```powershell
+$env:JAVA_HOME = "C:\Users\PC Gamer\Documents\Codex\jdks\jdk-17.0.21+9"
+.\gradlew.bat lwjgl3:run
+.\gradlew.bat core:test
+.\gradlew.bat lwjgl3:jar teavm:classes
 ```
 
-### Primeira travessia jogável
+Para usar o cache já existente neste computador:
 
-- Abertura de dez segundos, pulável por clique/tecla, seguida de início com três dificuldades. Nesta versão não há áudio.
-- Uma fase contínua de aproximadamente um minuto, com câmera acompanhando os personagens por margens, madeira e um jardim abandonado. A implementação completa dos capítulos ainda não existe.
-- Mova o cursor para a esquerda para desacelerar Sombra e acelerar Reflexo; para a direita, o inverso. Reflexo tem uma trilha mais longa. O centro mantém velocidades iguais, mas não resolve automaticamente a fase.
-- Os troncos atravessam as trilhas conforme a maré: desacelere o herói para esperar o espaço abrir. Impactos empurram e gastam tinta. O desequilíbrio prolongado custa uma medida do pote e retorna ao ponto de controle; a última medida perdida encerra a sessão.
-- Olhar recupera a tinta do mundo observado. Tinta zerada faz o herói parar até receber atenção. Encontros nas flores recarregam o pote e aumentam os pontos, uma vez por cruzamento.
-- Chegue com os dois ao final dentro de quatro segundos de diferença. Há resultado e recorde local, salvo somente via `Preferences`. `R` volta ao início; `Espaço` pausa.
-- Os personagens já usam as ilustrações aprovadas, com deslocamento e oscilação, mas ainda não têm animação de caminhada por direção. Os originais estão em `design/`.
-- `core:test` executa JUnit para olhar, entrada, câmera, tinta, harmonia, pausa, tentativas e travessia, além das verificações de movimento. Uma simulação confirma vitória com atenção alternada e derrota ao deixar a fase sem controle.
-- A verificação gráfica `java -jar lwjgl3/build/libs/NOS-1.14.2.3.jar --smoke-test CAMINHO_ABSOLUTO` captura menu, jogo e pausa com janela invisível e fecha sozinha. `--intro-smoke` verifica a abertura. Não é necessário executá-la para jogar.
+```powershell
+$env:GRADLE_USER_HOME = "C:\Users\PC Gamer\Documents\Codex\2026-11-06\instale-o-jdk-17-por-exemplo\work\gradle-user-home"
+```
 
-### Arte e tipografia
+## Versões preservadas
 
-Conceitos e aquarelas criados com geração de imagens a partir da direção aprovada pelo usuário. Cormorant Garamond (títulos) e Atkinson Hyperlegible (leitura) usam atlas de alta resolução, com licenças OFL incluídas em `assets/ui/`. Gerador e notas em `tools/`.
+- `--mirror-room`: sala experimental de movimento espelhado e selos.
+- `--legacy`: travessia de tempo, tinta e harmonia.
+- A pasta anterior em Documents/Codex não foi alterada. O histórico Git foi importado para esta pasta, incluindo os commits locais.
 
-## Tecnologias
-- [libGDX](https://libgdx.com/), com projeto gerado pelo gdx-liftoff.
-- Alvos: Desktop (LWJGL3), Android e Web (TeaVM).
+Exemplo: `java -jar outputs/NOS-Ponte.jar --mirror-room`.
 
----
-Design completo em [`GDD.md`](GDD.md).
+## Organização
+
+- `BridgeEncounter`: estado e regras do encontro, sem OpenGL.
+- `BridgeCollisionSystem`: margens, água, obstáculos e ponte.
+- `BridgeInput`: teclado e botões de toque.
+- `BridgeScreen`: orquestração em passos fixos.
+- `BridgeRenderer`: apresentação e câmera.
+- `levels/bridge-encounter.json`: planta do encontro.
+- `BridgeTuning`: movimento, distâncias e tempos de resposta.
+
+Os testes JUnit verificam os protótipos preservados e a solução completa da ponte por movimento e ações contextuais, além de colisões, sustentação, retorno seguro, pausa e liberação de teclas. O modo `--smoke-test CAMINHO_ABSOLUTO` captura menu, jogo e pausa numa janela invisível e fecha sozinho; `--intro-smoke` inspeciona a abertura.
+
+## Arte e direção
+
+Personagens e logo foram aprovados pelo usuário. Cenário, ponte e ciclo inicial de caminhada foram criados com geração de imagens e integrados ao jogo; referências originais em `design/`. Tipografia Cormorant Garamond e Atkinson Hyperlegible, com licenças OFL em `assets/ui/`. Notas e prompts em `design/BRIDGE-ARTS.md` (também entregues em `outputs/ARTE-E-REFERENCIAS.md`); gerador dos atlas em `tools/`.
+
+O GDD registra a revisão ativa e preserva as concepções anteriores como histórico. Os 13 níveis e capítulos da concepção original não estão implementados.

@@ -14,4 +14,10 @@ public final class LevelLoader {
     public LevelData read(String path) {
         return new Json().fromJson(LevelData.class, Gdx.files.internal(path));
     }
+    public RoomData readRoom(String path) {
+        return new Json().fromJson(RoomData.class,Gdx.files.internal(path));
+    }
+    public BridgeData readBridge(String path) {
+        return new Json().fromJson(BridgeData.class,Gdx.files.internal(path));
+    }
 }

@@ -1,6 +1,6 @@
 # AGENTS.md — Projeto NÓS (libGDX)
 
-Este é **NÓS**, um jogo 2D em libGDX: puzzle de fluxo, poético e filosófico. O jogador controla o tempo de dois mundos sobrepostos em aquarela. O mundo observado desacelera; o outro acelera e desbota.
+Este é **NÓS**, um jogo 2D em libGDX, poético e filosófico. O encontro ativo é a ponte: movimento direto de uma presença, troca por Tab, parceiro acompanhando quando solto e vínculo contextual num mecanismo. Um sustenta a ponte, o outro atravessa e fixa a escora, depois os dois seguem. A arte em aquarela e a identidade da dupla permanecem. O movimento espelhado e o controle de tempo ficam preservados como experimentos anteriores.
 
 **Leia `GDD.md` antes de qualquer tarefa.** Ele é a fonte da verdade do design.
 
@@ -11,7 +11,11 @@ Este é **NÓS**, um jogo 2D em libGDX: puzzle de fluxo, poético e filosófico.
 - Textos do jogo (aforismos, versos, UI) ficam em arquivos de dados, **nunca** fixos no código.
 
 ## Marco atual
-**M1 em validação de jogabilidade; primeira fatia de Água jogável em construção.** Não considerar M1 divertido/aprovado até teste do usuário.
+**M1 em validação: encontro ambiental da ponte, após estudar Unravel Two, COCOON e GRIS.** Não considerar divertido/aprovado até teste do usuário. Sem pressão de tempo, dano ou gestão de barras.
+
+**Plano atual, que prevalece sobre os planos antigos abaixo:** `BridgeEncounter` é a simulação pura; `BridgeCollisionSystem` respeita margens e vão visíveis; `BridgeInput` usa WASD/setas, Tab e E; `BridgeScreen` orquestra; `BridgeRenderer` só apresenta. Geometria em `levels/bridge-encounter.json`, ajustes em `BridgeTuning`. O parceiro segue quando está solto; o vínculo mantém o mecanismo até a escora ser fixada. Câmera acompanha a presença ativa. Não retomar selos coloridos ou movimento automático como núcleo sem decisão de design. A sala espelhada pode ser acessada por `--mirror-room`; a travessia de tempo, por `--legacy`.
+
+**Plano ativo aprovado:** movimento WASD/setas, colisões independentes por camada, Q/E para atar/soltar apenas uma presença, dois selos abrem uma ponte e duas flores concluem a sala. Sem tinta, harmonia, cronômetro ou dano nesta experiência. Regra do espelho em `MirrorMovementSystem`; vínculo em `AnchorSystem`; estado em `MirrorPuzzle`; geometria em `levels/knot-room.json`. Os requisitos de soma constante de velocidades e trilhas automáticas abaixo pertencem somente ao legado. A sala atual prevalece sobre esses itens do plano antigo. Controle por gamepad ainda não implementado; não adicionar dependências sem perguntar.
 
 **Escopo ampliado pelo usuário nesta iteração:** percurso contínuo com câmera acompanhando a dupla, ambiente variado, personagens ilustrados, tipografia revisada e abertura curta pulável. Essa autorização antecipa apresentação e um recorte de M2 para testar a experiência completa. Não implica concluir os 13 níveis ou implementar M4/M5 inteiros. Os limites abaixo descrevem o plano original do M1; a ampliação acima prevalece nos itens já autorizados.
 

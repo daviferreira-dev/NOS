@@ -27,7 +27,7 @@ public final class IntroScreen extends ScreenAdapter {
     @Override public void show() { Gdx.input.setInputProcessor(input); }
     @Override public void render(float delta) {
         if(!paused) time+=Math.min(delta,.05f);
-        if(skip||time>=10) { game.setScreen(new GameScreen());dispose();return; }
+        if(skip||time>=10) { game.setScreen(new BridgeScreen());dispose();return; }
         ScreenUtils.clear(.97f,.94f,.87f,1);
         viewport.apply();batch.setProjectionMatrix(viewport.getCamera().combined);batch.begin();
         batch.setColor(1,1,1,.65f);

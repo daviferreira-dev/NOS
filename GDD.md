@@ -1,5 +1,53 @@
 # NÓS — Documento de Design (GDD)
 
+## Revisão ativa — Encontro ambiental da ponte (07/11/2026)
+
+Depois de considerar a aparência e a jogabilidade dos testes anteriores insatisfatórias, o usuário pediu referências de jogos publicados e aprovou seguir com um encontro ambiental: **um sustenta, o outro atravessa e fixa a ponte**. Esta revisão é o teste atual e prevalece sobre as revisões anteriores preservadas abaixo.
+
+- Controle experimental mais simples: WASD/setas movem a presença ativa; Tab troca; a outra acompanha enquanto estiver solta. E é a ação contextual. O espelhamento simultâneo foi mantido na sala anterior para comparação, mas não é obrigatório na exploração atual.
+- Na margem inicial, E ata a presença ativa ao mecanismo e troca o controle para a outra. O vínculo sustenta a ponte, que se estende de forma visível. Uma presença atada fica parada.
+- A outra atravessa e usa E na escora da margem oposta. A ponte fica permanentemente segura, o nó se solta e as duas presenças podem seguir ao jardim. A saída exige ambas.
+- Sem tempo limite, dano, tinta ou pontuação. Soltar cedo permite que a ponte recue; quem ficar sem piso retorna à última margem segura, sem morte e sem bloquear a sessão. Espaço/Esc pausa; R recomeça.
+- Planta em `levels/bridge-encounter.json` e `BridgeTuning`. Margens, água, faixa da ponte e obstáculos têm geometria explícita. Sistemas de colisão e estado podem ser testados sem OpenGL.
+- Apresentação: cenário próprio com duas margens e vão central, ponte pintada, ciclo inicial de quatro quadros por personagem, câmera acompanhando o corpo ativo. Não é uma animação final em oito direções. Abertura anterior permanece pulável e leva ao novo encontro.
+- Referências de princípios, não de reprodução de assets: [Unravel Two](https://www.ea.com/games/unravel/unravel-two) (relação entre dois corpos e vínculo), [COCOON](https://annapurnainteractive.com/games/cocoon) (regras combinadas em desafios ambientais), [GRIS](https://store.steampowered.com/app/683320/GRIS/) (coerência visual, movimento e apresentação).
+
+**Decisões atuais**
+- [x] Prototipar uma ponte que muda fisicamente por ação das duas presenças.
+- [x] Preservar os testes anteriores e a pasta antiga; trabalho ativo na nova pasta da OneDrive.
+- [ ] Validar com o usuário o controle de uma presença ativa e o seguimento do parceiro.
+- [ ] Validar animação, clareza do mecanismo e interesse do encontro antes de produzir mais mapas.
+
+---
+
+## Revisão anterior — Sala de exploração, espelho e vínculo
+
+
+
+Após jogar os protótipos de tempo, o usuário aprovou substituir o núcleo por movimento direto e puzzles espaciais. **Esta revisão prevalece sobre as seções históricas abaixo.** O código e o executável anteriores ficam preservados para comparação.
+
+- WASD/setas movem Sombra; Reflexo responde invertendo esquerda/direita, mantendo cima/baixo. Não há movimento automático.
+- Cada camada tem colisões próprias. Pedras índigo bloqueiam Sombra; pedras claras bloqueiam Reflexo. As bordas e a ponte fechada bloqueiam os dois. Um corpo bloqueado não impede o outro de responder.
+- `E` ata/solta Reflexo; `Q` ata/solta Sombra. Apenas uma presença pode estar atada por vez. O vínculo dura até ser solto ou trocado, sem contagem regressiva. Isto é uma escolha provisória para experimentar sem pressão.
+- Primeira sala: colocar cada presença no selo de sua cor abre a ponte permanentemente. Depois é preciso conduzir ambas às flores além da passagem. Não há tinta, harmonia, dano, pontuação ou cronômetro nessa sala.
+- A posição assimétrica dos selos exige reposicionar os corpos. O jogador pode usar o vínculo e as colisões independentes para isso. `R` reinicia sem penalidade; Espaço/Esc pausa.
+- Abertura, personagens, logo, aquarela e tipografia são mantidos. O objetivo atual é validar uma única sala, antes de ampliar mapas e produção artística.
+- Arquitetura ativa: `PuzzleHero`, `MirrorMovementSystem`, `AnchorSystem`, `RoomCollisionSystem`, `MirrorPuzzle`, `PuzzleInput`, `PuzzleScreen` e `PuzzleRenderer`. Geometria e posições em `levels/knot-room.json`; ajustes em `PuzzleTuning`.
+- Entrada nesta implementação: teclado e direcional/botões de toque. Gamepad e animações de caminhada por direção permanecem pendentes.
+
+**Decisões desta revisão**
+- [x] Substituir controle de tempo por movimento direto e espelhado, aprovado pelo usuário.
+- [x] Testar a habilidade de atar uma presença para reposicionar a outra.
+- [ ] Validar sensação do movimento, clareza das colisões e interesse do primeiro puzzle com o usuário.
+- [ ] Decidir se futuras salas usam vínculo livre ou pontos específicos de amarração, após teste da sala atual.
+- [ ] Replanejar os capítulos e a progressão somente depois de validar o novo núcleo.
+
+---
+
+## Histórico — Concepção de tempo e trilhas
+
+As seções abaixo documentam a concepção anterior e não autorizam reintroduzir seus sistemas na sala ativa sem uma nova decisão de design.
+
 > Jogo 2D em libGDX. Puzzle de fluxo, poético e filosófico, com inspiração temática em *Serial Experiments Lain*: identidade incerta, existir apenas enquanto alguém percebe, realidade que vaza.
 > Não é cyberpunk: a estética é aquarela, com o ruído da "realidade" vazando por baixo.
 

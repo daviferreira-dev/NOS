@@ -32,6 +32,8 @@ gdxTeaVM {
   /// You can add additional classes or packages that need reflection here.
   //reflection.add("gdx.liftoff.reflect")
   reflection.add("com.nos.data.LevelData")
+  reflection.add("com.nos.data.RoomData")
+  reflection.add("com.nos.data.BridgeData")
   reflection.add('com.nos.data.LevelData$GateData')
 
   webDefaults {

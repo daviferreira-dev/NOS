@@ -1,4 +1,6 @@
 ## Gradle:
+/work/
+/outputs/
 .gradle/
 gradle-app.setting
 /build/
