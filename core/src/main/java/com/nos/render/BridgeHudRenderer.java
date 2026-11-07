@@ -18,7 +18,7 @@ final class BridgeHudRenderer {
     private final Color ink=new Color(.19f,.20f,.30f,1),paper=new Color(.985f,.96f,.89f,1),gold=new Color(.56f,.40f,.24f,1),edge=new Color(.70f,.64f,.53f,1);
     BridgeHudRenderer(GameAssets assets,SpriteBatch batch,ShapeRenderer shapes) { this.assets=assets;this.batch=batch;this.shapes=shapes; }
     void render(BridgeEncounter encounter,boolean touch,boolean help,BridgeUiState ui) {
-        if(encounter.getState()==BridgeEncounter.State.PAUSED) { if(ui.settings) bindings(ui);else pause(ui);return; }
+        if(encounter.getState()==BridgeEncounter.State.PAUSED) { if(ui.settings) bindings(ui);else pause(encounter,ui);return; }
         if(encounter.getState()!=BridgeEncounter.State.PLAYING) { result(encounter,ui);return; }
         float scale=ui.textScale;
         boolean expanded=ui.expandedObjective();
@@ -26,7 +26,7 @@ final class BridgeHudRenderer {
         float goalWidth=348;
         assets.title.getData().setScale(.43f*scale);layout.setText(assets.title,goal,ink,goalWidth,Align.left,true);
         float objectiveHeight=expanded?Math.max(79,44+layout.height):40;
-        String stage=assets.text.get("bridgeStage"+encounter.objectiveStep());
+        String stage=assets.text.format("bridgeStageCounter",encounter.objectiveStep(),encounter.objectiveCount());
         assets.font.getData().setScale(.28f*scale);layout.setText(assets.font,stage);
         float summaryX=43+layout.width+16,summaryWidth=392-summaryX;
         String summary=assets.text.get(encounter.objectiveKey()+"Compact");
@@ -78,7 +78,7 @@ final class BridgeHudRenderer {
         for(BridgeKeyBindings.Action a:new BridgeKeyBindings.Action[]{BridgeKeyBindings.Action.UP,BridgeKeyBindings.Action.LEFT,BridgeKeyBindings.Action.DOWN,BridgeKeyBindings.Action.RIGHT}) { if(keys.length()>0) keys.append(' ');keys.append(keyName(ui.bindings.key(a))); }
         return keys.toString();
     }
-    private void pause(BridgeUiState ui) {
+    private void pause(BridgeEncounter encounter,BridgeUiState ui) {
         float s=ui.textScale;
         fill();dim();panel(155,72,650,396,1);
         cap(ui.bindings.key(BridgeKeyBindings.Action.UP),226,289,34,30,ui);
@@ -92,7 +92,7 @@ final class BridgeHudRenderer {
         button(190,141,176,30);button(384,141,176,30);button(578,141,176,30);button(190,92,176,34);
         shapes.end();batch.begin();
         title(assets.text.get("bridgePauseTitle"),188,450,.60f*s,ink);
-        text(assets.text.get("bridgePauseSubtitle"),190,385,.30f*s,gold);
+        text(assets.text.get(encounter.isLocked()&&encounter.hasGarden()?"gardenPauseSubtitle":"bridgePauseSubtitle"),190,385,.30f*s,gold);
         title(assets.text.get("bridgeMovementGroup"),190,365,.37f*s,ink);
         title(assets.text.get("bridgeSystemGroup"),500,365,.37f*s,ink);
         for(BridgeKeyBindings.Action a:new BridgeKeyBindings.Action[]{BridgeKeyBindings.Action.UP,BridgeKeyBindings.Action.LEFT,BridgeKeyBindings.Action.DOWN,BridgeKeyBindings.Action.RIGHT}) {
@@ -139,8 +139,9 @@ final class BridgeHudRenderer {
             for(int i=1;i<=3;i++) centered(assets.text.get("bridgeIntro"+i),480,282-(i-1)*31,.34f,ink);
             centered(assets.text.get("bridgeStart"),480,164,.34f,gold);
         } else {
-            centeredTitle(assets.text.get("bridgeWon"),480,340,.54f,ink);centered(assets.text.get("bridgeWonDetail"),480,267,.36f,ink);
-            centered(localized("bridgeAgain",ui),480,192,.33f*ui.textScale,gold);
+            String result=encounter.hasGarden()?"gardenWon":"bridgeWon";
+            centeredTitle(assets.text.get(result),480,340,.54f,ink);centered(assets.text.get(result+"Detail"),480,267,.36f,ink);
+            centered(localized(encounter.hasGarden()?"gardenAgain":"bridgeAgain",ui),480,192,.33f*ui.textScale,gold);
         }
         batch.end();
     }

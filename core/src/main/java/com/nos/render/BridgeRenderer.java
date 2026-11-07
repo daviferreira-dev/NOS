@@ -8,6 +8,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.nos.data.BridgeData;
+import com.nos.data.GardenData;
+import com.nos.systems.GardenGateSystem;
 import com.nos.entities.PuzzleHero;
 import com.nos.world.BridgeEncounter;
 
@@ -22,7 +24,9 @@ public final class BridgeRenderer implements Disposable {
     private final Matrix4 scene=new Matrix4();
     private final GlyphLayout layout=new GlyphLayout();
     private final Color ink=new Color(.23f,.22f,.36f,1),paper=new Color(.98f,.95f,.87f,1),gold=new Color(.64f,.45f,.22f,1);
+    private final Color pressedPedal=new Color(.78f,.72f,.60f,1);
     private float camera,time;
+    private final int[] actorOrder={0,1,2};
     public BridgeUiState ui() { return ui; }
     public void snapTo(BridgeEncounter encounter) {
         camera=Math.max(0,Math.min(encounter.getData().width-960,encounter.hero(encounter.getActive()).getX()-360));
@@ -41,6 +45,7 @@ public final class BridgeRenderer implements Disposable {
         batch.setProjectionMatrix(scene);shapes.setProjectionMatrix(scene);
         batch.begin();batch.setColor(Color.WHITE);batch.draw(assets.bridgeBackground,0,0,data.width,data.height);
         for(float[] obstacle:data.obstacles) batch.draw(bridgeRock,obstacle[0],obstacle[1],obstacle[2],obstacle[3]);
+        if(encounter.hasGarden()) gardenFloor(encounter);
         batch.setColor(Color.WHITE);batch.end();
         blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
         float[] bridge=data.bridge;
@@ -83,8 +88,18 @@ public final class BridgeRenderer implements Disposable {
             }
         }
         shapes.end();batch.begin();batch.setColor(Color.WHITE);
-        if(encounter.hero(0).getY()>encounter.hero(1).getY()) { hero(encounter,0);hero(encounter,1); }
-        else { hero(encounter,1);hero(encounter,0); }
+        int count=encounter.hasGarden()?3:2;
+        for(int i=0;i<count;i++) actorOrder[i]=i;
+        for(int i=1;i<count;i++) {
+            int value=actorOrder[i],j=i-1;
+            while(j>=0&&actorY(encounter,actorOrder[j])<actorY(encounter,value)) { actorOrder[j+1]=actorOrder[j];j--; }
+            actorOrder[j+1]=value;
+        }
+        for(int i=0;i<count;i++) {
+            int actor=actorOrder[i];
+            if(actor<2) hero(encounter,actor);
+            else batch.draw(assets.gardenPlanter,encounter.garden().cartX()-38,encounter.garden().cartY()-15,76,59);
+        }
         batch.end();
         if(interaction!=null&&encounter.getState()==BridgeEncounter.State.PLAYING) {
             String action=actionText(encounter);
@@ -105,7 +120,7 @@ public final class BridgeRenderer implements Disposable {
             shapes.rect(other.getX()-82,other.getY()+88,164,29);shapes.end();
             batch.begin();centered(assets.text.get(speech),other.getX(),other.getY()+102.5f+UiTypography.BODY_VISUAL_CENTER*.30f*ui.textScale,.30f*ui.textScale,ink);batch.end();
         }
-        if(encounter.isLocked()) {
+        if(encounter.isLocked()&&(!encounter.hasGarden()||encounter.garden().isOpen())) {
             float destinationX=data.exit[0]+data.exit[2]/2,destinationY=data.exit[1]+32;
             blend();shapes.begin(ShapeRenderer.ShapeType.Filled);shapes.setColor(paper.r,paper.g,paper.b,.9f);
             shapes.rect(destinationX-51,destinationY,102,26);shapes.end();
@@ -123,9 +138,28 @@ public final class BridgeRenderer implements Disposable {
     private void mechanism(float[] point,int type,boolean active) {
         batch.draw(assets.mechanisms[active?1:0][type],point[0]-33,point[1]-10,66,66);
     }
+    private float actorY(BridgeEncounter encounter,int index) { return index<2?encounter.hero(index).getY():encounter.garden().cartY(); }
+    private void gardenFloor(BridgeEncounter encounter) {
+        GardenData data=encounter.getData().garden;GardenGateSystem garden=encounter.garden();
+        for(float[] bed:data.barriers) batch.draw(assets.gardenFlowerbed,bed[0]-3,bed[1]-4,bed[2]+6,bed[3]+15);
+        pedal(data.helperPlate,garden.helperPressed());pedal(data.weightPlate,garden.weightPressed());
+        float baseX=data.gate[0]-39,baseY=data.gate[1]-6,opening=garden.getOpening();
+        if(opening<1) {
+            TextureRegion panel=assets.gardenGatePanel;
+            int cut=Math.min(panel.getRegionHeight()-1,(int)(opening*panel.getRegionHeight()));
+            batch.draw(panel.getTexture(),baseX+20,baseY+opening*90,61,90*(1-opening),
+                panel.getRegionX(),panel.getRegionY()+cut,panel.getRegionWidth(),panel.getRegionHeight()-cut,false,false);
+        }
+        batch.draw(assets.gardenGateFrame,baseX,baseY,101,118);
+    }
+    private void pedal(float[] box,boolean pressed) {
+        batch.setColor(pressed?pressedPedal:Color.WHITE);
+        batch.draw(assets.gardenPedal,box[0]-3,box[1]-(pressed?2:0),box[2]+6,box[3]);batch.setColor(Color.WHITE);
+    }
     private void hero(BridgeEncounter encounter,int index) {
         PuzzleHero hero=encounter.hero(index);
         HeroFrame frame=encounter.getBound()==index?assets.poses[index][1]
+            :index==0&&encounter.hasGarden()&&encounter.garden().isDragging()&&!hero.isMoving()?assets.poses[index][1]
             :hero.isMoving()?assets.walk[index][encounter.frame(index)]:assets.poses[index][0];
         frame.draw(batch,hero.getX(),hero.getY(),hero.getFacing()<0);
     }

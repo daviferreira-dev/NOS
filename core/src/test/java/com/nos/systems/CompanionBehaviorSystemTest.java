@@ -8,8 +8,11 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class CompanionBehaviorSystemTest {
-    private final BridgeData data=new Json().fromJson(BridgeData.class,
-        new FileHandle(System.getProperty("nos.assets")+"/levels/bridge-encounter.json"));
+    private static BridgeData bridgeOnly() {
+        BridgeData data=new Json().fromJson(BridgeData.class,new FileHandle(System.getProperty("nos.assets")+"/levels/bridge-encounter.json"));
+        data.garden=null;return data;
+    }
+    private final BridgeData data=bridgeOnly();
     private final BridgeCollisionSystem collision=new BridgeCollisionSystem(data);
     private final CompanionBehaviorSystem behavior=new CompanionBehaviorSystem(data,collision);
     private void advance(PuzzleHero npc,PuzzleHero player,boolean open,boolean locked,int steps) {

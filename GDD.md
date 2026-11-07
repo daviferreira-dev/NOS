@@ -14,6 +14,21 @@ O usuário aprovou testar uma relação em que se controla apenas uma presença 
 - Apresentação ambiental: contato dos pés mais legível, remoção de riscos soltos sobre a água, pedra sem tintura verde chapada, destino com indicação legível sem cruzar a coluna, laterais em cor da cena e opção de tela cheia. Nenhuma alteração na planta de colisão.
 - Arquitetura: `BridgeEncounter`, `CompanionBehaviorSystem`, `CompanionFollowSystem`, `BridgeCollisionSystem`, `BridgeKeyBindings`, `BridgeInput`, `BridgeScreen`, `BridgeUiState`, `BridgeHudRenderer` e `BridgeRenderer`. Ajustes em `BridgeTuning`; planta no JSON existente.
 
+**Ampliação jogável autorizada — contrapesos no pátio**
+
+O usuário pediu continuar o jogo com decisões automáticas e trabalho paralelo, depois de rejeitar o teste CGI. O pátio já ilustrado passa a ter uma jardineira com rodas, um pedal pequeno, um pedal largo e uma grade com trava. É um desafio adicional da primeira fase de Água, não a conclusão de M1/M2 ou dos treze níveis.
+
+- `E` perto da jardineira segura/solta; WASD empurra ou puxa a mesma peça, com velocidade menor. A caixa respeita água, obstáculos, canteiros, grade e o corpo de Reflexo. Puxar evita deixar a peça presa num canto.
+- `E` perto do pedal menor pede ajuda. Reflexo percorre o caminho, espera espaço e pisa no pedal ao chegar. Pedir novamente chama de volta. Sombra também pode pressionar o pedal fisicamente; o pedal largo exige a massa da jardineira.
+- Quando os dois pesos estão presentes, a grade se ergue e uma trava a mantém aberta. Reflexo fica livre para se reunir a Sombra. Ambos atravessam a grade para concluir. Sem cronômetro, dano, barras ou troca de controle.
+- `R` depois de fixar a ponte reinicia só o pátio durante essa sessão. Abertura e início explícito permanecem. Não há novo salvamento em arquivo nem dependência de runtime.
+- `GardenGateSystem`, `GardenData`, `GardenTuning` e a colisão compartilhada mantêm as regras fora da renderização. Os dados opcionais `garden` no JSON permitem preservar a ponte de três etapas em fixtures e experiências antigas.
+- Objetivo informa etapa atual de cinco e os comandos próximos usam as teclas remapeadas. Ajuda/configuração continuam pausando a simulação; texto ampliado e tela cheia permanecem. A arte dos novos objetos é aquarela transparente, com os mesmos heróis.
+- Terceiro tema musical de 112 segundos para o pátio, piano e harpa amostrados com frases/pausas próprias. A transição mantém o teto de volume de 20%, mute e pausa de foco. Sem voz sintética. Procedência e licença do banco GeneralUser GS acompanham o áudio.
+
+- [x] Implementar posicionamento, ajuda física, pesos, abertura permanente e reinício do trecho.
+- [ ] Validar interesse do puzzle, legibilidade dos objetos e nova trilha com o usuário.
+
 **Abertura CGI — piloto rejeitado (07/11/2026)**
 
 O usuário rejeitou a prévia CGI por aparência infantil, qualidade insuficiente e movimento sem a atuação esperada da referência. O teste de mão, água e voz sintética não entregou a cinematográfica solicitada. Essa tentativa está encerrada e não deve ser integrada ao jogo nem apresentada como abertura pronta. Os entregáveis foram retirados da pasta ativa e arquivados fora do projeto. Os scripts permanecem somente como registro do experimento rejeitado.

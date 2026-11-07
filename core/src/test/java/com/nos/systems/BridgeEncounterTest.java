@@ -10,7 +10,10 @@ import static org.junit.Assert.*;
 
 public class BridgeEncounterTest {
     private BridgeEncounter create() {
-        return new BridgeEncounter(new Json().fromJson(BridgeData.class,new FileHandle(System.getProperty("nos.assets")+"/levels/bridge-encounter.json")));
+        BridgeData data=new Json().fromJson(BridgeData.class,new FileHandle(System.getProperty("nos.assets")+"/levels/bridge-encounter.json"));
+        data.garden=null;
+        data.exit=new float[]{1370,205,150,180};
+        return new BridgeEncounter(data);
     }
     private void waitFor(BridgeEncounter run,int steps) { for(int i=0;i<steps;i++) run.update(0,0,BridgeTuning.FIXED_STEP); }
     private void go(BridgeEncounter run,float x,float y) {

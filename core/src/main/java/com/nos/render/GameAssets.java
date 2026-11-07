@@ -15,6 +15,7 @@ public final class GameAssets implements Disposable {
     public final HeroFrame[][] walk=new HeroFrame[2][4],poses=new HeroFrame[2][2];
     public final TextureRegion[][] mechanisms=new TextureRegion[2][2];
     public final TextureRegion shadow, reflection, driftwood, rock,bridgeStone;
+    public final TextureRegion gardenPlanter,gardenPedal,gardenGateFrame,gardenGatePanel,gardenFlowerbed;
     public final BitmapFont font, title;
     public final I18NBundle text;
     public GameAssets() {
@@ -28,6 +29,10 @@ public final class GameAssets implements Disposable {
         manager.load("art/driftwood.png", Texture.class);
         manager.load("art/stone.png",Texture.class);
         manager.load("art/bridge-stone-v2.png",Texture.class);
+        manager.load("art/garden-planter-v1.png",Texture.class);
+        manager.load("art/garden-pedal-v1.png",Texture.class);
+        manager.load("art/garden-gate-v1.png",Texture.class);
+        manager.load("art/garden-flowerbed-v1.png",Texture.class);
         manager.load("art/logo.png", Texture.class);
         manager.load("art/knot.png", Texture.class);
         manager.load("ui/body.fnt", BitmapFont.class);
@@ -65,6 +70,11 @@ public final class GameAssets implements Disposable {
         Texture paintedStone=manager.get("art/bridge-stone-v2.png",Texture.class);
         paintedStone.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
         bridgeStone=new TextureRegion(paintedStone,220,195,1054,643);
+        gardenPlanter=region("art/garden-planter-v1.png",145,52,1237,951);
+        gardenPedal=region("art/garden-pedal-v1.png",21,110,1565,780);
+        gardenGateFrame=region("art/garden-gate-v1.png",88,30,752,807);
+        gardenGatePanel=region("art/garden-gate-v1.png",1040,124,580,703);
+        gardenFlowerbed=region("art/garden-flowerbed-v1.png",52,97,2049,510);
         heroes.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         garden.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         logo.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -75,6 +85,11 @@ public final class GameAssets implements Disposable {
         title.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         text = manager.get("ui/strings", I18NBundle.class);
+    }
+    private TextureRegion region(String path,int x,int y,int width,int height) {
+        Texture texture=manager.get(path,Texture.class);
+        texture.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
+        return new TextureRegion(texture,x,y,width,height);
     }
     @Override public void dispose() { manager.dispose(); }
 }

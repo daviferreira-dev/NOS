@@ -4,6 +4,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.nos.NosGame;
 import com.nos.data.*;
 import com.nos.input.BridgeInput;
 import com.nos.input.BridgeKeyBindings;
@@ -88,11 +89,17 @@ public final class BridgeScreen extends ScreenAdapter {
             accumulator+=Math.min(.1f,delta);
             while(accumulator>=BridgeTuning.FIXED_STEP) { encounter.update(input.x(),input.y(),BridgeTuning.FIXED_STEP);accumulator-=BridgeTuning.FIXED_STEP; }
         } else accumulator=0;
+        if(encounter.isLocked()&&encounter.hasGarden()&&Gdx.app.getApplicationListener() instanceof NosGame) {
+            NosGame game=(NosGame)Gdx.app.getApplicationListener();
+            if(game.soundtrack()!=null) game.soundtrack().garden();
+        }
         ScreenUtils.clear(.30f,.32f,.28f,1);
         renderer.render(encounter,viewport,Math.min(.1f,delta),touchControls||smokeTouch,showHelp);
     }
     private void restart() {
-        encounter=new BridgeEncounter(new LevelLoader().readBridge("levels/bridge-encounter.json"));encounter.start();
+        boolean gardenCheckpoint=encounter.isLocked()&&encounter.hasGarden();
+        encounter=new BridgeEncounter(new LevelLoader().readBridge("levels/bridge-encounter.json"));
+        if(gardenCheckpoint&&encounter.hasGarden()) encounter.startAtGardenCheckpoint();else encounter.start();
         input.clearForMenu();accumulator=0;showHelp=false;ui.settings=false;ui.awaitingKey=false;ui.resetPresentation();Gdx.input.setInputProcessor(input);
     }
     private void toggleMenu() {
@@ -126,6 +133,28 @@ public final class BridgeScreen extends ScreenAdapter {
     public void prepareSmokeScene() { prepareSmokeScene(false); }
     public void prepareSmokeScene(String scenario) {
         smokeTouch=scenario.equals("--touch");
+        if(scenario.startsWith("--garden")) {
+            encounter.startAtGardenCheckpoint();
+            if(scenario.endsWith("-large")) ui.textScale=1.3f;
+            if(scenario.equals("--garden-grab")) {
+                float[] cart=encounter.getData().garden.cartStart;
+                walkTo(cart[0]-42,cart[1]);encounter.interact();
+            }
+            if(scenario.equals("--garden-open")) {
+                float[] pedal=encounter.getData().garden.helperPlate;
+                walkTo(pedal[0]+pedal[2]/2-42,pedal[1]+pedal[3]/2);encounter.interact();
+                for(int i=0;i<600;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+                float[] cart=encounter.getData().garden.cartStart,weight=encounter.getData().garden.weightPlate;
+                walkTo(cart[0]-40,cart[1]);encounter.interact();
+                walkTo(weight[0]+weight[2]/2-40,weight[1]+weight[3]/2);encounter.interact();
+                for(int i=0;i<300;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+                if(!encounter.garden().isOpen()) throw new IllegalStateException("O percurso de inspeção não abriu a grade.");
+                walkTo(1236,248);
+            }
+            if(scenario.equals("--garden-compact")||scenario.equals("--garden-compact-large")) ui.update(encounter,60);
+            if(scenario.equals("--garden-help")||scenario.equals("--garden-help-large")) { encounter.togglePause();showHelp=true; }
+            renderer.snapTo(encounter);return;
+        }
         boolean modal=scenario.equals("--help")||scenario.equals("--settings")||scenario.equals("--settings-large")||scenario.equals("--large");
         boolean compact=scenario.equals("--compact")||scenario.equals("--compact-large");
         prepareSmokeScene(scenario.equals("--mechanism")||modal||compact);
