@@ -36,6 +36,7 @@ gdxTeaVM {
   reflection.add("com.nos.data.BridgeData")
   reflection.add("com.nos.data.GardenData")
   reflection.add("com.nos.data.RelayData")
+  reflection.add("com.nos.data.HazardData")
   reflection.add('com.nos.data.LevelData$GateData')
 
   webDefaults {

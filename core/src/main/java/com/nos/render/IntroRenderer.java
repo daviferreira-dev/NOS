@@ -25,17 +25,29 @@ public final class IntroRenderer implements Disposable {
         if(sequence.getState()==OpeningSequence.State.CUTSCENE) cutscene(sequence);else title(sequence,music,progress);
     }
     private void cutscene(OpeningSequence sequence) {
-        float p=sequence.shotProgress();int shot=sequence.shot();Texture frame=shot==1?assets.reflection:assets.wide;
-        float zoom=shot==0?1.02f+p*.06f:shot==1?1.04f+p*.05f:1.17f-p*.08f;
-        float width=960*zoom,height=width*frame.getHeight()/frame.getWidth();
-        batch.begin();batch.setColor(Color.WHITE);batch.draw(frame,(960-width)/2+(shot==1?-10*p:12*p),(540-height)/2,width,height);batch.end();
+        float p=sequence.shotProgress();int shot=sequence.shot();Texture frame=assets.scenes[shot];
+        float height=shot==0?560:540,width=height*frame.getWidth()/frame.getHeight();
+        float camera=shot==0?(width-960)*.5f:(width-960)*(.14f+.17f*p);
+        if(shot==4) camera=(width-960)*(.65f+.25f*p);
+        batch.begin();batch.setColor(Color.WHITE);batch.draw(frame,-camera,(540-height)/2,width,height);
+        if(shot>0) {
+            float travel=Math.min(1,p/.72f),shadowX=250+travel*260,otherX=170+Math.min(1,Math.max(0,p-.16f)/.7f)*290;
+            boolean shadowMoving=p<.72f,otherMoving=p>.16f&&p<.86f;
+            if(shot==1) { shadowX=220+travel*180;otherX=360;otherMoving=false; }
+            if(shot==3) { shadowX=430;shadowMoving=false;otherX=650-travel*170;otherMoving=p<.72f; }
+            if(shot==4) { shadowX=360+travel*180;otherX=300+travel*180;otherMoving=shadowMoving; }
+            HeroFrame shadow=shadowMoving?assets.walk[0][(int)(sequence.getTime()*8)%4]:assets.idle[0][0];
+            HeroFrame other=otherMoving?assets.walk[1][(int)(sequence.getTime()*7)%4]:assets.idle[1][0];
+            other.draw(batch,otherX,shot==3?280:254,shot==3);shadow.draw(batch,shadowX,222,false);
+        }
+        batch.end();
         fill();shapes.setColor(ink.r*.35f,ink.g*.35f,ink.b*.35f,1-sequence.sceneVisibility());shapes.rect(0,0,960,540);
         shapes.setColor(.055f,.065f,.10f,1);shapes.rect(0,0,960,49);shapes.rect(0,498,960,42);shapes.end();
         batch.begin();centered(assets.text.get("openingVerse"+(shot+1)),480,42,.40f,new Color(paper.r,paper.g,paper.b,sequence.sceneVisibility()));
-        text(assets.text.get("openingSkip"),26,531,.28f,paper);batch.end();
+        text(assets.text.get("openingSkip"),26,525,.28f,paper);batch.end();
     }
     private void title(OpeningSequence sequence,Soundtrack music,int progress) {
-        boolean saved=progress>0&&progress<=4;
+        boolean saved=progress>0&&progress<=5;
         batch.begin();batch.setColor(Color.WHITE);batch.draw(assets.wide,0,0,960,540,0,0,assets.wide.getWidth(),assets.wide.getHeight(),true,false);batch.end();
         fill();shapes.setColor(paper.r,paper.g,paper.b,.97f);shapes.rect(0,0,385,540);
         Color edge=new Color(paper.r,paper.g,paper.b,.97f),clear=new Color(paper.r,paper.g,paper.b,0);
@@ -44,7 +56,7 @@ public final class IntroRenderer implements Disposable {
         shapes.setColor(gold.r,gold.g,gold.b,.55f);shapes.rect(76,saved?175:179,264,1);shapes.end();
         batch.begin();batch.setColor(Color.WHITE);batch.draw(assets.logo,76,310,264,132);
         assets.title.getData().setScale(.45f);assets.title.setColor(ink);assets.title.draw(batch,assets.text.get("openingTagline"),78,304);
-        centered(assets.text.get(!saved?"openingStart":progress==4?"openingRevisitWaterThree":progress==3?"openingContinueWaterThree":progress==2?"openingContinueWaterTwo":"openingContinue"),208,start[1]+35,.43f,paper);
+        centered(assets.text.get(!saved?"openingStart":progress==5?"openingRevisitIris":progress==4?"openingContinueIris":progress==3?"openingContinueWaterThree":progress==2?"openingContinueWaterTwo":"openingContinue"),208,start[1]+35,.43f,paper);
         if(saved) {
             text(assets.text.get("openingFromBeginning"),91,198,.33f,ink);
             text(assets.text.get("openingFromBeginningKey"),315,198,.33f,gold);
@@ -54,7 +66,7 @@ public final class IntroRenderer implements Disposable {
         text(assets.text.get(!music.isAvailable()?"openingAudioUnavailable":music.isMuted()?"openingMusicOff":"openingMusicOn"),91,116,.31f,ink);
         text(assets.text.get("openingMusicKey"),315,116,.31f,gold);
         text(assets.text.get(saved?"openingProgressHint":"openingWait"),76,62,.28f,ink);
-        text(assets.text.get(!saved?"openingMenuKeys":progress>=3?"openingMenuKeysWaterThree":progress>=2?"openingMenuKeysWaterTwo":"openingMenuKeysSaved"),76,38,.27f,ink);batch.end();
+        text(assets.text.get(!saved?"openingMenuKeys":progress>=4?"openingMenuKeysIris":progress>=3?"openingMenuKeysWaterThree":progress>=2?"openingMenuKeysWaterTwo":"openingMenuKeysSaved"),76,38,.27f,ink);batch.end();
         float darkness=Math.max(1-sequence.titleVisibility(),sequence.startFade());
         if(darkness>0) { fill();shapes.setColor(ink.r*.35f,ink.g*.35f,ink.b*.35f,darkness);shapes.rect(0,0,960,540);shapes.end(); }
     }

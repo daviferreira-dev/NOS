@@ -14,14 +14,17 @@ public class JourneyProgressTest {
         save.recordSecondJourneyComplete();
         assertEquals(JourneyProgress.Stage.WATER_THREE,JourneyProgress.start(save,true));
         save.recordThirdJourneyComplete();
-        assertEquals(JourneyProgress.Stage.WATER_THREE,JourneyProgress.start(save,true));
+        assertEquals(JourneyProgress.Stage.WATER_FOUR,JourneyProgress.start(save,true));
+        save.recordFourthJourneyComplete();
+        assertEquals(JourneyProgress.Stage.WATER_FOUR,JourneyProgress.start(save,true));
     }
 
     @Test public void explicitFreshStartDoesNotModifySavedAdvance() {
-        SaveData save=new SaveData(null);save.recordJourneyComplete();save.recordSecondJourneyComplete();save.recordThirdJourneyComplete();
+        SaveData save=new SaveData(null);save.recordJourneyComplete();save.recordSecondJourneyComplete();save.recordThirdJourneyComplete();save.recordFourthJourneyComplete();
         assertEquals(JourneyProgress.Stage.BRIDGE,JourneyProgress.start(save,false));
-        assertEquals(4,save.menuProgress());assertTrue(save.isSecondJourneyComplete());assertTrue(save.isThirdJourneyComplete());
-        assertEquals(JourneyProgress.Stage.WATER_THREE,JourneyProgress.start(save,true));
+        assertEquals(5,save.menuProgress());assertTrue(save.isSecondJourneyComplete());assertTrue(save.isThirdJourneyComplete());
+        assertTrue(save.isFourthJourneyComplete());
+        assertEquals(JourneyProgress.Stage.WATER_FOUR,JourneyProgress.start(save,true));
     }
 
     @Test public void isolatedOrMissingProgressAlwaysStartsAtBridge() {
@@ -36,5 +39,12 @@ public class JourneyProgressTest {
         assertEquals(JourneyProgress.Stage.BRIDGE,JourneyProgress.start(save,false));
         assertEquals(3,save.menuProgress());assertFalse(save.isThirdJourneyComplete());
         assertEquals(JourneyProgress.Stage.WATER_THREE,JourneyProgress.start(save,true));
+    }
+
+    @Test public void freshStartBeforeFinalKeepsFinalAvailableAndUnfinished() {
+        SaveData save=new SaveData(null);save.recordJourneyComplete();save.recordSecondJourneyComplete();save.recordThirdJourneyComplete();
+        assertEquals(JourneyProgress.Stage.BRIDGE,JourneyProgress.start(save,false));
+        assertEquals(4,save.menuProgress());assertFalse(save.isFourthJourneyComplete());
+        assertEquals(JourneyProgress.Stage.WATER_FOUR,JourneyProgress.start(save,true));
     }
 }

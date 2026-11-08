@@ -42,14 +42,23 @@ public final class IntroScreen extends ScreenAdapter {
     private int menuProgress() { return previewProgress>=0?previewProgress:game.progress().menuProgress(); }
     public void prepareSmokeScene() { prepareSmokeScene("reflection"); }
     public void prepareSmokeScene(String shot) {
-        previewProgress=shot.equals("continue")?1:shot.equals("complete")?2:shot.equals("third")?3:shot.equals("all-complete")?4:-1;
+        previewProgress=shot.equals("continue")?1:shot.equals("complete")?2:shot.equals("third")?3:shot.equals("all-complete")?5:-1;
         resumeCheckpoint=false;
         if(shot.equals("natural")) { for(int i=0;i<1200;i++) sequence.update(.05f); }
         else if(shot.equals("title")||shot.equals("start")||shot.equals("continue")||shot.equals("complete")||shot.equals("third")||shot.equals("all-complete")) {
             sequence.skip();for(int i=0;i<20;i++) sequence.update(.05f);
             if(shot.equals("start")) { sequence.start();for(int i=0;i<30;i++) sequence.update(.05f); }
         }
-        else { float target=shot.equals("wide")?3:shot.equals("return")?18:10;while(sequence.getTime()<target) sequence.update(.05f); }
+        else {
+            float target=shot.equals("wide")?3:shot.equals("return")?18:10;
+            if(shot.startsWith("shot-")) {
+                int index=Integer.parseInt(shot.substring(5));
+                float[] ends=com.nos.data.OpeningTuning.SHOT_ENDS;
+                if(index<0||index>=ends.length) throw new IllegalArgumentException("Plano inexistente.");
+                target=((index==0?0:ends[index-1])+ends[index])*.5f;
+            }
+            while(sequence.getTime()<target) sequence.update(.05f);
+        }
         input.setTitle(sequence.getState()==OpeningSequence.State.TITLE);input.setProgressAvailable(menuProgress()>0);
     }
     @Override public void resize(int width,int height) { viewport.update(width,height,true); }

@@ -5,6 +5,11 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class BridgeInputTest {
+    @Test public void sprintUsesEitherShiftAndFocusClearReleasesIt() {
+        BridgeInput input=new BridgeInput();input.keyDown(Input.Keys.SHIFT_LEFT);input.keyDown(Input.Keys.SHIFT_RIGHT);
+        input.keyUp(Input.Keys.SHIFT_LEFT);assertTrue(input.isSprinting());input.keyUp(Input.Keys.SHIFT_RIGHT);assertFalse(input.isSprinting());
+        input.keyDown(Input.Keys.SHIFT_LEFT);input.clear();assertFalse(input.isSprinting());
+    }
     @Test public void tabAndFormerSwapKeyCannotSelectCompanion() {
         BridgeInput input=new BridgeInput();input.keyDown(Input.Keys.TAB);input.keyDown(Input.Keys.Q);
         assertEquals(0,input.action());assertEquals(0,input.x(),0);assertEquals(0,input.y(),0);

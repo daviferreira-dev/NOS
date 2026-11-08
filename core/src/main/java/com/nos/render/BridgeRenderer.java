@@ -25,6 +25,7 @@ public final class BridgeRenderer implements Disposable {
     private final Color ink=new Color(.23f,.22f,.36f,1),paper=new Color(.98f,.95f,.87f,1),gold=new Color(.64f,.45f,.22f,1);
     private float camera,time;
     private final int[] actorOrder={0,1,2};
+    private final ActionHazardRenderer hazards=new ActionHazardRenderer();
     public BridgeRenderer() { this(null); }
     public BridgeRenderer(String background) {
         assets=new GameAssets(background);bridgeRock=assets.bridgeStone;
@@ -59,6 +60,7 @@ public final class BridgeRenderer implements Disposable {
         shapes.end();
         if(encounter.hasGarden()) { batch.begin();gardenRenderer.floor(encounter);batch.end(); }
         if(encounter.hasRelay()) { batch.begin();gardenRenderer.relayFloor(encounter);batch.end(); }
+        hazards.draw(encounter,batch,shapes,assets);
         blend();shapes.begin(ShapeRenderer.ShapeType.Line);
         if(encounter.getSupport()>.05f) {
             shapes.setColor(.45f,.36f,.23f,.85f);

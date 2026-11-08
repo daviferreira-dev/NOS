@@ -40,6 +40,7 @@ public class NosGame extends Game {
     public void beginJourney() { beginJourney(progress.canResumeJourney()); }
     public void beginJourney(boolean resumeCheckpoint) {
         JourneyProgress.Stage stage=JourneyProgress.start(progress,resumeCheckpoint);
+        if(stage==JourneyProgress.Stage.WATER_FOUR) { beginWaterFour();return; }
         if(stage==JourneyProgress.Stage.WATER_THREE) { beginWaterThree();return; }
         if(stage==JourneyProgress.Stage.WATER_TWO) { beginWaterTwo();return; }
         boolean resume=stage==JourneyProgress.Stage.GARDEN;
@@ -58,6 +59,12 @@ public class NosGame extends Game {
         if(!progress.isThirdJourneyAvailable()) { returnToTitle();return; }
         com.badlogic.gdx.Screen previous=getScreen();
         setScreen(new BridgeScreen(true,progress,false,3));soundtrack.garden();
+        if(previous!=null) previous.dispose();
+    }
+    public void beginWaterFour() {
+        if(!progress.isFourthJourneyAvailable()) { returnToTitle();return; }
+        com.badlogic.gdx.Screen previous=getScreen();
+        setScreen(new BridgeScreen(true,progress,false,4));soundtrack.garden();
         if(previous!=null) previous.dispose();
     }
     @Override public void render() {

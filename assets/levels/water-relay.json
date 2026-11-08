@@ -1,12 +1,14 @@
 {
   "width":1600,"height":540,"phaseNumber":3,
-  "gardenOnly":true,"backgroundPath":"art/water-relay-bank-v1.png","destinationKey":"relayExitLabel",
+  "gardenOnly":true,"backgroundPath":"art/wind-bank-v1.png","destinationKey":"relayExitLabel",
   "ground":[60,145,1480,265],
   "river":[-500,0,0,540],"bridge":[-500,230,0,80],
   "winch":[-500,270],"latch":[-500,270],
   "shadowStart":[170,255],"reflectionStart":[240,300],
   "exit":[1410,235,130,80],
   "obstacles":[[420,355,62,55],[1210,145,62,55]],
+  "recoveryPoint":[190,250],
+  "hazards":[{"type":"gust","x":450,"y":280,"amplitudeX":0,"amplitudeY":40,"period":6,"phase":0,"radius":36,"warningSeconds":1,"activeSeconds":2,"restSeconds":3,"pushX":0,"pushY":100}],
   "relay":{
     "westPlate":[620,175,48,32],"eastPlate":[1010,175,48,32],
     "gate":[820,230,24,95],"reunionPoint":[1034,290],

@@ -15,6 +15,7 @@ public final class BridgeInput extends InputAdapter {
     public void setBindings(BridgeKeyBindings value) { clear();bindings=value; }
     @Override public boolean keyDown(int physicalKey) {
         if(physicalKey<0||physicalKey>=physicalHeld.length) return false;
+        if(physicalKey==Input.Keys.SHIFT_LEFT||physicalKey==Input.Keys.SHIFT_RIGHT) { physicalHeld[physicalKey]=true;return true; }
         int key=physicalKey==Input.Keys.ENTER?Input.Keys.ENTER:bindings.translate(physicalKey);
         if(key<0) return false;
         if(physicalHeld[physicalKey]) return true;
@@ -46,6 +47,7 @@ public final class BridgeInput extends InputAdapter {
     @Override public boolean touchCancelled(int x,int y,int p,int b) { return touchControls&&delegate.touchCancelled(x,y,p,b); }
     public void project(Viewport v,int h) { if(touchControls) delegate.projectTouch(v,h); }
     public float x() { return delegate.axisX(); }
+    public boolean isSprinting() { return physicalHeld[Input.Keys.SHIFT_LEFT]||physicalHeld[Input.Keys.SHIFT_RIGHT]; }
     public float y() { return delegate.axisY(); }
     public int action() { return delegate.takeAnchor()==2?2:0; }
     public boolean start() { boolean value=delegate.takeStart()||desktopTap;desktopTap=false;return value; }

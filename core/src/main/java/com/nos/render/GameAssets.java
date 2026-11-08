@@ -12,6 +12,7 @@ import com.nos.data.HeroSpriteTuning;
 public final class GameAssets implements Disposable {
     private final AssetManager manager = new AssetManager();
     public final Texture garden, logo, knot, bridgeBackground, bridgeDeck;
+    public final Texture ember;
     public final HeroFrame[][] walk=new HeroFrame[2][4],poses=new HeroFrame[2][2];
     public final TextureRegion[][] mechanisms=new TextureRegion[2][2];
     public final TextureRegion shadow, reflection, driftwood, rock,bridgeStone;
@@ -36,6 +37,7 @@ public final class GameAssets implements Disposable {
         manager.load("art/garden-gate-v1.png",Texture.class);
         manager.load("art/garden-flowerbed-v1.png",Texture.class);
         manager.load("art/garden-small-bed-v1.png",Texture.class);
+        manager.load("art/ember-v1.png",Texture.class);
         manager.load("art/logo.png", Texture.class);
         manager.load("art/knot.png", Texture.class);
         manager.load("ui/body.fnt", BitmapFont.class);
@@ -44,6 +46,7 @@ public final class GameAssets implements Disposable {
         manager.finishLoading();
         garden = manager.get("art/journey.png", Texture.class);
         bridgeBackground=manager.get(background,Texture.class);
+        ember=manager.get("art/ember-v1.png",Texture.class);ember.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
         bridgeDeck=manager.get("art/bridge-deck-v1.png",Texture.class);
         bridgeDeck.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
         bridgeBackground.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);

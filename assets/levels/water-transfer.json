@@ -1,12 +1,14 @@
 {
   "width":1600,"height":540,
-  "phaseNumber":2,"gardenOnly":true,"backgroundPath":"art/water-terrace-v1.png","destinationKey":"transferExitLabel",
+  "phaseNumber":2,"gardenOnly":true,"backgroundPath":"art/fire-bank-v1.png","destinationKey":"transferExitLabel",
   "ground":[60,145,1480,265],
   "river":[-500,0,0,540],"bridge":[-500,230,0,80],
   "winch":[-500,270],"latch":[-500,270],
   "shadowStart":[170,255],"reflectionStart":[240,300],
   "exit":[1410,235,130,80],
   "obstacles":[[400,145,62,55],[540,355,70,55]],
+  "recoveryPoint":[190,250],
+  "hazards":[{"type":"ember","x":760,"y":270,"amplitudeX":0,"amplitudeY":45,"period":7,"phase":0,"radius":24,"warningSeconds":1,"activeSeconds":2,"restSeconds":3}],
   "garden":{
     "cartStart":[330,270],
     "transferPlate":[660,248,76,48],

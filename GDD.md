@@ -2,6 +2,23 @@
 
 ## Revisão ativa — Uma presença controlável, duas pessoas (07/11/2026)
 
+**Revisão v9 — quatro fases no jogo inteiro, mais ação e nova abertura**
+
+O usuário gostou do protótipo, pediu reduzir de treze para quatro fases, mais ação e uma abertura sem repetir só duas imagens, e autorizou implementar todas antes de chamá-lo para testar. O plano atual é `design/PLANO-QUATRO-FASES.md`. Esta revisão prevalece sobre qualquer menção anterior a treze níveis ou quatro níveis por elemento.
+
+- Campanha: Água (ponte e apresentação), Fogo (transferência com brasas móveis), Vento (rajadas e revezamento), Íris (convergência e conclusão). Os protótipos Água 02/03 foram reaproveitados em Fogo/Vento; não são mais fases extras do mesmo capítulo.
+- `EnvironmentalActionSystem` atualiza trajetos, antecipação, atividade, recuperação segura e empurrões pela colisão. Dados em `HazardData` e JSON; ajustes em `ActionTuning`. O relógio para durante ajuda/pausa. Shift permite correr sem peso; arrastar conserva velocidade anterior. Sem dano, vidas, barras ou cronômetro global. Ação ambiental não teletransporta nem atinge Reflexo.
+- Íris combina os sistemas de jardim e revezamento em sequência, sete objetivos e saída exigindo ambos. Não há quinto mapa. `water04.journey` registra conclusão final; chaves antigas permanecem para compatibilidade. Cada resultado espera Enter/clique, incluindo a volta ao menu após a quarta fase.
+- Abertura de cinco planos distintos em 24 segundos, com personagens animados caminhando e pausando, movimentos de câmera e transições. Textos em dados. Não é CGI nem contém narração sintética. Menu e marca mantêm início explícito.
+- Recursos novos: fundos de Fogo, Vento e Íris e brasa em aquarela transparente. Carga via AssetManager; liberação no ciclo da tela.
+
+**Decisões em aberto da v9**
+- [x] Reduzir o escopo total para quatro fases e implementar fluxo até a conclusão.
+- [x] Acrescentar corrida, brasas e rajadas recuperáveis, sem trocar o controle de Sombra.
+- [x] Substituir a repetição da abertura por cinco planos e animação dos sprites.
+- [ ] Validar ação, repetição, duração e interesse das quatro fases com o usuário.
+- [ ] Validar a abertura em movimento; não considerar seu acabamento aprovado antes do teste.
+
 **Continuação — Água 03, revezamento da sustentação (v8)**
 
 O pedido de continuar e a autorização de avançar fases em paralelo permitem implementar um próximo desafio de cooperação. Esta revisão substitui o fim de Água 02 voltando ao menu: agora Enter/clique segue à Água 03. Nada avança sozinho. A fase 03 termina em um resultado que espera comando para voltar ao menu. Água 04 e o restante do jogo continuam pendentes.
