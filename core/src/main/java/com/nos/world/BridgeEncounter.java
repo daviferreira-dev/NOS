@@ -23,6 +23,7 @@ public final class BridgeEncounter {
     private float support,velocityX,velocityY,noticeTime;
     private boolean locked;
     private String notice="bridgeWelcome";
+    private boolean introducedNearbyHazard;
     public BridgeEncounter(BridgeData data) {
         this.data=data;collision=new BridgeCollisionSystem(data);
         companion=new CompanionBehaviorSystem(data,collision);
@@ -118,6 +119,7 @@ public final class BridgeEncounter {
         if(actions.didRecover()) {
             stop();notify("actionRecovered");
         }
+        introduceNearbyHazard();
         for(int i=0;i<2;i++) {
             PuzzleHero h=heroes[i];
             if(!collision.walkable(h.getX(),h.getY(),isOpen())) {
@@ -145,6 +147,17 @@ public final class BridgeEncounter {
         return h.getX()>=e[0]&&h.getX()<=e[0]+e[2]&&h.getY()>=e[1]&&h.getY()<=e[1]+e[3];
     }
     private void notify(String key) { notice=key;noticeTime=BridgeTuning.NOTICE_DURATION; }
+    private void introduceNearbyHazard() {
+        if(introducedNearbyHazard || noticeTime>0 || (data.phaseNumber!=2 && data.phaseNumber!=3)) return;
+        for(int i=0;i<actions.count();i++) {
+            float dx=heroes[0].getX()-actions.hazardX(i);
+            float dy=heroes[0].getY()-actions.hazardY(i);
+            if(dx*dx+dy*dy>ActionTuning.HINT_DISTANCE*ActionTuning.HINT_DISTANCE) continue;
+            notify("gust".equals(data.hazards[i].type)?"gustApproach":"emberApproach");
+            introducedNearbyHazard=true;
+            return;
+        }
+    }
     private void drainGardenNotice() { String key=garden.pollNotice();if(key!=null) notify(key); }
     private void drainRelayNotice() { String key=relay.pollNotice();if(key!=null) notify(key); }
     public String notice() { return noticeTime>0?notice:null; }

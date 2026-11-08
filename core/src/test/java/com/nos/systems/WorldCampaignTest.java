@@ -9,6 +9,18 @@ import static org.junit.Assert.*;
 
 /** Integra ação ambiental, cooperação e a convergência final pelos mapas distribuídos. */
 public class WorldCampaignTest {
+    @Test public void windHintWaitsForTheWelcomeAndOnlyAppearsOnce() {
+        BridgeEncounter world=create("water-relay.json");
+        go(world,345,280);
+        assertEquals("relayWelcome",world.notice());
+        for(int i=0;i<700 && !"gustApproach".equals(world.notice());i++) world.update(0,0,BridgeTuning.FIXED_STEP);
+        assertEquals("gustApproach",world.notice());
+        waitFor(world,700);
+        assertNull(world.notice());
+        go(world,220,280);
+        go(world,345,280);
+        assertNull(world.notice());
+    }
     @Test public void allDestinationsAndOpeningFramesExistInShippedAssets() {
         com.badlogic.gdx.utils.I18NBundle strings=com.badlogic.gdx.utils.I18NBundle.createBundle(new FileHandle(System.getProperty("nos.assets")+"/ui/strings"));
         for(String map:new String[]{"bridge-encounter.json","water-transfer.json","water-relay.json","iris-convergence.json"}) {

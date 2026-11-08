@@ -13,7 +13,7 @@ Plano, cortes e limites: [design/PLANO-QUATRO-FASES.md](design/PLANO-QUATRO-FASE
 
 ## Jogar
 
-Execute `outputs/Jogar-NOS-Campanha-v9.bat`, mantendo `NOS-Campanha-v9.jar` ao lado. O iniciador usa o JDK 17 deste computador. O executável empacotado não precisa de Gradle ou downloads. As versões anteriores continuam preservadas.
+Abra **Jogar NÓS.bat** na raiz do projeto. As atualizações usam sempre o mesmo arquivo `outputs/NOS.jar`. Em uma cópia recém-clonada, execute `.\gradlew.bat lwjgl3:jar` e copie o JAR da aplicação de `lwjgl3/build/libs` para `outputs/NOS.jar`.
 
 - WASD/setas movem Sombra. E executa a ação contextual.
 - Shift mantido corre sem peso. E segura/solta a jardineira; o movimento empurra ou puxa.
