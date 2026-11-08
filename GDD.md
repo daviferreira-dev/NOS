@@ -2,6 +2,8 @@
 
 ## Revisão ativa — Uma presença controlável, duas pessoas (07/11/2026)
 
+Em Fogo e Íris, uma brasa devolve Sombra ao último piso visitado fora de todo o trajeto dos perigos, com margem definida no mapa. A recuperação verifica se o lugar e a passagem até ele continuam livres. Se a jardineira ou uma grade bloquearem o retorno local, vale o ponto seguro da fase. O ponto local pertence à tentativa atual.
+
 **Revisão v9 — quatro fases no jogo inteiro, mais ação e nova abertura**
 
 O usuário gostou do protótipo, pediu reduzir de treze para quatro fases, mais ação e uma abertura sem repetir só duas imagens, e autorizou implementar todas antes de chamá-lo para testar. O plano atual é `design/PLANO-QUATRO-FASES.md`. Esta revisão prevalece sobre qualquer menção anterior a treze níveis ou quatro níveis por elemento.

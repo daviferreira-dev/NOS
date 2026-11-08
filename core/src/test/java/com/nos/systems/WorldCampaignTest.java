@@ -95,7 +95,7 @@ public class WorldCampaignTest {
         BridgeData data=read("water-transfer.json");
         HazardData ember=new HazardData();ember.x=360;ember.y=270;ember.radius=12;
         ember.warningSeconds=0;ember.activeSeconds=100;ember.restSeconds=0;
-        data.hazards=new HazardData[]{ember};data.recoveryPoint=new float[]{170,255};
+        data.hazards=new HazardData[]{ember};data.recoveryPoint=new float[]{170,255};data.localRecoveryMargin=0;
         BridgeEncounter world=new BridgeEncounter(data);world.start();waitFor(world,30);
         float time=world.actions().time();world.togglePause();
         for(int i=0;i<300;i++) world.update(1,0,.05f,true);

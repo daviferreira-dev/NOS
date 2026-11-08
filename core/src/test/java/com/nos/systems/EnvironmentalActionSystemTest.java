@@ -18,6 +18,29 @@ public class EnvironmentalActionSystemTest {
         hazard.warningSeconds=0;hazard.activeSeconds=100;hazard.restSeconds=0;return hazard;
     }
     private EnvironmentalActionSystem system(BridgeData data) { return new EnvironmentalActionSystem(data,new BridgeCollisionSystem(data)); }
+    @Test public void localRecoveryReturnsToTheSideThePlayerApproachedFrom() {
+        for(float side:new float[]{-1,1}) {
+            HazardData h=ember();h.amplitudeY=45;
+            BridgeData data=data(h);data.localRecoveryMargin=32;
+            EnvironmentalActionSystem system=system(data);
+            float approachX=h.x+side*90;
+            PuzzleHero player=new PuzzleHero(approachX,200),other=new PuzzleHero(120,100);
+            system.update(player,other,.01f);
+            player.setPosition(h.x+side*50,200);system.update(player,other,.01f);
+            player.setPosition(h.x,200);system.update(player,other,.01f);
+            assertTrue(system.didRecover());assertEquals(approachX,player.getX(),0);
+        }
+    }
+    @Test public void planterOnRememberedGroundForcesFallback() {
+        BridgeData data=data(ember());data.localRecoveryMargin=32;
+        BridgeCollisionSystem collision=new BridgeCollisionSystem(data);
+        EnvironmentalActionSystem system=new EnvironmentalActionSystem(data,collision);
+        PuzzleHero player=new PuzzleHero(210,200),other=new PuzzleHero(120,100);
+        system.update(player,other,.01f);
+        collision.setGardenCartPosition(210,200);
+        player.setPosition(300,200);system.update(player,other,.05f);
+        assertTrue(system.didRecover());assertEquals(100,player.getX(),0);
+    }
     @Test public void warningPrecedesActiveWindowAndRestIsSafe() {
         HazardData hazard=ember();hazard.warningSeconds=1;hazard.activeSeconds=2;hazard.restSeconds=2;
         EnvironmentalActionSystem system=system(data(hazard));PuzzleHero player=new PuzzleHero(100,100),other=new PuzzleHero(120,100);

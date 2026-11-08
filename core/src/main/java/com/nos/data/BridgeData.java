@@ -9,6 +9,7 @@ public final class BridgeData {
     public RelayData relay;
     public HazardData[] hazards;
     public float[] recoveryPoint;
+    public float localRecoveryMargin;
     public int phaseNumber=1;
     public boolean gardenOnly;
     public String backgroundPath;

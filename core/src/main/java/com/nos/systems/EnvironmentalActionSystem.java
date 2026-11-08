@@ -57,13 +57,16 @@ public final class EnvironmentalActionSystem {
             }
         }
         previousX=player.getX();previousY=player.getY();observed=true;
-        if(safe(player.getX(),player.getY())) { safeX=player.getX();safeY=player.getY();hasSafe=true; }
+        if(canRemember(player.getX(),player.getY())) { safeX=player.getX();safeY=player.getY();hasSafe=true; }
     }
     private boolean recover(PuzzleHero player) {
         float x,y;
-        if(data.recoveryPoint!=null&&data.recoveryPoint.length>=2&&safe(data.recoveryPoint[0],data.recoveryPoint[1])) {
+        if(data.localRecoveryMargin>0 && hasSafe && canRemember(safeX,safeY)
+            && collision.clearPath(player.getX(),player.getY(),safeX,safeY,bridgeOpen)) {
+            x=safeX;y=safeY;
+        } else if(data.recoveryPoint!=null&&data.recoveryPoint.length>=2&&safe(data.recoveryPoint[0],data.recoveryPoint[1])) {
             x=data.recoveryPoint[0];y=data.recoveryPoint[1];
-        } else if(hasSafe&&safe(safeX,safeY)) { x=safeX;y=safeY; }
+        } else if(data.localRecoveryMargin<=0&&hasSafe&&safe(safeX,safeY)) { x=safeX;y=safeY; }
         else if(data.shadowStart!=null&&data.shadowStart.length>=2&&safe(data.shadowStart[0],data.shadowStart[1])) {
             x=data.shadowStart[0];y=data.shadowStart[1];
         } else return false;
@@ -74,6 +77,18 @@ public final class EnvironmentalActionSystem {
         for(int i=0;i<hazards.length;i++) {
             float radius=hazards[i].radius+BridgeTuning.RADIUS;
             if(isActive(i)&&distanceSquared(x,y,hazardX(i),hazardY(i))<=radius*radius) return false;
+        }
+        return true;
+    }
+    private boolean canRemember(float x,float y) {
+        if(!safe(x,y)) return false;
+        if(data.localRecoveryMargin<=0) return true;
+        // Mesmo em repouso, reserve o espaço que o perigo pode alcançar no próximo ciclo.
+        for(HazardData hazard:hazards) {
+            float dx=Math.max(0,Math.abs(x-hazard.x)-Math.abs(hazard.amplitudeX));
+            float dy=Math.max(0,Math.abs(y-hazard.y)-Math.abs(hazard.amplitudeY));
+            float clearance=hazard.radius+BridgeTuning.RADIUS+data.localRecoveryMargin;
+            if(dx*dx+dy*dy<=clearance*clearance) return false;
         }
         return true;
     }
@@ -112,7 +127,7 @@ public final class EnvironmentalActionSystem {
     public boolean didRecover() { return recovered; }
     public void reset() {
         elapsed=0;cooldown=0;recovered=false;observed=false;hasSafe=false;
-        if(data.shadowStart!=null&&data.shadowStart.length>=2&&safe(data.shadowStart[0],data.shadowStart[1])) {
+        if(data.shadowStart!=null&&data.shadowStart.length>=2&&canRemember(data.shadowStart[0],data.shadowStart[1])) {
             safeX=data.shadowStart[0];safeY=data.shadowStart[1];hasSafe=true;
         }
     }
