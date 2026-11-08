@@ -2,6 +2,8 @@
 
 ## Revisão ativa — Uma presença controlável, duas pessoas (07/11/2026)
 
+Com o primeiro checkpoint salvo, reabrir o jogo leva ao título. A opção Rever abertura continua disponível. A partir de Fogo, Escolher fase permite voltar ao início de qualquer fase já alcançada pelo teclado, mouse ou toque. Continuar ainda usa o ponto mais avançado da campanha.
+
 Em Fogo e Íris, uma brasa devolve Sombra ao último piso visitado fora de todo o trajeto dos perigos, com margem definida no mapa. A recuperação verifica se o lugar e a passagem até ele continuam livres. Se a jardineira ou uma grade bloquearem o retorno local, vale o ponto seguro da fase. O ponto local pertence à tentativa atual.
 
 **Revisão v9 — quatro fases no jogo inteiro, mais ação e nova abertura**

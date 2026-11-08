@@ -27,7 +27,13 @@ public class NosGame extends Game {
     public void create() {
         soundtrack=new Soundtrack(silent);
         progress=silent||skipIntro||legacy?new SaveData(null):new SaveData();
-        setScreen(legacy ? new GameScreen() : skipIntro ? new BridgeScreen(false,progress,false) : new IntroScreen(this));
+        if(legacy) setScreen(new GameScreen());
+        else if(skipIntro) setScreen(new BridgeScreen(false,progress,false));
+        else {
+            IntroScreen intro=new IntroScreen(this);
+            if(progress.canResumeJourney()) intro.showTitle();
+            setScreen(intro);
+        }
         if(skipIntro) soundtrack.journey();
     }
 

@@ -13,6 +13,8 @@ Plano, cortes e limites: [design/PLANO-QUATRO-FASES.md](design/PLANO-QUATRO-FASE
 
 ## Jogar
 
+Com progresso salvo, o jogo abre no menu. A partir de Fogo, pressione F ou clique em **Escolher fase** para revisitar uma fase desbloqueada. R no menu revê a abertura.
+
 Abra **Jogar NÓS.bat** na raiz do projeto. As atualizações usam sempre o mesmo arquivo `outputs/NOS.jar`. Em uma cópia recém-clonada, execute `.\gradlew.bat lwjgl3:jar` e copie o JAR da aplicação de `lwjgl3/build/libs` para `outputs/NOS.jar`.
 
 - WASD/setas movem Sombra. E executa a ação contextual.

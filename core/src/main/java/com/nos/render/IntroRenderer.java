@@ -65,10 +65,39 @@ public final class IntroRenderer implements Disposable {
         text(assets.text.get("openingReplayKey"),315,166,.35f,gold);
         text(assets.text.get(!music.isAvailable()?"openingAudioUnavailable":music.isMuted()?"openingMusicOff":"openingMusicOn"),91,116,.31f,ink);
         text(assets.text.get("openingMusicKey"),315,116,.31f,gold);
-        text(assets.text.get(saved?"openingProgressHint":"openingWait"),76,62,.28f,ink);
+        if(progress>=2) text(assets.text.get("openingChooseChapter"),76,68,.35f,gold);
+        else text(assets.text.get(saved?"openingProgressHint":"openingWait"),76,62,.28f,ink);
         text(assets.text.get(!saved?"openingMenuKeys":progress>=4?"openingMenuKeysIris":progress>=3?"openingMenuKeysWaterThree":progress>=2?"openingMenuKeysWaterTwo":"openingMenuKeysSaved"),76,38,.27f,ink);batch.end();
         float darkness=Math.max(1-sequence.titleVisibility(),sequence.startFade());
         if(darkness>0) { fill();shapes.setColor(ink.r*.35f,ink.g*.35f,ink.b*.35f,darkness);shapes.rect(0,0,960,540);shapes.end(); }
+    }
+    public void renderChapters(Viewport viewport,int progress) {
+        com.badlogic.gdx.utils.ScreenUtils.clear(ink);
+        viewport.apply();
+        batch.setProjectionMatrix(viewport.getCamera().combined);
+        shapes.setProjectionMatrix(viewport.getCamera().combined);
+        batch.begin();batch.setColor(Color.WHITE);
+        batch.draw(assets.wide,0,0,960,540,0,0,assets.wide.getWidth(),assets.wide.getHeight(),true,false);
+        batch.end();
+        int unlocked=Math.min(4,progress);
+        fill();
+        shapes.setColor(paper);shapes.rect(0,0,395,540);
+        for(int phase=1;phase<=unlocked;phase++) {
+            shapes.setColor(ink);
+            shapes.rect(76,OpeningTuning.chapterBottom(phase),264,OpeningTuning.ROW_HEIGHT);
+        }
+        shapes.end();
+        batch.begin();
+        assets.title.setColor(ink);assets.title.getData().setScale(.63f);
+        assets.title.draw(batch,assets.text.get("chaptersTitle"),76,448);
+        text(assets.text.get("chaptersHint"),76,393,.28f,ink);
+        for(int phase=1;phase<=unlocked;phase++) {
+            float y=OpeningTuning.chapterBottom(phase)+32;
+            text(Integer.toString(phase),91,y,.34f,paper);
+            text(assets.text.get("chapterName"+phase),130,y,.38f,paper);
+        }
+        text(assets.text.get("chaptersBack"),76,103,.32f,gold);
+        batch.end();
     }
     private void fill() { Gdx.gl.glEnable(GL20.GL_BLEND);Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA);shapes.begin(ShapeRenderer.ShapeType.Filled); }
     private void text(String s,float x,float y,float scale,Color color) { assets.body.getData().setScale(scale);assets.body.setColor(color);assets.body.draw(batch,s,x,y); }

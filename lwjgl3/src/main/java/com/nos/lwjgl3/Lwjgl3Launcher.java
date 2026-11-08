@@ -34,6 +34,20 @@ public class Lwjgl3Launcher {
                         else if(getScreen() instanceof BridgeScreen) ((BridgeScreen)getScreen()).prepareSmokeScene(args.length>2?args[2]:"");
                         else {
                             String scenario=args.length>2?args[2]:"reflection";
+                            if(scenario.equals("--chapters")||scenario.equals("--revisit-fire")) {
+                                progress().recordJourneyComplete();
+                                progress().recordSecondJourneyComplete();
+                                ((IntroScreen)getScreen()).showTitle();
+                                getScreen().render(.05f);
+                                Gdx.input.getInputProcessor().keyDown(com.badlogic.gdx.Input.Keys.F);
+                                getScreen().render(.05f);
+                                if(scenario.equals("--revisit-fire")) {
+                                    Gdx.input.getInputProcessor().keyDown(com.badlogic.gdx.Input.Keys.NUM_2);
+                                    for(int i=0;i<40&&getScreen() instanceof IntroScreen;i++) getScreen().render(.05f);
+                                    if(!(getScreen() instanceof BridgeScreen)||!((BridgeScreen)getScreen()).isWaterTwo()||progress().menuProgress()!=3)
+                                        throw new IllegalStateException("Falha ao revisitar Fogo com Vento desbloqueado.");
+                                }
+                            } else
                             if(scenario.equals("--resume-start")||scenario.equals("--fresh-start")||scenario.equals("--resume-water-two")||scenario.equals("--resume-water-three")||scenario.equals("--resume-iris")) {
                                 // Nesta aplicação de inspeção, progress usa somente memória.
                                 if(scenario.equals("--resume-iris")) { progress().recordJourneyComplete();progress().recordSecondJourneyComplete();progress().recordThirdJourneyComplete(); }
