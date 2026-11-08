@@ -1,0 +1,12 @@
+{
+  "trailA": [[100,220],[500,260],[950,290],[1450,240],[1950,310],[2450,250],[2900,270],[3100,290]],
+  "trailB": [[100,330],[350,160],[600,350],[850,220],[1100,390],[1350,180],[1600,340],[1850,150],[2100,330],[2350,190],[2600,370],[2850,160],[3100,290]],
+  "gates": [
+    {"world":0,"progress":0.22,"period":7,"opening":3.6,"offset":1.4},
+    {"world":1,"progress":0.22,"period":7,"opening":3.6,"offset":4.9},
+    {"world":0,"progress":0.57,"period":6,"opening":3.0,"offset":0.8},
+    {"world":1,"progress":0.57,"period":6,"opening":3.0,"offset":3.8},
+    {"world":0,"progress":0.82,"period":8,"opening":3.8,"offset":1.8},
+    {"world":1,"progress":0.82,"period":8,"opening":3.8,"offset":5.8}
+  ]
+}

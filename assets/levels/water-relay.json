@@ -1,0 +1,17 @@
+{
+  "width":1600,"height":540,"phaseNumber":3,
+  "gardenOnly":true,"backgroundPath":"art/water-relay-bank-v1.png","destinationKey":"relayExitLabel",
+  "ground":[60,145,1480,265],
+  "river":[-500,0,0,540],"bridge":[-500,230,0,80],
+  "winch":[-500,270],"latch":[-500,270],
+  "shadowStart":[170,255],"reflectionStart":[240,300],
+  "exit":[1410,235,130,80],
+  "obstacles":[[420,355,62,55],[1210,145,62,55]],
+  "relay":{
+    "westPlate":[620,175,48,32],"eastPlate":[1010,175,48,32],
+    "gate":[820,230,24,95],"reunionPoint":[1034,290],
+    "barriers":[[790,145,90,85],[790,325,90,85]],
+    "westCable":[[644,206],[644,222],[830,222],[830,245]],
+    "eastCable":[[1034,206],[1034,222],[840,222],[840,245]]
+  }
+}

@@ -1,32 +1,77 @@
 package com.nos;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.Game;
+import com.nos.screens.GameScreen;
+import com.nos.screens.IntroScreen;
+import com.nos.screens.PuzzleScreen;
+import com.nos.screens.BridgeScreen;
+import com.nos.audio.Soundtrack;
+import com.nos.data.SaveData;
+import com.nos.data.JourneyProgress;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 
-/** Initial libGDX application shared by all targets. */
-public class NosGame extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture image;
+/** Ponto de entrada compartilhado; mantém o ciclo de vida da tela. */
+public class NosGame extends Game {
+    private final boolean skipIntro;
+    private final boolean legacy;
+    private final boolean silent;
+    private Soundtrack soundtrack;
+    private SaveData progress;
+    public NosGame() { this(false); }
+    public NosGame(boolean skipIntro) { this(skipIntro,false); }
+    public NosGame(boolean skipIntro,boolean legacy) { this(skipIntro,legacy,false); }
+    public NosGame(boolean skipIntro,boolean legacy,boolean silent) { this.skipIntro=skipIntro;this.legacy=legacy;this.silent=silent; }
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+        soundtrack=new Soundtrack(silent);
+        progress=silent||skipIntro||legacy?new SaveData(null):new SaveData();
+        setScreen(legacy ? new GameScreen() : skipIntro ? new BridgeScreen(false,progress,false) : new IntroScreen(this));
+        if(skipIntro) soundtrack.journey();
     }
 
-    @Override
-    public void render() {
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-        batch.draw(image, 140, 210);
-        batch.end();
+    public Soundtrack soundtrack() { return soundtrack; }
+    public SaveData progress() { return progress; }
+    public void returnToTitle() {
+        com.badlogic.gdx.Screen previous=getScreen();IntroScreen menu=new IntroScreen(this);
+        menu.showTitle();setScreen(menu);if(previous!=null) previous.dispose();
     }
+    public void beginJourney() { beginJourney(progress.canResumeJourney()); }
+    public void beginJourney(boolean resumeCheckpoint) {
+        JourneyProgress.Stage stage=JourneyProgress.start(progress,resumeCheckpoint);
+        if(stage==JourneyProgress.Stage.WATER_THREE) { beginWaterThree();return; }
+        if(stage==JourneyProgress.Stage.WATER_TWO) { beginWaterTwo();return; }
+        boolean resume=stage==JourneyProgress.Stage.GARDEN;
+        com.badlogic.gdx.Screen previous=getScreen();
+        setScreen(new BridgeScreen(true,progress,resume));
+        if(resume) soundtrack.garden();else soundtrack.journey();
+        if(previous!=null) previous.dispose();
+    }
+    public void beginWaterTwo() {
+        if(!progress.isSecondJourneyAvailable()) { returnToTitle();return; }
+        com.badlogic.gdx.Screen previous=getScreen();
+        setScreen(new BridgeScreen(true,progress,false,true));soundtrack.garden();
+        if(previous!=null) previous.dispose();
+    }
+    public void beginWaterThree() {
+        if(!progress.isThirdJourneyAvailable()) { returnToTitle();return; }
+        com.badlogic.gdx.Screen previous=getScreen();
+        setScreen(new BridgeScreen(true,progress,false,3));soundtrack.garden();
+        if(previous!=null) previous.dispose();
+    }
+    @Override public void render() {
+        if(soundtrack!=null&&Gdx.input.isKeyJustPressed(Input.Keys.M)
+            &&!(getScreen() instanceof BridgeScreen&&((BridgeScreen)getScreen()).isConfiguringControls())) soundtrack.toggleMute();
+        super.render();
+        if(soundtrack!=null) soundtrack.update(Math.min(.1f,Gdx.graphics.getDeltaTime()));
+    }
+    @Override public void pause() { super.pause();if(soundtrack!=null) soundtrack.pause(); }
+    @Override public void resume() { super.resume();if(soundtrack!=null) soundtrack.resume(); }
 
     @Override
     public void dispose() {
-        batch.dispose();
-        image.dispose();
+        if (getScreen() != null) getScreen().dispose();
+        if(soundtrack!=null) soundtrack.dispose();
     }
 }

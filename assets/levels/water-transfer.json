@@ -1,0 +1,23 @@
+{
+  "width":1600,"height":540,
+  "phaseNumber":2,"gardenOnly":true,"backgroundPath":"art/water-terrace-v1.png","destinationKey":"transferExitLabel",
+  "ground":[60,145,1480,265],
+  "river":[-500,0,0,540],"bridge":[-500,230,0,80],
+  "winch":[-500,270],"latch":[-500,270],
+  "shadowStart":[170,255],"reflectionStart":[240,300],
+  "exit":[1410,235,130,80],
+  "obstacles":[[400,145,62,55],[540,355,70,55]],
+  "garden":{
+    "cartStart":[330,270],
+    "transferPlate":[660,248,76,48],
+    "transferGate":[820,230,24,95],
+    "transferCable":[[698,294],[698,344],[826,344],[826,302]],
+    "helperPlate":[1000,170,48,32],
+    "weightPlate":[1180,285,76,48],
+    "gate":[1370,230,24,95],
+    "barriers":[[790,145,90,85],[790,325,90,85],[1330,145,210,85],[1330,325,210,85]],
+    "helperCable":[[1024,201],[1024,222],[1380,222],[1380,245]],
+    "weightCable":[[1218,332],[1218,352],[1380,352],[1380,302]],
+    "checkpointShadow":[170,255],"checkpointReflection":[240,300]
+  }
+}

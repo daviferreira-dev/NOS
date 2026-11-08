@@ -1,0 +1,12 @@
+{
+  "seconds":8,
+  "notes":[
+    {"time":0.18,"pitch":50,"velocity":34,"duration":3.9},
+    {"time":0.24,"pitch":57,"velocity":25,"duration":3.5},
+    {"time":1.37,"pitch":69,"velocity":32,"duration":2.4},
+    {"time":2.64,"pitch":74,"velocity":27,"duration":1.7},
+    {"time":4.13,"pitch":65,"velocity":35,"duration":2.6},
+    {"time":5.39,"pitch":64,"velocity":24,"duration":1.8},
+    {"time":6.32,"pitch":62,"velocity":29,"duration":1.2}
+  ]
+}

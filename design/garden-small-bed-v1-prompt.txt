@@ -1,0 +1,6 @@
+Asset: assets/art/garden-small-bed-v1.png
+Created: 2026-11-07
+Tool: built-in image_gen, transparent background. No API/CLI fallback.
+Style reference: assets/art/water-terrace-v1.png
+Final prompt:
+Use case: stylized-concept. Asset type: transparent-background 2D game prop sprite for NÓS. Image reference is STYLE REFERENCE ONLY: watercolor pale limestone, soft sage leaves, restrained pale lavender and ivory flowers, paper grain, mature quiet aesthetic. Generate ONE low freestanding square limestone garden planter with a dense but natural loose flowering shrub, seen from elevated orthographic 3/4 overhead view matching the background. Footprint approximately square, small rounded weathered stones along all sides, low wall, plant shoots organic and asymmetrical. Entire isolated object fully visible, no cropping, no clipped edges, no background ground or rectangle, no text, no people. Genuine transparent alpha surrounding whole sprite. Soft contact shadow immediately under object only. Keep margins small but leave clear transparent space on every edge. Fine hand-painted detail readable in a small 100px game prop. NOT a tall tower, not a flowerpot, not a cut section of a larger border.

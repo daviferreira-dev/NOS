@@ -1,5 +1,163 @@
 # NÓS — Documento de Design (GDD)
 
+## Revisão ativa — Uma presença controlável, duas pessoas (07/11/2026)
+
+**Continuação — Água 03, revezamento da sustentação (v8)**
+
+O pedido de continuar e a autorização de avançar fases em paralelo permitem implementar um próximo desafio de cooperação. Esta revisão substitui o fim de Água 02 voltando ao menu: agora Enter/clique segue à Água 03. Nada avança sozinho. A fase 03 termina em um resultado que espera comando para voltar ao menu. Água 04 e o restante do jogo continuam pendentes.
+
+- Em `water-relay.json`, Reflexo caminha até o pedal oeste quando Sombra pede ajuda. Apenas a chegada física ao pedal abre a grade; Sombra não pode resolver esse lado sozinha. Há espera por espaço e cancelamento próximo como nos encontros anteriores.
+- Sombra atravessa a passagem e pisa no pedal leste. A ação contextual chama Reflexo para atravessar. Enquanto ela permanece no pedal, ele navega até um ponto de reunião além da grade. Sair cedo faz Reflexo esperar sem perder posição; retornar ao pedal retoma o mesmo pedido, sem outra interação.
+- A grade temporária espera o vão ficar livre. A chegada física ao ponto de reunião trava a passagem permanentemente. Depois os dois seguem ao claustro. Não há jardineira neste desafio, cronômetro, dano ou troca de personagem.
+- `RelayGateSystem` contém estados e regras; `RelayData/RelayTuning` contêm geometria e ajustes. `BridgeEncounter` integra movimento, pausa e conclusão. A colisão e a navegação são as mesmas dos outros encontros, sem teleporte durante a solução. Sistemas têm testes isolados e um percurso completo no JSON distribuído.
+- A fase usa novo cenário em aquarela ao entardecer, com sprites já existentes dos heróis, pedais e grade. O HUD mostra Água 03 e quatro etapas. Textos estão em dados, comandos continuam remapeáveis e a ajuda pausa toda a simulação.
+- `water03.journey` registra a terceira conclusão via Preferences. `JourneyProgress` continua da fase mais avançada disponível. Registros inválidos ou órfãos não pulam desbloqueios; começar novamente conserva o progresso. Inspeções usam memória e não alteram o save real.
+
+**Decisões em aberto da v8**
+- [x] Implementar revezamento, interrupção recuperável, sequência entre três fases e persistência compatível.
+- [ ] Validar ritmo, clareza do pedido no pedal leste e interesse da cooperação com o usuário.
+- [ ] Água 04: combinar transferência e revezamento após validar as regras introduzidas; ainda não implementada.
+
+**Ampliação autorizada — Água 02, transferência de contrapeso (v7)**
+
+O usuário pediu avançar para as próximas fases com trabalho paralelo, após fechar a demo. A primeira nova entrega acrescenta Água 02; os treze níveis não ficam concluídos por essa ampliação. Esta revisão substitui a volta ao menu no fim de Água 01: a conclusão agora espera Enter/clique para seguir à segunda fase, nunca avança automaticamente. O fim de Água 02 espera Enter/clique para voltar ao menu. A abertura continua terminando no menu.
+
+- Água 02 usa `levels/water-transfer.json` e uma nova varanda de estufa em aquarela. A personagem controlável, sprites, controles e regras de ausência de dano/cronômetro permanecem.
+- Uma primeira grade abre enquanto a jardineira pressiona seu pedal largo. Sombra atravessa e pede ajuda no pedal menor além dela. Reflexo chega pelo piso real; somente sua chegada e sustentação travam a primeira grade aberta. Sombra pode então recuperar a mesma jardineira e levá-la ao pedal largo da saída. Os dois pesos e a trava anterior liberam a saída permanente.
+- A grade temporária espera pessoas ou a peça saírem do vão antes de fechar. Não esmaga, teletransporta nem pune. A variante é opcional em `GardenData`; sem `transferPlate/transferGate`, Água 01 conserva a solução anterior. Os cabos físicos também ficam no JSON.
+- `BridgeEncounter` recebe a variante `gardenOnly` por dados; regras continuam em `GardenGateSystem` e `BridgeCollisionSystem`. A tela seleciona o mapa e orquestra. A sequência da solução é testada no JSON distribuído, sem OpenGL e sem reposicionar personagens durante o percurso.
+- `SaveData` preserva `water01.journey` e registra conclusão de Água 02 separadamente. `JourneyProgress` escolhe o trecho a continuar. O menu oferece Água 02 depois da primeira conclusão; recomeçar não apaga progresso. A segunda fase pode ser repetida. `R` reinicia somente a fase/trecho atual.
+- Correção de entrada: aliases físicos de WASD/setas permanecem independentes, inclusive remapeados. Soltar uma tecla não cancela a outra mantida; abrir a ajuda não rearma movimento pela autorrepetição.
+
+**Decisões em aberto desta ampliação**
+- [x] Implementar transferência de peso, sequência entre fases e persistência compatível.
+- [ ] Validar com o usuário interesse do novo desafio, leitura dos três pedais e ritmo do retorno à jardineira.
+- [x] Implementar o próximo recorte, Água 03, na continuação v8 descrita acima.
+- [ ] Água 04 ainda não implementada; validar os primeiros recortes com o usuário.
+
+O usuário aprovou testar uma relação em que se controla apenas uma presença e se percebe a outra como pessoa distinta, apesar do mesmo rosto. O recorte continua sendo a ponte; não se antecipa a história completa nem se explica o mistério. Esta revisão substitui a troca por Tab da versão anterior.
+
+- O jogador move somente Sombra (WASD/setas por padrão). Reflexo não é selecionável. Câmera, marcador por forma e sombra de contato identificam Sombra sem depender apenas da cor.
+- Reflexo tem um pequeno tempo de reação e distâncias diferentes para partir e parar. Ao se aproximarem do rio, observa a água uma vez e pergunta discretamente "Você também viu?". O pedido de ajuda interrompe essa observação; ele retoma o acompanhamento se o jogador se afasta. Não usar a autonomia para bloquear a sessão ou resolver o desafio sozinho.
+- No guincho, a ação contextual pede ajuda. Reflexo caminha até o mecanismo respeitando pedras, margens e água; se Sombra ocupa o ponto, espera espaço. A ponte só começa a estender quando Reflexo chega e assume a sustentação. Sombra continua sob controle durante todo o processo.
+- Sombra atravessa e fixa a escora com a ação contextual. Reflexo não fixa essa escora sozinho. A ponte fica segura; ele solta o guincho, faz uma pequena pausa e se reúne a Sombra pela ponte. Ambos precisam chegar ao jardim para concluir.
+- Perto do guincho, pedir novamente cancela a aproximação ou chama Reflexo de volta. Não há comando remoto para soltar a sustentação do meio da ponte. Sem cronômetro, dano ou tinta; o retorno à margem segura continua como recuperação de perda inesperada de piso.
+- Abertura ilustrada, menu com início explícito, sprites e trilhas originais são aproveitados. Volume máximo da música reduzido a 20% por pedido do usuário. A cutscene sempre termina no menu; somente Começar ou um novo Enter inicia a partida.
+- Interface: ajuda/pausa modal interrompe toda a simulação, escurece a cena e substitui o HUD. Comandos em teclas visuais e grupos. Objetivo mostra "Etapa N de 3", expande ao mudar e depois encolhe; os atalhos ficam discretos com o tempo. Painéis compartilham papel creme, títulos serifados e texto de apoio legível. Textos e teclas podem ser ajustados pelo menu; preferências são salvas. Sem suporte de gamepad nesta implementação.
+- Apresentação ambiental: contato dos pés mais legível, remoção de riscos soltos sobre a água, pedra sem tintura verde chapada, destino com indicação legível sem cruzar a coluna, laterais em cor da cena e opção de tela cheia. Nenhuma alteração na planta de colisão.
+- Arquitetura: `BridgeEncounter`, `CompanionBehaviorSystem`, `CompanionFollowSystem`, `BridgeCollisionSystem`, `BridgeKeyBindings`, `BridgeInput`, `BridgeScreen`, `BridgeUiState`, `BridgeHudRenderer` e `BridgeRenderer`. Ajustes em `BridgeTuning`; planta no JSON existente.
+
+**Ampliação jogável autorizada — contrapesos no pátio**
+
+**Refinamento da demo — continuidade e espaço para cooperar (v6)**
+
+O usuário pediu continuar com decisões automáticas e priorizar rapidez. O foco é fechar uma demo curta da primeira fase antes de produzir as treze fases previstas; o interesse da jogabilidade ainda precisa do teste do usuário.
+
+- Ao fixar a ponte, `SaveData` registra um checkpoint do pátio via `Preferences`; ao concluir, registra a conclusão desse trecho. O avanço é monotônico e mantém o recorde legado separado. Valores inválidos de progresso voltam ao início, sem pular desafios.
+- Ao reabrir, o menu oferece Continuar do pátio ou Revisitar pátio, conforme o avanço. Jogar do começo inicia uma sessão nova sem apagar o checkpoint mais avançado. Pular/terminar a abertura continua indo apenas ao menu; cada início exige um novo comando explícito.
+- Depois da conclusão, Enter/clique volta ao menu e R repete o pátio. A tecla mantida da tela anterior não inicia outra partida. Retomar e reiniciar posicionam a câmera imediatamente no trecho correto.
+- Inspeções e testes usam armazenamento em memória, sem alterar o progresso real do jogador. `R` continua reiniciando o trecho atual durante a sessão.
+- Ao mover a jardineira contra Reflexo livre, ele pode dar um passo lateral pelo piso, depois de uma pequena reação. O desvio precisa de caminho seguro e espaço para o jogador; não atravessa jardineira, obstáculos ou água, e não teletransporta. Quando sustenta o pedal, ele permanece ali. Sem rota livre, o jogador pode puxar ou reposicionar a peça.
+- Um bloqueio persistente mostra um aviso curto com intervalo entre repetições. A pausa congela também o desvio. A regra fica em `CompanionClearanceSystem`, independente da apresentação.
+- Cabos com percurso definido em JSON ligam os pedais à grade. A pressão do pedal muda discretamente sua apresentação e a tensão do cabo; o feedback combina deslocamento físico e forma, sem depender de cor. `GardenMechanismRenderer` reúne essa apresentação.
+
+- [x] Implementar checkpoint, início explícito, desvio físico e leitura dos mecanismos.
+- [ ] Validar a demo e o menu de continuidade com o usuário.
+
+**Recorte implementado na v5**
+
+O usuário pediu continuar o jogo com decisões automáticas e trabalho paralelo, depois de rejeitar o teste CGI. O pátio já ilustrado passa a ter uma jardineira com rodas, um pedal pequeno, um pedal largo e uma grade com trava. É um desafio adicional da primeira fase de Água, não a conclusão de M1/M2 ou dos treze níveis.
+
+- `E` perto da jardineira segura/solta; WASD empurra ou puxa a mesma peça, com velocidade menor. A caixa respeita água, obstáculos, canteiros, grade e o corpo de Reflexo. Puxar evita deixar a peça presa num canto.
+- `E` perto do pedal menor pede ajuda. Reflexo percorre o caminho, espera espaço e pisa no pedal ao chegar. Pedir novamente chama de volta. Sombra também pode pressionar o pedal fisicamente; o pedal largo exige a massa da jardineira.
+- Quando os dois pesos estão presentes, a grade se ergue e uma trava a mantém aberta. Reflexo fica livre para se reunir a Sombra. Ambos atravessam a grade para concluir. Sem cronômetro, dano, barras ou troca de controle.
+- `R` depois de fixar a ponte reinicia só o pátio durante essa sessão. Abertura e início explícito permanecem. Não há novo salvamento em arquivo nem dependência de runtime.
+- `GardenGateSystem`, `GardenData`, `GardenTuning` e a colisão compartilhada mantêm as regras fora da renderização. Os dados opcionais `garden` no JSON permitem preservar a ponte de três etapas em fixtures e experiências antigas.
+- Objetivo informa etapa atual de cinco e os comandos próximos usam as teclas remapeadas. Ajuda/configuração continuam pausando a simulação; texto ampliado e tela cheia permanecem. A arte dos novos objetos é aquarela transparente, com os mesmos heróis.
+- Terceiro tema musical de 112 segundos para o pátio, piano e harpa amostrados com frases/pausas próprias. A transição mantém o teto de volume de 20%, mute e pausa de foco. Sem voz sintética. Procedência e licença do banco GeneralUser GS acompanham o áudio.
+
+- [x] Implementar posicionamento, ajuda física, pesos, abertura permanente e reinício do trecho.
+- [ ] Validar interesse do puzzle, legibilidade dos objetos e nova trilha com o usuário.
+
+**Abertura CGI — piloto rejeitado (07/11/2026)**
+
+O usuário rejeitou a prévia CGI por aparência infantil, qualidade insuficiente e movimento sem a atuação esperada da referência. O teste de mão, água e voz sintética não entregou a cinematográfica solicitada. Essa tentativa está encerrada e não deve ser integrada ao jogo nem apresentada como abertura pronta. Os entregáveis foram retirados da pasta ativa e arquivados fora do projeto. Os scripts permanecem somente como registro do experimento rejeitado.
+
+A imagem `design/cinematic-cgi-look-v1.png` continua sendo uma referência estática de aparência, não um render 3D alcançado. A abertura ilustrada já distribuída continua no jogo, com menu que espera início explícito. A narração está adiada, como escolhido pelo usuário após rejeitar a voz sintética. O trabalho atual se concentra na jogabilidade e na arte em aquarela aprovada.
+
+O usuário autorizou continuar o jogo depois desse experimento, com decisões de implementação aprovadas automaticamente, sem novas perguntas de rotina, sem custo adicional e sem interferir nos outros trabalhos. O próximo recorte acrescenta agência e posicionamento ao pátio após a ponte; Sombra continua controlável e Reflexo autônomo. Não considerar M1/M2 completos ou divertidos antes do teste do usuário.
+
+**Decisões atuais**
+- [x] Testar Sombra como única presença controlável e Reflexo como pessoa autônoma.
+- [x] Manter o pedido de ajuda contextual e a solução final da escora nas mãos do jogador.
+- [x] Pausar a simulação durante ajuda e configuração, com comandos visuais e hierarquia de leitura.
+- [ ] Validar se Reflexo parece uma pessoa, e não um corpo que simplesmente copia o jogador.
+- [ ] Validar ritmo da cooperação, clareza do guincho e interesse da ponte.
+- [ ] Validar leitura, tamanho de texto, remapeamento e nova apresentação do cenário.
+- [ ] Aprofundar as diferenças de percepção e memória somente depois desse teste.
+- [x] Preparar ferramentas gratuitas isoladas, render 3D e trilha instrumental para um plano piloto.
+- [x] Retirar a voz sintética rejeitada e adiar narração, por decisão do usuário.
+- [x] Avaliação do piloto CGI pelo usuário: rejeitado; encerrar essa tentativa.
+- [ ] Cinematográfica completa suspensa; o experimento de CGI procedural foi rejeitado.
+- [ ] Definir integração e formato por plataforma depois de haver cinematográfica revisada, preservando pular → menu → Começar.
+
+---
+
+## Revisão anterior — Encontro da ponte com troca de controle
+
+Depois de considerar a aparência e a jogabilidade dos testes anteriores insatisfatórias, o usuário pediu referências de jogos publicados e aprovou seguir com um encontro ambiental: **um sustenta, o outro atravessa e fixa a ponte**. Esta revisão é o teste atual e prevalece sobre as revisões anteriores preservadas abaixo.
+
+- Controle experimental mais simples: WASD/setas movem a presença ativa; Tab troca; a outra acompanha enquanto estiver solta. E é a ação contextual. O espelhamento simultâneo foi mantido na sala anterior para comparação, mas não é obrigatório na exploração atual.
+- Na margem inicial, E ata a presença ativa ao mecanismo e troca o controle para a outra. O vínculo sustenta a ponte, que se estende de forma visível. Uma presença atada fica parada.
+- A outra atravessa e usa E na escora da margem oposta. A ponte fica permanentemente segura, o nó se solta e as duas presenças podem seguir ao jardim. A saída exige ambas.
+- Sem tempo limite, dano, tinta ou pontuação. Soltar cedo permite que a ponte recue; quem ficar sem piso retorna à última margem segura, sem morte e sem bloquear a sessão. Espaço/Esc pausa; R recomeça.
+- Planta em `levels/bridge-encounter.json` e `BridgeTuning`. Margens, água, faixa da ponte e obstáculos têm geometria explícita. Sistemas de colisão e estado podem ser testados sem OpenGL.
+- Apresentação: cenário próprio com duas margens e vão central, ponte pintada, ciclo inicial de quatro quadros por personagem, câmera acompanhando o corpo ativo. Não é uma animação final em oito direções.
+- Abertura revisada a pedido do usuário: montagem ilustrada de 23 segundos com planos da margem, do reflexo e retorno ao conjunto, movimentos lentos de câmera, transições e duas composições instrumentais originais. Terminar ou pular leva a um menu que espera indefinidamente. A logo fica separada dos personagens; somente Começar ou um novo Enter no menu inicia a travessia. Rever abertura e ligar/desligar música estão disponíveis no menu. M alterna a música durante o jogo; Preferences preserva a escolha. A música pausa ao perder foco. Isso amplia a autorização de apresentação e áudio sem antecipar a narrativa completa do M5.
+- Refinamento: repouso e sustentação têm poses próprias; os quadros compartilham altura visual e origem nos pés. A caminhada avança pela distância realmente percorrida e para diante de colisões. Mecanismos usam sprites em aquarela com estados de repouso/acionamento, e a ação contextual aparece junto ao objeto próximo. O rodapé informa quando o parceiro está sustentando a ponte.
+- Seguimento: o parceiro procura um desvio caminhável quando a linha direta encontra pedra ou água; cruza somente pela faixa da ponte aberta. A busca não teletransporta o corpo e respeita as mesmas colisões do jogador. O retorno à margem segura continua reservado à perda de piso quando a ponte recolhe.
+- Interface revisada após a abertura: o objetivo atual fica num cartão compacto com verbo de ação e etapa 1/3, 2/3 ou 3/3; não expira junto dos avisos. Mudanças importantes aparecem em avisos temporários de maior contraste. A identificação da presença ativa e os atalhos são secundários, em painéis menores no rodapé. H mostra a ajuda completa. No desktop, controles de toque não são exibidos nem respondem ao mouse como direcional invisível; em dispositivos de toque, direcional e ações permanecem disponíveis. A entrada do jardim recebe uma indicação discreta depois de fixar a ponte. Não houve mudança nas regras do encontro.
+- Referências de princípios, não de reprodução de assets: [Unravel Two](https://www.ea.com/games/unravel/unravel-two) (relação entre dois corpos e vínculo), [COCOON](https://annapurnainteractive.com/games/cocoon) (regras combinadas em desafios ambientais), [GRIS](https://store.steampowered.com/app/683320/GRIS/) (coerência visual, movimento e apresentação).
+
+**Decisões atuais**
+- [x] Prototipar uma ponte que muda fisicamente por ação das duas presenças.
+- [x] Preservar os testes anteriores e a pasta antiga; trabalho ativo na nova pasta da OneDrive.
+- [x] Separar o fim da cutscene do início da partida e exigir uma ação explícita no menu.
+- [ ] Validar a nova montagem e os temas musicais com o usuário.
+- [ ] Validar a leitura dos objetivos e dos avisos durante a travessia.
+- [ ] Validar com o usuário o controle de uma presença ativa e o seguimento do parceiro.
+- [ ] Validar animação, clareza do mecanismo e interesse do encontro antes de produzir mais mapas.
+
+---
+
+## Revisão anterior — Sala de exploração, espelho e vínculo
+
+
+
+Após jogar os protótipos de tempo, o usuário aprovou substituir o núcleo por movimento direto e puzzles espaciais. **Esta revisão prevalece sobre as seções históricas abaixo.** O código e o executável anteriores ficam preservados para comparação.
+
+- WASD/setas movem Sombra; Reflexo responde invertendo esquerda/direita, mantendo cima/baixo. Não há movimento automático.
+- Cada camada tem colisões próprias. Pedras índigo bloqueiam Sombra; pedras claras bloqueiam Reflexo. As bordas e a ponte fechada bloqueiam os dois. Um corpo bloqueado não impede o outro de responder.
+- `E` ata/solta Reflexo; `Q` ata/solta Sombra. Apenas uma presença pode estar atada por vez. O vínculo dura até ser solto ou trocado, sem contagem regressiva. Isto é uma escolha provisória para experimentar sem pressão.
+- Primeira sala: colocar cada presença no selo de sua cor abre a ponte permanentemente. Depois é preciso conduzir ambas às flores além da passagem. Não há tinta, harmonia, dano, pontuação ou cronômetro nessa sala.
+- A posição assimétrica dos selos exige reposicionar os corpos. O jogador pode usar o vínculo e as colisões independentes para isso. `R` reinicia sem penalidade; Espaço/Esc pausa.
+- Abertura, personagens, logo, aquarela e tipografia são mantidos. O objetivo atual é validar uma única sala, antes de ampliar mapas e produção artística.
+- Arquitetura ativa: `PuzzleHero`, `MirrorMovementSystem`, `AnchorSystem`, `RoomCollisionSystem`, `MirrorPuzzle`, `PuzzleInput`, `PuzzleScreen` e `PuzzleRenderer`. Geometria e posições em `levels/knot-room.json`; ajustes em `PuzzleTuning`.
+- Entrada nesta implementação: teclado e direcional/botões de toque. Gamepad e animações de caminhada por direção permanecem pendentes.
+
+**Decisões desta revisão**
+- [x] Substituir controle de tempo por movimento direto e espelhado, aprovado pelo usuário.
+- [x] Testar a habilidade de atar uma presença para reposicionar a outra.
+- [ ] Validar sensação do movimento, clareza das colisões e interesse do primeiro puzzle com o usuário.
+- [ ] Decidir se futuras salas usam vínculo livre ou pontos específicos de amarração, após teste da sala atual.
+- [ ] Replanejar os capítulos e a progressão somente depois de validar o novo núcleo.
+
+---
+
+## Histórico — Concepção de tempo e trilhas
+
+As seções abaixo documentam a concepção anterior e não autorizam reintroduzir seus sistemas na sala ativa sem uma nova decisão de design.
+
 > Jogo 2D em libGDX. Puzzle de fluxo, poético e filosófico, com inspiração temática em *Serial Experiments Lain*: identidade incerta, existir apenas enquanto alguém percebe, realidade que vaza.
 > Não é cyberpunk: a estética é aquarela, com o ruído da "realidade" vazando por baixo.
 
@@ -31,6 +189,7 @@
 ## 3. Perspectiva, controles e plataformas
 
 - **Vista de cima.** Os dois mundos ocupam **o mesmo espaço**, sobrepostos em duas camadas de tinta translúcidas.
+- **Travessia contínua (revisão após teste):** a câmera acompanha os heróis por uma paisagem de 3.200 unidades, passando de margens com juncos a madeira abandonada e ruínas de jardim. As trilhas seguem adiante, sem dar voltas na mesma arena. A câmera enquadra ambos quando se afastam.
 - **Os heróis andam sozinhos**, cada um por uma **trilha sinuosa** pintada. As trilhas se cruzam.
 - **Controle:** o jogador arrasta o pincel (mouse no desktop e na web, dedo no Android). Um único gesto contínuo.
 - **Plataformas:** Desktop (LWJGL3), Android e Web (TeaVM).
@@ -45,6 +204,8 @@
   - `balance = (dB - dA) / (dA + dB)`, em [-1, 1], onde `dA` e `dB` são as distâncias do cursor a cada herói.
   - `speedA = 1 - k·balance` e `speedB = 1 + k·balance`. A soma é constante, o que implementa a regra do espelho.
 - **Alternativa a testar:** posição horizontal do cursor na tela.
+- **Controles do protótipo:** mouse ou arraste do primeiro toque controla o olhar; `Tab` alterna proximidade/horizontal; `R` reinicia as trilhas. Na leitura horizontal, esquerda observa A e direita observa B. Sem entrada ativa ou nas barras fora da área da fase, o equilíbrio volta a zero. Ao soltar o toque, o olhar fica neutro; no desktop, mover o mouse ativa novamente a observação.
+- Na fatia jogável, a leitura **horizontal é o padrão provisório**, para evitar perseguir dois alvos móveis. `Tab` permite comparar com proximidade. O caminho de Reflexo é mais longo, então deixar a simulação neutra não sincroniza as chegadas.
 - ⚠️ **Decisão em aberto:** escolher entre as duas leituras no protótipo, com tecla de debug para alternar.
 - Cada `World` tem **relógio próprio**: `deltaMundo = delta × speed`.
 
@@ -59,6 +220,11 @@
 - **Sobe com:** golpes de obstáculos, e `|balance|` acima de um limiar por tempo prolongado.
 - **Desce** lentamente quando o equilíbrio volta.
 - **Se estourar:** o jogador volta ao último **ponto de controle** da fase e gasta tinta do pote.
+- A primeira fatia usa três medidas no pote e um ponto de controle após ambos passarem de 48% da trilha. Tinta e posição são recuperadas ao retornar; perder a última medida encerra a sessão.
+
+### 4.3.1 Correntes da primeira fatia
+- Os antigos ícones de X e círculo foram substituídos por troncos que se deslocam transversalmente à trilha. O espaço livre é a indicação visual da passagem; aproximar-se do tronco custa tinta, aumenta o desequilíbrio e empurra o herói.
+- **Decisão experimental:** a maré é um relógio ambiental compartilhado da sessão (pausa junto com ela), independente dos relógios locais dos heróis. Isso permite esperar uma abertura alterando o tempo de um mundo; se herói e abertura usassem exatamente o mesmo relógio e progresso, desacelerar não mudaria o resultado.
 
 ### 4.4 Pote de tinta (tentativas)
 - Estoque **único por capítulo**.
@@ -173,6 +339,18 @@ multiplicador  = cresce com os encontros de tinta
 
 ## 10. Visual e som
 
+### Direção visual aprovada (conceitos V1)
+
+- Dois heróis são manifestações da mesma pessoa de aparência andrógina: Sombra em índigo e Reflexo em marfim. Cabelo curto assimétrico, presilhas em lados opostos, suéter amplo, calça curta e tênis simples; expressão contida e vista elevada. A influência de *Serial Experiments Lain* está no clima e no cotidiano dos anos 1990, com personagens próprios.
+- Marca: duas cordas índigo/marfim unidas num nó compacto, sem alças de laço de presente. A logo V1 coloca o nó acima do nome `NÓS`, com letras serifadas e textura de tinta.
+- Na roupa, o símbolo é um bordado pequeno e discreto, rente ao tecido e adaptado à perspectiva; não um fecho volumoso. Referências em `design/`.
+- Os conceitos aprovados são referências para sprites e marca. Legibilidade em tamanho de jogo e acessibilidade da paleta ainda precisam de validação.
+- Na fatia jogável, as ilustrações aprovadas já são usadas como sprites estáticos com deslocamento e oscilação suave. Não são ainda animações de caminhada por direção. O ambiente é uma aquarela panorâmica original gerada por IA, sem repetição de tiles. Os arquivos de referência originais continuam em `design/`.
+- Tipografia: Cormorant Garamond para títulos e Atkinson Hyperlegible para leitura, rasterizadas em alta resolução; licenças OFL acompanham os atlas em `assets/ui/`.
+- Abertura: sequência de aproximadamente dez segundos em camadas animadas, pulável por clique ou tecla, antes da tela de início. Água, duas presenças, nó e logo; texto mínimo. Não é um vídeo renderizado nem contém áudio nesta versão.
+
+### Tratamento previsto
+
 - **Aquarela:**
   - framebuffers (FBO) com difusão de tinta e textura de papel;
   - bordas escurecidas;
@@ -257,8 +435,12 @@ nos/
 ## 15. Decisões em aberto
 
 - [ ] Leitura do olhar: proximidade × posição horizontal (M1)
+- [x] Percurso contínuo com câmera acompanhando os personagens, escolhido pelo usuário após testar a arena fixa.
+- [ ] Validar a nova leitura horizontal, a sinalização dos troncos e o ritmo da travessia com o usuário.
+- [ ] Validar maré ambiental compartilhada e balanceamento do primeiro recorte de Água.
 - [ ] Números de balanceamento (k, limiares, Δt, tamanhos do pote)
 - [ ] Paleta final das duas tintas
+- [x] Direção inicial dos personagens, nó de duas cores e logo V1 (conceitos em `design/`; paleta final e legibilidade ainda em teste)
 - [ ] Imagem final da galeria em ÍRIS
 - [ ] Textos: 13 aforismos, 13 versos e 13 versos ocultos
 - [ ] Lista final de pincéis
