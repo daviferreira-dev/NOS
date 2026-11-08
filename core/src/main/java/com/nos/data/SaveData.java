@@ -8,8 +8,9 @@ public final class SaveData {
     public static final int JOURNEY_START=0,GARDEN_REACHED=1,JOURNEY_COMPLETE=2;
     private static final String JOURNEY_KEY="water01.journey";
     private static final String SECOND_JOURNEY_KEY="water02.journey";
+    private static final String THIRD_JOURNEY_KEY="water03.journey";
     private final Preferences preferences;
-    private int memoryBest,memoryJourney,memorySecondJourney;
+    private int memoryBest,memoryJourney,memorySecondJourney,memoryThirdJourney;
     public SaveData() { this(Gdx.app.getPreferences("com.nos.progress")); }
     /** Um backend nulo mantém somente memória, para inspeção e testes isolados. */
     public SaveData(Preferences preferences) { this.preferences=preferences; }
@@ -37,7 +38,17 @@ public final class SaveData {
         catch(RuntimeException invalidValue) { return false; }
         return value==1;
     }
+    /** Avanço órfão da terceira fase não substitui a conclusão válida das anteriores. */
+    public boolean isThirdJourneyAvailable() { return isSecondJourneyComplete(); }
+    public boolean isThirdJourneyComplete() {
+        if(!isThirdJourneyAvailable()) return false;
+        int value;
+        try { value=preferences==null?memoryThirdJourney:preferences.getInteger(THIRD_JOURNEY_KEY,0); }
+        catch(RuntimeException invalidValue) { return false; }
+        return value==1;
+    }
     public int menuProgress() {
+        if(isThirdJourneyComplete()) return 4;
         if(isSecondJourneyComplete()) return 3;
         return journeyProgress();
     }
@@ -47,6 +58,11 @@ public final class SaveData {
         if(!isSecondJourneyAvailable()||isSecondJourneyComplete()) return;
         if(preferences==null) memorySecondJourney=1;
         else { preferences.putInteger(SECOND_JOURNEY_KEY,1);preferences.flush(); }
+    }
+    public void recordThirdJourneyComplete() {
+        if(!isThirdJourneyAvailable()||isThirdJourneyComplete()) return;
+        if(preferences==null) memoryThirdJourney=1;
+        else { preferences.putInteger(THIRD_JOURNEY_KEY,1);preferences.flush(); }
     }
     private void advanceJourney(int value) {
         if(value<=journeyProgress()) return;

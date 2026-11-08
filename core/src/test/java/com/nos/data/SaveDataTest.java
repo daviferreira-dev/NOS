@@ -126,6 +126,72 @@ public class SaveDataTest {
         assertEquals(0,second.menuProgress());assertFalse(second.isSecondJourneyComplete());
     }
 
+    @Test public void thirdJourneyRequiresBothEarlierCompletionsAndSurvivesReload() {
+        MemoryPreferences preferences=new MemoryPreferences();
+        SaveData save=new SaveData(preferences);
+        save.recordThirdJourneyComplete();
+        assertFalse(save.isThirdJourneyAvailable());assertFalse(save.isThirdJourneyComplete());
+        assertEquals(0,preferences.flushes);
+        save.recordJourneyComplete();save.recordThirdJourneyComplete();
+        assertFalse(save.isThirdJourneyAvailable());assertEquals(2,save.menuProgress());
+        assertEquals(1,preferences.flushes);
+        save.recordSecondJourneyComplete();
+        assertTrue(save.isThirdJourneyAvailable());assertFalse(save.isThirdJourneyComplete());
+        assertEquals(3,save.menuProgress());
+        save.recordThirdJourneyComplete();
+        SaveData reloaded=new SaveData(preferences);
+        assertTrue(reloaded.isThirdJourneyComplete());assertEquals(4,reloaded.menuProgress());
+        assertEquals(SaveData.JOURNEY_COMPLETE,reloaded.journeyProgress());
+        assertTrue(reloaded.isSecondJourneyComplete());assertEquals(3,preferences.flushes);
+        reloaded.recordGardenCheckpoint();reloaded.recordJourneyComplete();
+        reloaded.recordSecondJourneyComplete();reloaded.recordThirdJourneyComplete();
+        assertEquals(3,preferences.flushes);assertEquals(4,reloaded.menuProgress());
+    }
+
+    @Test public void orphanThirdCompletionCannotBypassMissingOrInvalidEarlierProgress() {
+        Object[] invalidSecond={0,-1,2,Integer.MAX_VALUE,"corrompido",1.0f};
+        for(Object value:invalidSecond) {
+            MemoryPreferences preferences=new MemoryPreferences();
+            preferences.values.put("water01.journey",SaveData.JOURNEY_COMPLETE);
+            preferences.values.put("water02.journey",value);
+            preferences.values.put("water03.journey",1);
+            SaveData save=new SaveData(preferences);
+            assertFalse(save.isThirdJourneyAvailable());assertFalse(save.isThirdJourneyComplete());
+            assertEquals(2,save.menuProgress());assertEquals(0,preferences.flushes);
+            save.recordThirdJourneyComplete();assertEquals(0,preferences.flushes);
+        }
+        MemoryPreferences preferences=new MemoryPreferences();
+        preferences.values.put("water01.journey","corrompido");
+        preferences.values.put("water02.journey",1);preferences.values.put("water03.journey",1);
+        SaveData save=new SaveData(preferences);
+        assertFalse(save.isThirdJourneyAvailable());assertFalse(save.isThirdJourneyComplete());
+        assertEquals(0,save.menuProgress());assertEquals(0,preferences.flushes);
+    }
+
+    @Test public void invalidThirdCompletionKeepsThirdAvailableWithoutSkippingIt() {
+        Object[] invalid={-1,2,Integer.MIN_VALUE,Integer.MAX_VALUE,"corrompido",1.0f,true};
+        for(Object value:invalid) {
+            MemoryPreferences preferences=new MemoryPreferences();
+            preferences.values.put("water01.journey",SaveData.JOURNEY_COMPLETE);
+            preferences.values.put("water02.journey",1);preferences.values.put("water03.journey",value);
+            SaveData save=new SaveData(preferences);
+            assertTrue(save.isThirdJourneyAvailable());assertFalse(save.isThirdJourneyComplete());
+            assertEquals(3,save.menuProgress());assertEquals(0,preferences.flushes);
+            save.recordThirdJourneyComplete();
+            assertTrue(new SaveData(preferences).isThirdJourneyComplete());assertEquals(1,preferences.flushes);
+        }
+    }
+
+    @Test public void thirdJourneyMemoryIsIsolatedAndKeepsLegacyScore() {
+        SaveData first=new SaveData(null);first.record(450);
+        first.recordJourneyComplete();first.recordSecondJourneyComplete();first.recordThirdJourneyComplete();
+        assertEquals(4,first.menuProgress());assertTrue(first.isThirdJourneyComplete());
+        assertEquals(450,first.bestScore());
+        SaveData another=new SaveData(null);
+        assertEquals(0,another.menuProgress());assertFalse(another.isThirdJourneyAvailable());
+        assertFalse(another.isThirdJourneyComplete());assertEquals(0,another.bestScore());
+    }
+
     private static final class MemoryPreferences implements Preferences {
         final Map<String,Object> values=new HashMap<>();int flushes;
         @Override public Preferences putBoolean(String key,boolean value) { values.put(key,value);return this; }

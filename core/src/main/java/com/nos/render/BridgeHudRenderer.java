@@ -26,7 +26,7 @@ final class BridgeHudRenderer {
         float goalWidth=348;
         assets.title.getData().setScale(.43f*scale);layout.setText(assets.title,goal,ink,goalWidth,Align.left,true);
         float objectiveHeight=expanded?Math.max(79,44+layout.height):40;
-        String stage=assets.text.format(encounter.getData().gardenOnly?"transferStageCounter":"bridgeStageCounter",encounter.objectiveStep(),encounter.objectiveCount());
+        String stage=assets.text.format(encounter.hasRelay()?"relayStageCounter":encounter.getData().gardenOnly?"transferStageCounter":"bridgeStageCounter",encounter.objectiveStep(),encounter.objectiveCount());
         assets.font.getData().setScale(.28f*scale);layout.setText(assets.font,stage);
         float summaryX=43+layout.width+16,summaryWidth=392-summaryX;
         String summary=assets.text.get(encounter.objectiveKey()+"Compact");
@@ -92,7 +92,7 @@ final class BridgeHudRenderer {
         button(190,141,176,30);button(384,141,176,30);button(578,141,176,30);button(190,92,176,34);
         shapes.end();batch.begin();
         title(assets.text.get("bridgePauseTitle"),188,450,.60f*s,ink);
-        text(assets.text.get(encounter.getData().gardenOnly?"transferPauseSubtitle":encounter.isLocked()&&encounter.hasGarden()?"gardenPauseSubtitle":"bridgePauseSubtitle"),190,385,.30f*s,gold);
+        text(assets.text.get(encounter.hasRelay()?"relayPauseSubtitle":encounter.getData().gardenOnly?"transferPauseSubtitle":encounter.isLocked()&&encounter.hasGarden()?"gardenPauseSubtitle":"bridgePauseSubtitle"),190,385,.30f*s,gold);
         title(assets.text.get("bridgeMovementGroup"),190,365,.37f*s,ink);
         title(assets.text.get("bridgeSystemGroup"),500,365,.37f*s,ink);
         for(BridgeKeyBindings.Action a:new BridgeKeyBindings.Action[]{BridgeKeyBindings.Action.UP,BridgeKeyBindings.Action.LEFT,BridgeKeyBindings.Action.DOWN,BridgeKeyBindings.Action.RIGHT}) {
@@ -139,10 +139,10 @@ final class BridgeHudRenderer {
             for(int i=1;i<=3;i++) centered(assets.text.get("bridgeIntro"+i),480,282-(i-1)*31,.34f,ink);
             centered(assets.text.get("bridgeStart"),480,164,.34f,gold);
         } else {
-            String result=encounter.getData().gardenOnly?"transferWon":encounter.hasGarden()?"gardenWon":"bridgeWon";
+            String result=encounter.hasRelay()?"relayWon":encounter.getData().gardenOnly?"transferWon":encounter.hasGarden()?"gardenWon":"bridgeWon";
             centeredTitle(assets.text.get(result),480,340,.54f,ink);centered(assets.text.get(result+"Detail"),480,267,.36f,ink);
-            centered(localized(encounter.getData().gardenOnly?"gardenReturnToMenu":encounter.hasGarden()?"gardenNextPhase":"bridgeAgain",ui),480,192,.33f*ui.textScale,gold);
-            if(encounter.hasGarden()) centered(localized(encounter.getData().gardenOnly?"transferReplayShort":"gardenReplayShort",ui),480,162,.27f*ui.textScale,ink);
+            centered(localized(encounter.hasRelay()?"gardenReturnToMenu":encounter.getData().gardenOnly?"transferNextPhase":encounter.hasGarden()?"gardenNextPhase":"bridgeAgain",ui),480,192,.33f*ui.textScale,gold);
+            if(encounter.hasGarden()||encounter.hasRelay()) centered(localized(encounter.hasRelay()?"relayReplayShort":encounter.getData().gardenOnly?"transferReplayShort":"gardenReplayShort",ui),480,162,.27f*ui.textScale,ink);
         }
         batch.end();
     }

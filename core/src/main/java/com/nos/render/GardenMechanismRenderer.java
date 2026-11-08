@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.nos.data.GardenData;
+import com.nos.data.RelayData;
 import com.nos.systems.GardenGateSystem;
 import com.nos.world.BridgeEncounter;
 
@@ -22,6 +23,16 @@ final class GardenMechanismRenderer {
         GardenData data=encounter.getData().garden;GardenGateSystem garden=encounter.garden();
         cable(data.helperCable,garden.helperPressed());cable(data.weightCable,garden.weightPressed());
         if(garden.hasTransfer()) cable(data.transferCable,garden.transferPressed()||garden.isTransferLatched());
+    }
+    void relayCables(BridgeEncounter encounter) {
+        RelayData data=encounter.getData().relay;
+        cable(data.westCable,encounter.relay().westPressed());cable(data.eastCable,encounter.relay().eastPressed());
+    }
+    void relayFloor(BridgeEncounter encounter) {
+        RelayData data=encounter.getData().relay;
+        for(float[] bed:data.barriers) flowerbed(bed);
+        pedal(data.westPlate,encounter.relay().westPressed());pedal(data.eastPlate,encounter.relay().eastPressed());
+        gate(data.gate,encounter.relay().opening());
     }
     private void cable(float[][] points,boolean taut) {
         if(points==null) return;

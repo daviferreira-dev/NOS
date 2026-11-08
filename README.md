@@ -2,7 +2,7 @@
 
 Um puzzle de exploração sobre duas presenças e o vínculo entre elas, em libGDX.
 
-## Experiência atual: Água 01 e Água 02
+## Experiência atual: Água 01, Água 02 e Água 03
 
 Você controla somente Sombra. Reflexo tem o mesmo rosto, mas seu próprio ritmo: observa a água, reage e coopera quando você pede ajuda. A primeira fase inclui a ponte e um desafio de posicionamento no pátio seguinte. A relação e a diversão continuam em validação. As versões anteriores permanecem nos executáveis antigos.
 
@@ -20,7 +20,7 @@ No pátio, os dois pedais liberam a grade. Peça ajuda no menor e posicione a ja
 Depois da ponte e do pátio de Água 01, Enter/clique segue à segunda fase. Água 02 se passa numa varanda de estufa e exige transferir a mesma jardineira: primeiro abre uma passagem, depois Reflexo sustenta o mecanismo do outro lado e permite recuperar o peso para a saída. A primeira grade espera os corpos e a jardineira saírem do vão antes de fechar. A solução completa é testada com movimento físico no mapa distribuído.
 
 O jogo guarda o checkpoint ao fixar a ponte, a conclusão de Água 01 e a de Água 02. Ao reabrir, o menu permite continuar do pátio ou da segunda fase, conforme o avanço. N / Jogar do começo reinicia a sessão sem apagar o avanço mais distante. A abertura nunca inicia a partida sozinha. Testes e inspeções usam progresso em memória para preservar o save real.
-No fim de Água 02, Enter/clique volta ao menu. R repete somente o trecho/fase atual. Retomar já enquadra o trecho correto, sem atravessar a cena com a câmera.
+No fim de Água 02, Enter/clique segue para Água 03. No revezamento da terceira fase, peça ajuda no primeiro pedal, atravesse e pise no pedal do outro lado. Use E para chamar Reflexo a atravessar; mantenha Sombra no pedal até ele chegar. Se sair cedo, ele espera e retoma quando você volta. A chegada trava a grade aberta; sigam juntos ao claustro. No fim de Água 03, Enter/clique volta ao menu. R repete somente o trecho/fase atual. Retomar já enquadra o trecho correto, sem atravessar a cena com a câmera.
 
 A câmera acompanha Sombra, identificada por um marcador por forma e pelo contato dos pés. Há quatro quadros de caminhada, poses próprias de repouso e sustentação, registrados nos pés e em altura comum. Reflexo contorna obstáculos e procura a ponte aberta para reunir-se a você. A tecla de interação atual aparece sobre o mecanismo próximo. Ainda não há animação completa em oito direções.
 
@@ -30,7 +30,7 @@ A abertura usa enquadramentos ilustrados. Terminar ou pular leva ao menu; soment
 
 ## Jogar
 
-Dê dois cliques em `outputs/Jogar-NOS-Demo-v7.bat`, mantendo `NOS-Demo-v7.jar` ao lado. O iniciador usa o JDK 17 já instalado neste computador. O executável empacotado não requer Gradle nem downloads. As versões anteriores continuam preservadas.
+Dê dois cliques em `outputs/Jogar-NOS-Demo-v8.bat`, mantendo `NOS-Demo-v8.jar` ao lado. O iniciador usa o JDK 17 já instalado neste computador. O executável empacotado não requer Gradle nem downloads. As versões anteriores continuam preservadas.
 
 ## Desenvolvimento
 
@@ -55,7 +55,7 @@ $env:GRADLE_USER_HOME = "C:\Users\PC Gamer\Documents\Codex\2026-11-06\instale-o-
 - `--legacy`: travessia de tempo, tinta e harmonia.
 - A pasta anterior em Documents/Codex não foi alterada. O histórico Git foi importado para esta pasta, incluindo os commits locais.
 
-Exemplo: `java -jar outputs/NOS-Demo-v7.jar --mirror-room`.
+Exemplo: `java -jar outputs/NOS-Demo-v8.jar --mirror-room`.
 
 ## Organização
 
@@ -74,6 +74,8 @@ Exemplo: `java -jar outputs/NOS-Demo-v7.jar --mirror-room`.
 - `BridgeUiState` / `BridgeHudRenderer`: objetivo, avisos, identificação, leitura e menus modais; tempos de apresentação separados da simulação.
 - `levels/bridge-encounter.json`: planta do encontro.
 - `levels/water-transfer.json`: segunda fase, com transferência do peso.
+- `levels/water-relay.json`: terceira fase, com revezamento da sustentação.
+- `RelayGateSystem` / `RelayData` / `RelayTuning`: pedido, travessia, espera e trava da passagem.
 - `JourneyProgress`: escolha do trecho de continuação sem dependências gráficas.
 - `BridgeTuning`: movimento, distâncias e tempos de resposta.
 
@@ -84,5 +86,7 @@ Os testes JUnit verificam os protótipos preservados e os percursos das duas pri
 Personagens e logo foram aprovados pelo usuário. Cenário, ponte, mecanismos e poses foram criados com geração de imagens e integrados ao jogo; referências originais em `design/`. Tipografia Cormorant Garamond e Atkinson Hyperlegible, com licenças OFL em `assets/ui/`. Notas e prompts em `design/BRIDGE-ARTS.md` e `design/SPRITE-REFINEMENT.md`, também entregues em `outputs/`; gerador dos atlas em `tools/`.
 
 Água 02 recebe cenário de estufa e canteiro estreito com transparência próprios. Arquivos e prompts finais em `design/WATER02-ARTS.md`.
+
+Água 03 recebe uma colunata ao entardecer, usando os mesmos sprites dos heróis e mecanismos. Prompt e caminho do cenário em `design/water-relay-bank-v1-prompt.txt`. Inspeções invisíveis: `--water-three-start`, `--water-three-west`, `--water-three-handoff`, `--water-three-hold`, `--water-three-won`, `--water-three-menu`, `--water-three-large`. A continuação pelo menu é verificada com `--intro-smoke CAMINHO_ABSOLUTO --resume-water-three`.
 
 O GDD registra a revisão ativa e preserva as concepções anteriores como histórico. Os 13 níveis e capítulos da concepção original não estão implementados.

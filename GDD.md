@@ -2,6 +2,22 @@
 
 ## Revisão ativa — Uma presença controlável, duas pessoas (07/11/2026)
 
+**Continuação — Água 03, revezamento da sustentação (v8)**
+
+O pedido de continuar e a autorização de avançar fases em paralelo permitem implementar um próximo desafio de cooperação. Esta revisão substitui o fim de Água 02 voltando ao menu: agora Enter/clique segue à Água 03. Nada avança sozinho. A fase 03 termina em um resultado que espera comando para voltar ao menu. Água 04 e o restante do jogo continuam pendentes.
+
+- Em `water-relay.json`, Reflexo caminha até o pedal oeste quando Sombra pede ajuda. Apenas a chegada física ao pedal abre a grade; Sombra não pode resolver esse lado sozinha. Há espera por espaço e cancelamento próximo como nos encontros anteriores.
+- Sombra atravessa a passagem e pisa no pedal leste. A ação contextual chama Reflexo para atravessar. Enquanto ela permanece no pedal, ele navega até um ponto de reunião além da grade. Sair cedo faz Reflexo esperar sem perder posição; retornar ao pedal retoma o mesmo pedido, sem outra interação.
+- A grade temporária espera o vão ficar livre. A chegada física ao ponto de reunião trava a passagem permanentemente. Depois os dois seguem ao claustro. Não há jardineira neste desafio, cronômetro, dano ou troca de personagem.
+- `RelayGateSystem` contém estados e regras; `RelayData/RelayTuning` contêm geometria e ajustes. `BridgeEncounter` integra movimento, pausa e conclusão. A colisão e a navegação são as mesmas dos outros encontros, sem teleporte durante a solução. Sistemas têm testes isolados e um percurso completo no JSON distribuído.
+- A fase usa novo cenário em aquarela ao entardecer, com sprites já existentes dos heróis, pedais e grade. O HUD mostra Água 03 e quatro etapas. Textos estão em dados, comandos continuam remapeáveis e a ajuda pausa toda a simulação.
+- `water03.journey` registra a terceira conclusão via Preferences. `JourneyProgress` continua da fase mais avançada disponível. Registros inválidos ou órfãos não pulam desbloqueios; começar novamente conserva o progresso. Inspeções usam memória e não alteram o save real.
+
+**Decisões em aberto da v8**
+- [x] Implementar revezamento, interrupção recuperável, sequência entre três fases e persistência compatível.
+- [ ] Validar ritmo, clareza do pedido no pedal leste e interesse da cooperação com o usuário.
+- [ ] Água 04: combinar transferência e revezamento após validar as regras introduzidas; ainda não implementada.
+
 **Ampliação autorizada — Água 02, transferência de contrapeso (v7)**
 
 O usuário pediu avançar para as próximas fases com trabalho paralelo, após fechar a demo. A primeira nova entrega acrescenta Água 02; os treze níveis não ficam concluídos por essa ampliação. Esta revisão substitui a volta ao menu no fim de Água 01: a conclusão agora espera Enter/clique para seguir à segunda fase, nunca avança automaticamente. O fim de Água 02 espera Enter/clique para voltar ao menu. A abertura continua terminando no menu.
@@ -16,7 +32,8 @@ O usuário pediu avançar para as próximas fases com trabalho paralelo, após f
 **Decisões em aberto desta ampliação**
 - [x] Implementar transferência de peso, sequência entre fases e persistência compatível.
 - [ ] Validar com o usuário interesse do novo desafio, leitura dos três pedais e ritmo do retorno à jardineira.
-- [ ] Projetar Água 03 e 04 a partir do teste das duas primeiras; ainda não implementadas.
+- [x] Implementar o próximo recorte, Água 03, na continuação v8 descrita acima.
+- [ ] Água 04 ainda não implementada; validar os primeiros recortes com o usuário.
 
 O usuário aprovou testar uma relação em que se controla apenas uma presença e se percebe a outra como pessoa distinta, apesar do mesmo rosto. O recorte continua sendo a ponte; não se antecipa a história completa nem se explica o mistério. Esta revisão substitui a troca por Tab da versão anterior.
 

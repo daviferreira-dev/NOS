@@ -67,8 +67,11 @@ public final class BridgeScreen extends ScreenAdapter {
         this(begin,progress,resumeCheckpoint,false);
     }
     public BridgeScreen(boolean begin,SaveData progress,boolean resumeCheckpoint,boolean waterTwo) {
+        this(begin,progress,resumeCheckpoint,waterTwo?2:1);
+    }
+    public BridgeScreen(boolean begin,SaveData progress,boolean resumeCheckpoint,int phase) {
         this.progress=progress;
-        levelPath=waterTwo?LevelLoader.SECOND_WATER:LevelLoader.FIRST_WATER;
+        levelPath=phase==3?LevelLoader.THIRD_WATER:phase==2?LevelLoader.SECOND_WATER:LevelLoader.FIRST_WATER;
         encounter=new BridgeEncounter(new LevelLoader().readBridge(levelPath));
         renderer=new BridgeRenderer(encounter.getData().backgroundPath);ui=renderer.ui();
         ui.bindings.load(preferences);input.setBindings(ui.bindings);
@@ -79,16 +82,17 @@ public final class BridgeScreen extends ScreenAdapter {
         }
     }
     public boolean isConfiguringControls() { return ui.settings||settingsKeyFrame; }
-    public boolean isWaterTwo() { return encounter.getData().gardenOnly; }
+    public boolean isWaterTwo() { return encounter.getData().phaseNumber==2; }
+    public boolean isWaterThree() { return encounter.getData().phaseNumber==3; }
     @Override public void show() { input.setTouchControls(touchControls);Gdx.input.setInputProcessor(input); }
     @Override public void render(float delta) {
         input.project(viewport,Gdx.graphics.getHeight());
         boolean start=input.start(),pause=input.pause(),help=input.help(),restart=input.restart();
         int action=input.action();
-        if(!ui.settings&&start&&!restart&&encounter.getState()==BridgeEncounter.State.WON&&encounter.hasGarden()
+        if(!ui.settings&&start&&!restart&&encounter.getState()==BridgeEncounter.State.WON&&(encounter.hasGarden()||encounter.hasRelay())
             &&Gdx.app.getApplicationListener() instanceof NosGame) {
             NosGame game=(NosGame)Gdx.app.getApplicationListener();
-            if(encounter.getData().gardenOnly) game.returnToTitle();else game.beginWaterTwo();
+            if(isWaterThree()) game.returnToTitle();else if(isWaterTwo()) game.beginWaterThree();else game.beginWaterTwo();
             return;
         }
         if(!ui.settings&&!settingsKeyFrame) {
@@ -120,7 +124,11 @@ public final class BridgeScreen extends ScreenAdapter {
     }
     private void recordProgress() {
         if(progress==null) return;
-        if(encounter.getData().gardenOnly) {
+        if(isWaterThree()) {
+            if(!journeyRecorded&&encounter.getState()==BridgeEncounter.State.WON) { progress.recordThirdJourneyComplete();journeyRecorded=true; }
+            return;
+        }
+        if(isWaterTwo()) {
             if(!journeyRecorded&&encounter.getState()==BridgeEncounter.State.WON) { progress.recordSecondJourneyComplete();journeyRecorded=true; }
             return;
         }
@@ -166,6 +174,7 @@ public final class BridgeScreen extends ScreenAdapter {
     public void prepareSmokeScene() { prepareSmokeScene(false); }
     public void prepareSmokeScene(String scenario) {
         smokeTouch=scenario.equals("--touch");
+        if(scenario.startsWith("--water-three")) { prepareWaterThreeSmoke(scenario);return; }
         if(scenario.startsWith("--water-two")) { prepareWaterTwoSmoke(scenario);return; }
         if(scenario.startsWith("--garden")) {
             encounter.startAtGardenCheckpoint();
@@ -241,6 +250,33 @@ public final class BridgeScreen extends ScreenAdapter {
             }
         }
         if(scenario.equals("--water-two-large")) ui.textScale=1.3f;
+        renderer.snapTo(encounter);
+    }
+    private void prepareWaterThreeSmoke(String scenario) {
+        encounter.start();
+        if(!scenario.equals("--water-three-start")) {
+            walkTo(602,191);encounter.interact();
+            for(int i=0;i<800;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+            if(!encounter.relay().isHoldingWest()) throw new IllegalStateException("Reflexo não chegou ao primeiro pedal.");
+            if(!scenario.equals("--water-three-west")) {
+                walkTo(740,270);walkTo(910,270);walkTo(1034,191);encounter.interact();
+                if(scenario.equals("--water-three-handoff")) {
+                    for(int i=0;i<120;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+                } else if(scenario.equals("--water-three-hold")) {
+                    walkTo(1034,350);
+                    for(int i=0;i<300;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+                } else {
+                    for(int i=0;i<1600;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+                    if(!encounter.relay().isLatched()) throw new IllegalStateException("O revezamento não reuniu as presenças.");
+                    if(scenario.equals("--water-three-won")||scenario.equals("--water-three-menu")) {
+                        walkTo(1490,270);
+                        for(int i=0;i<1000&&encounter.getState()!=BridgeEncounter.State.WON;i++) encounter.update(0,0,BridgeTuning.FIXED_STEP);
+                        if(encounter.getState()!=BridgeEncounter.State.WON) throw new IllegalStateException("A dupla não concluiu Água 03.");
+                    }
+                }
+            }
+        }
+        if(scenario.equals("--water-three-large")) ui.textScale=1.3f;
         renderer.snapTo(encounter);
     }
     private void walkTo(float x,float y) {

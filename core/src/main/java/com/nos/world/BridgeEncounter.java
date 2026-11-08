@@ -5,6 +5,7 @@ import com.nos.entities.PuzzleHero;
 import com.nos.systems.BridgeCollisionSystem;
 import com.nos.systems.CompanionBehaviorSystem;
 import com.nos.systems.GardenGateSystem;
+import com.nos.systems.RelayGateSystem;
 
 /** Sombra é controlada pelo jogador; Reflexo percebe e coopera com ações próprias. */
 public final class BridgeEncounter {
@@ -14,6 +15,7 @@ public final class BridgeEncounter {
     private final BridgeCollisionSystem collision;
     private final CompanionBehaviorSystem companion;
     private final GardenGateSystem garden;
+    private final RelayGateSystem relay;
     private final float[] safeX=new float[2],safeY=new float[2],steps=new float[2];
     private State state=State.READY;
     private float support,velocityX,velocityY,noticeTime;
@@ -23,11 +25,12 @@ public final class BridgeEncounter {
         this.data=data;collision=new BridgeCollisionSystem(data);
         companion=new CompanionBehaviorSystem(data,collision);
         garden=data.garden==null?null:new GardenGateSystem(data,collision);
+        relay=data.relay==null?null:new RelayGateSystem(data,collision);
         heroes=new PuzzleHero[] {new PuzzleHero(data.shadowStart[0],data.shadowStart[1]),new PuzzleHero(data.reflectionStart[0],data.reflectionStart[1])};
         if(data.gardenOnly) { locked=true;support=1; }
         for(int i=0;i<2;i++) { safeX[i]=heroes[i].getX();safeY[i]=heroes[i].getY(); }
     }
-    public void start() { if(state==State.READY) { state=State.PLAYING;if(data.gardenOnly) notify("transferWelcome"); } }
+    public void start() { if(state==State.READY) { state=State.PLAYING;if(data.gardenOnly) notify(relay!=null?"relayWelcome":"transferWelcome"); } }
     /** Reinício explícito do trecho já alcançado; não é um comando de ajuda. */
     public void startAtGardenCheckpoint() {
         if(garden==null) { start();return; }
@@ -43,7 +46,7 @@ public final class BridgeEncounter {
         else if(state==State.PAUSED) state=State.PLAYING;
         stop();
     }
-    private void stop() { velocityX=0;velocityY=0;companion.resetNavigation();if(garden!=null) garden.resetNavigation();for(PuzzleHero h:heroes) h.setMotion(0,0); }
+    private void stop() { velocityX=0;velocityY=0;companion.resetNavigation();if(garden!=null) garden.resetNavigation();if(relay!=null) relay.resetNavigation();for(PuzzleHero h:heroes) h.setMotion(0,0); }
     private boolean near(PuzzleHero h,float[] point) {
         float dx=h.getX()-point[0],dy=h.getY()-point[1];
         return dx*dx+dy*dy<=BridgeTuning.INTERACT_DISTANCE*BridgeTuning.INTERACT_DISTANCE;
@@ -51,6 +54,11 @@ public final class BridgeEncounter {
     public void interact() {
         if(state!=State.PLAYING) return;
         PuzzleHero h=heroes[0];
+        if(relay!=null) {
+            if(relay.interact(h,heroes[1])) { drainRelayNotice();stop(); }
+            else notify("relayLookAround");
+            return;
+        }
         if(locked&&garden!=null) {
             if(garden.interact(h,heroes[1])) { drainGardenNotice();stop(); }
             else notify(garden.isOpen()?"gardenPassage":"gardenLookAround");
@@ -82,8 +90,9 @@ public final class BridgeEncounter {
         for(PuzzleHero h:heroes) h.setMotion(0,0);
         move(0,velocityX*delta,velocityY*delta);
         float previousX=heroes[1].getX(),previousY=heroes[1].getY();
-        if(garden==null||!locked||!garden.controlsCompanion()) companion.update(heroes[1],heroes[0],isOpen(),locked,delta);
+        if((relay==null||!relay.controlsCompanion())&&(garden==null||!locked||!garden.controlsCompanion())) companion.update(heroes[1],heroes[0],isOpen(),locked,delta);
         if(garden!=null&&locked) { garden.update(heroes[0],heroes[1],isOpen(),delta);drainGardenNotice(); }
+        if(relay!=null) { relay.update(heroes[0],heroes[1],isOpen(),delta);drainRelayNotice(); }
         recordSteps(1,previousX,previousY);
         if(!held&&companion.isHolding()) notify("bridgeHeld");
         for(int i=0;i<2;i++) {
@@ -95,7 +104,7 @@ public final class BridgeEncounter {
                 safeX[i]=h.getX();safeY[i]=h.getY();
             }
         }
-        if(locked&&(garden==null||garden.isOpen())&&atExit(heroes[0])&&atExit(heroes[1])) { state=State.WON;stop(); }
+        if(locked&&(garden==null||garden.isOpen())&&(relay==null||relay.isLatched())&&atExit(heroes[0])&&atExit(heroes[1])) { state=State.WON;stop(); }
     }
     private void move(int index,float dx,float dy) {
         PuzzleHero h=heroes[index];float x=h.getX(),y=h.getY();
@@ -114,11 +123,13 @@ public final class BridgeEncounter {
     }
     private void notify(String key) { notice=key;noticeTime=BridgeTuning.NOTICE_DURATION; }
     private void drainGardenNotice() { String key=garden.pollNotice();if(key!=null) notify(key); }
+    private void drainRelayNotice() { String key=relay.pollNotice();if(key!=null) notify(key); }
     public String notice() { return noticeTime>0?notice:null; }
     public float noticeVisibility() { return Math.min(1,noticeTime/.5f); }
-    public int objectiveStep() { return locked&&garden!=null?garden.objectiveStep():locked?3:companion.isHolding()?2:1; }
+    public int objectiveStep() { return relay!=null?relay.objectiveStep():locked&&garden!=null?garden.objectiveStep():locked?3:companion.isHolding()?2:1; }
     public int objectiveCount() { return data.gardenOnly?4:garden==null?3:5; }
     public String objectiveKey() {
+        if(relay!=null) return relay.objectiveKey();
         if(locked&&garden!=null) return garden.objectiveKey();
         if(companion.getState()==CompanionBehaviorSystem.State.APPROACHING_WINCH)
             return companion.needsRoom()?"bridgeGoalMakeRoom":"bridgeGoalWaiting";
@@ -130,23 +141,28 @@ public final class BridgeEncounter {
         return locked?"bridgeExit":companion.isHolding()?"bridgeCross":"bridgeWelcome";
     }
     public String action() {
+        if(relay!=null) { String key=relay.actionKey(heroes[0]);return key==null?"bridgeInteract":key; }
         if(locked&&garden!=null) { String key=garden.actionKey(heroes[0]);return key==null?"bridgeInteract":key; }
         if(!locked&&isOpen()&&near(heroes[0],data.latch)) return "bridgeFixAction";
         if(!locked&&near(heroes[0],data.winch)) return companion.isSupportingOrApproaching()?"bridgeCallBackAction":"bridgeAskHelpAction";
         return "bridgeInteract";
     }
     public float[] interactionPoint() {
+        if(relay!=null) return relay.interactionPoint(heroes[0]);
         if(locked&&garden!=null) return garden.interactionPoint(heroes[0]);
         if(!locked&&isOpen()&&near(heroes[0],data.latch)) return data.latch;
         if(!locked&&near(heroes[0],data.winch)) return data.winch;
         return null;
     }
     public String companionStatus() {
+        if(relay!=null) { String key=relay.companionStatus();if(key!=null) return key; }
         if(locked&&garden!=null) { String key=garden.companionStatus();if(key!=null) return key; }
         return companion.status();
     }
     public boolean hasGarden() { return garden!=null; }
     public GardenGateSystem garden() { return garden; }
+    public boolean hasRelay() { return relay!=null; }
+    public RelayGateSystem relay() { return relay; }
     public CompanionBehaviorSystem.State getCompanionState() { return companion.getState(); }
     public String companionSpeech() { return companion.speech(); }
     public boolean isOpen() { return support>=BridgeTuning.OPEN_THRESHOLD; }
@@ -155,7 +171,7 @@ public final class BridgeEncounter {
     public BridgeData getData() { return data; }
     public PuzzleHero hero(int index) { return heroes[index]; }
     public int getActive() { return 0; }
-    public int getBound() { return companion.isHolding()?1:-1; }
+    public int getBound() { return relay!=null&&relay.isHoldingWest()||companion.isHolding()?1:-1; }
     public float getSupport() { return support; }
     public int frame(int index) { return heroes[index].isMoving()?(int)steps[index]%4:1; }
 }

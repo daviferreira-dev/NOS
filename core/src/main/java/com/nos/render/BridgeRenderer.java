@@ -52,11 +52,13 @@ public final class BridgeRenderer implements Disposable {
         batch.setColor(Color.WHITE);batch.end();
         blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
         if(encounter.hasGarden()) gardenRenderer.cables(encounter);
+        if(encounter.hasRelay()) gardenRenderer.relayCables(encounter);
         float[] bridge=data.bridge;
         shapes.setColor(.16f,.20f,.22f,.2f);
         shapes.rect(bridge[0],bridge[1]-4,bridge[2]*encounter.getSupport(),bridge[3]+8);
         shapes.end();
         if(encounter.hasGarden()) { batch.begin();gardenRenderer.floor(encounter);batch.end(); }
+        if(encounter.hasRelay()) { batch.begin();gardenRenderer.relayFloor(encounter);batch.end(); }
         blend();shapes.begin(ShapeRenderer.ShapeType.Line);
         if(encounter.getSupport()>.05f) {
             shapes.setColor(.45f,.36f,.23f,.85f);
@@ -64,7 +66,7 @@ public final class BridgeRenderer implements Disposable {
             shapes.line(bridge[0],bridge[1]+bridge[3],end,bridge[1]+bridge[3]);
             shapes.line(bridge[0],bridge[1],end,bridge[1]);
         }
-        if(encounter.getBound()>=0) {
+        if(encounter.getBound()>=0&&!data.gardenOnly) {
             PuzzleHero bound=encounter.hero(encounter.getBound());shapes.setColor(gold);
             shapes.line(bound.getX()+13,bound.getY()+34,data.winch[0]+16,data.winch[1]+20);
         }
@@ -127,7 +129,7 @@ public final class BridgeRenderer implements Disposable {
             shapes.rect(other.getX()-82,other.getY()+88,164,29);shapes.end();
             batch.begin();centered(assets.text.get(speech),other.getX(),other.getY()+102.5f+UiTypography.BODY_VISUAL_CENTER*.30f*ui.textScale,.30f*ui.textScale,ink);batch.end();
         }
-        if(encounter.isLocked()&&(!encounter.hasGarden()||encounter.garden().isOpen())) {
+        if(encounter.isLocked()&&(!encounter.hasGarden()||encounter.garden().isOpen())&&(!encounter.hasRelay()||encounter.relay().isLatched())) {
             float destinationX=data.exit[0]+data.exit[2]/2,destinationY=data.exit[1]+32;
             blend();shapes.begin(ShapeRenderer.ShapeType.Filled);shapes.setColor(paper.r,paper.g,paper.b,.9f);
             shapes.rect(destinationX-51,destinationY,102,26);shapes.end();

@@ -7,7 +7,7 @@ import com.nos.entities.PuzzleHero;
 public final class BridgeCollisionSystem {
     private final BridgeData data;
     private float cartX,cartY;
-    private boolean hasCart,gardenGateOpen,transferGateOpen;
+    private boolean hasCart,gardenGateOpen,transferGateOpen,relayGateOpen;
     public BridgeCollisionSystem(BridgeData data) {
         this.data=data;
         if(data.garden!=null&&data.garden.cartStart!=null)
@@ -16,6 +16,7 @@ public final class BridgeCollisionSystem {
     public void setGardenCartPosition(float x,float y) { cartX=x;cartY=y;hasCart=true; }
     public void setGardenGateOpen(boolean open) { gardenGateOpen=open; }
     public void setTransferGateOpen(boolean open) { transferGateOpen=open; }
+    public void setRelayGateOpen(boolean open) { relayGateOpen=open; }
     public boolean walkable(float x,float y,boolean open) {
         return walkable(x,y,open,true);
     }
@@ -38,6 +39,12 @@ public final class BridgeCollisionSystem {
             float[] transfer=data.garden.transferGate;
             if(!transferGateOpen&&transfer!=null&&circleTouchesBox(x,y,r,transfer[0],transfer[1],transfer[2],transfer[3])) return false;
         }
+        if(data.relay!=null) {
+            if(data.relay.barriers!=null) for(float[] box:data.relay.barriers)
+                if(circleTouchesBox(x,y,r,box[0],box[1],box[2],box[3])) return false;
+            float[] gate=data.relay.gate;
+            if(!relayGateOpen&&circleTouchesBox(x,y,r,gate[0],gate[1],gate[2],gate[3])) return false;
+        }
         if(includeCart&&hasCart&&circleTouchesBox(x,y,r,cartX-GardenTuning.CART_WIDTH/2,
             cartY-GardenTuning.CART_HEIGHT/2,GardenTuning.CART_WIDTH,GardenTuning.CART_HEIGHT)) return false;
         return true;
@@ -54,6 +61,10 @@ public final class BridgeCollisionSystem {
             if(data.garden.barriers!=null) for(float[] box:data.garden.barriers) if(overlap(x,y,width,height,box)) return false;
             if(!gardenGateOpen&&data.garden.gate!=null&&overlap(x,y,width,height,data.garden.gate)) return false;
             if(!transferGateOpen&&data.garden.transferGate!=null&&overlap(x,y,width,height,data.garden.transferGate)) return false;
+        }
+        if(data.relay!=null) {
+            if(data.relay.barriers!=null) for(float[] box:data.relay.barriers) if(overlap(x,y,width,height,box)) return false;
+            if(!relayGateOpen&&overlap(x,y,width,height,data.relay.gate)) return false;
         }
         return true;
     }

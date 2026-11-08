@@ -1,6 +1,6 @@
 {
   "width":1600,"height":540,
-  "gardenOnly":true,"backgroundPath":"art/water-terrace-v1.png","destinationKey":"transferExitLabel",
+  "phaseNumber":2,"gardenOnly":true,"backgroundPath":"art/water-terrace-v1.png","destinationKey":"transferExitLabel",
   "ground":[60,145,1480,265],
   "river":[-500,0,0,540],"bridge":[-500,230,0,80],
   "winch":[-500,270],"latch":[-500,270],
