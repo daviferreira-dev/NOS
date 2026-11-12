@@ -1,92 +1,64 @@
 # NÓS
 
-Um puzzle de exploração sobre duas presenças e o vínculo entre elas, em libGDX.
+Jogo 2D em libGDX (Game Jam, 2026).
 
-## Experiência atual: Água 01, Água 02 e Água 03
+**Mecânica central:** você controla a Sombra e o Reflexo age sozinho, então cada passo seu muda o caminho dele.
+A graça é cooperar sem comandá-lo: preparar o terreno, observar por onde ele vai e esperar o reencontro.
+Quatro fases (Água, Fogo, Vento, Íris), cada uma com um jeito diferente de atravessar.
 
-Você controla somente Sombra. Reflexo tem o mesmo rosto, mas seu próprio ritmo: observa a água, reage e coopera quando você pede ajuda. A primeira fase inclui a ponte e um desafio de posicionamento no pátio seguinte. A relação e a diversão continuam em validação. As versões anteriores permanecem nos executáveis antigos.
+**Restrição sorteada: "Espelho".** Cada ação afeta os dois personagens ao mesmo tempo; não existe solução local, o que ajuda um custa ao outro.
 
-- WASD/setas: mover Sombra.
-- E: interagir com o objeto próximo; pedir ajuda, fixar a escora ou segurar/soltar a jardineira.
-- Espaço/Esc: pausa. R: reiniciar o trecho; no pátio, a ponte concluída continua fixa.
-- H: abrir/fechar ajuda com o jogo pausado. M: ligar/desligar música.
-- F6: tamanho do texto. F7 no menu de pausa: configurar teclas. F8 na configuração: restaurar padrão. F11: tela cheia/janela.
-- Reflexo não pode ser selecionado por Tab/Q. Não há dano, tinta ou cronômetro neste encontro.
+**Requisitos da atividade:** menu inicial (com abertura animada), 4 fases com dificuldade crescente, tela de **Fim de jogo** ao terminar a Íris, e **pontuação** = 5000 − 4 pontos por segundo jogado − 150 por recomeço. Código separado em `screens`, `systems`, `world`, `entities`, `render`, `data`, `input` e `audio`.
 
-Perto do guincho da primeira margem, peça ajuda e dê espaço. Reflexo caminha até o mecanismo e só então sustenta a ponte. Atravesse com Sombra e fixe a escora na outra margem; ele se solta e vem ao seu encontro pela ponte. Perto do guincho, uma nova interação chama Reflexo de volta e pode recolher a ponte enquanto não estiver fixa. Quem ficar sem piso retorna à última margem segura.
+**Como jogar rápido:** baixe `NOS.jar` (Releases) e rode `java -jar NOS.jar` (Java 17+), ou abra `Jogar NÓS.bat`.
 
-No pátio, os dois pedais liberam a grade. Peça ajuda no menor e posicione a jardineira sobre o mais largo. E segura/solta a peça; WASD permite empurrar e puxar. A grade fica travada aberta e Reflexo se reúne pelo caminho real. Ambos precisam atravessá-la para concluir. Não há prazo nem punição por reposicionar o peso. Os cabos mostram a ligação com a grade; se Reflexo livre bloqueia a peça, ele pode sair da frente por uma rota segura. Um bloqueio persistente dá uma dica curta para reposicionar.
+## Campanha
 
-Depois da ponte e do pátio de Água 01, Enter/clique segue à segunda fase. Água 02 se passa numa varanda de estufa e exige transferir a mesma jardineira: primeiro abre uma passagem, depois Reflexo sustenta o mecanismo do outro lado e permite recuperar o peso para a saída. A primeira grade espera os corpos e a jardineira saírem do vão antes de fechar. A solução completa é testada com movimento físico no mapa distribuído.
+1. **Água.** Peça ajuda no guincho, atravesse a ponte e fixe a escora para que Reflexo possa reencontrar você.
+2. **Fogo.** Escolha o corredor das brasas e abra a porta para Reflexo, ou explorem juntos o desvio entre as máquinas.
+3. **Vento.** Suba a encosta pelas curvas da trilha. Na abertura, pegue a rajada lateral e chame Reflexo do abrigo.
+4. **Íris.** Contorne o observatório prestando atenção à galeria interior. A passagem indicada por Reflexo leva ao reencontro final.
 
-O jogo guarda o checkpoint ao fixar a ponte, a conclusão de Água 01 e a de Água 02. Ao reabrir, o menu permite continuar do pátio ou da segunda fase, conforme o avanço. N / Jogar do começo reinicia a sessão sem apagar o avanço mais distante. A abertura nunca inicia a partida sozinha. Testes e inspeções usam progresso em memória para preservar o save real.
-No fim de Água 02, Enter/clique segue para Água 03. No revezamento da terceira fase, peça ajuda no primeiro pedal, atravesse e pise no pedal do outro lado. Use E para chamar Reflexo a atravessar; mantenha Sombra no pedal até ele chegar. Se sair cedo, ele espera e retoma quando você volta. A chegada trava a grade aberta; sigam juntos ao claustro. No fim de Água 03, Enter/clique volta ao menu. R repete somente o trecho/fase atual. Retomar já enquadra o trecho correto, sem atravessar a cena com a câmera.
-
-A câmera acompanha Sombra, identificada por um marcador por forma e pelo contato dos pés. Há quatro quadros de caminhada, poses próprias de repouso e sustentação, registrados nos pés e em altura comum. Reflexo contorna obstáculos e procura a ponte aberta para reunir-se a você. A tecla de interação atual aparece sobre o mecanismo próximo. Ainda não há animação completa em oito direções.
-
-A ajuda e a configuração são modais: escurecem o cenário, ocultam o HUD e pausam toda a simulação. O objetivo expande quando muda e depois encolhe para um resumo; "Etapa N de 5" indica progresso do trecho atual. Teclas e tamanho do texto são salvos nas preferências.
-
-A abertura usa enquadramentos ilustrados. Terminar ou pular leva ao menu; somente Começar ou um novo Enter inicia a partida. R no menu revê a abertura; M liga/desliga a música e preserva sua escolha. O pátio recebe um terceiro tema, com 112 segundos de piano/harpa amostrados, crossfade e volume máximo de 20%. Não há narração sintética. Notas, prompts e licenças em `design/OPENING-AND-MUSIC.md` e `design/GARDEN-ARTS.md`.
+O [GDD](GDD.md) descreve a campanha atual e registra as experiências anteriores.
 
 ## Jogar
 
-Dê dois cliques em `outputs/Jogar-NOS-Demo-v8.bat`, mantendo `NOS-Demo-v8.jar` ao lado. O iniciador usa o JDK 17 já instalado neste computador. O executável empacotado não requer Gradle nem downloads. As versões anteriores continuam preservadas.
+Com progresso salvo, o jogo abre no menu. A partir de Fogo, pressione F ou clique em **Escolher fase** para revisitar uma fase desbloqueada. R no menu revê a abertura.
+
+Abra **Jogar NÓS.bat** na raiz do projeto. As atualizações usam sempre o mesmo arquivo `outputs/NOS.jar`. Em uma cópia recém-clonada, execute `.\gradlew.bat lwjgl3:jar` e copie o JAR da aplicação de `lwjgl3/build/libs` para `outputs/NOS.jar`.
+
+- WASD/setas movem Sombra. E executa a ação contextual.
+- Segure Shift para correr.
+- H ou Esc abre ajuda e pausa tudo. R reinicia o trecho/fase atual.
+- M liga/desliga música; F11 alterna tela cheia; F6 ajusta texto.
+- F7 na pausa configura teclas; F8 nessa configuração restaura o padrão.
+
+Reflexo não é selecionado por Tab/Q. Ele chega fisicamente aos mecanismos e acompanha pelo piso real. Sem cronômetro global, dano, vidas ou barras. Brasas recuperam Sombra em piso seguro, preservando mecanismos resolvidos. Em Vento, a corrente lateral leva Sombra até um patamar protegido.
+
+A abertura tem cinco planos diferentes, caminhada dos sprites, pausas, câmera e transições. É animação 2D por camadas, sem CGI rejeitado ou voz sintética. Terminar/pular leva ao menu; começar requer outro comando. R no menu revê o filme. Três trilhas instrumentais, volume máximo de 20%, mute persistente e pausa ao perder foco.
+
+Cada resultado espera Enter/clique para seguir; Íris volta ao menu. Preferences guarda checkpoint e conclusões monotônicas. Continuar escolhe o trecho mais avançado disponível; N começa outra sessão sem apagar progresso. Chaves antigas water01/02/03 preservadas; quarta em water04.journey. Inspeções usam memória e não alteram o save real.
 
 ## Desenvolvimento
 
 Requer JDK 17 ou superior. Na raiz:
 
 ```powershell
-$env:JAVA_HOME = "C:\Users\PC Gamer\Documents\Codex\jdks\jdk-17.0.21+9"
 .\gradlew.bat lwjgl3:run
 .\gradlew.bat core:test
-.\gradlew.bat lwjgl3:jar teavm:classes
+.\gradlew.bat lwjgl3:jar teavm:gdx_teavm_web_js_release_build
 ```
 
-Para usar o cache já existente neste computador:
+Neste computador: JDK em `C:\Users\PC Gamer\Documents\Codex\jdks\jdk-17.0.21+9` e cache Gradle em `C:\Users\PC Gamer\Documents\Codex\2026-11-06\instale-o-jdk-17-por-exemplo\work\gradle-user-home`.
 
-```powershell
-$env:GRADLE_USER_HOME = "C:\Users\PC Gamer\Documents\Codex\2026-11-06\instale-o-jdk-17-por-exemplo\work\gradle-user-home"
-```
+Lógica em BridgeEncounter, FurnaceSystem, RidgeSystem, ObservatorySystem, EnvironmentalActionSystem, CompanionBehaviorSystem e CompanionFollowSystem. Geometria em JSON/LevelLoader e ajustes em dados/Tuning. Regras separadas da renderização. Entrada por BridgeInput/BridgeKeyBindings; recursos via AssetManager/dispose; persistência por SaveData/Preferences e roteamento por JourneyProgress.
 
-## Versões preservadas
+Testes percorrem os quatro mapas sem OpenGL: cooperação, colisões, pausa, corrida, brasas, rajadas e recuperação. Desktop e Web/TeaVM compilados; navegador e Android precisam de teste próprio.
 
-- `--mirror-room`: sala experimental de movimento espelhado e selos.
-- `--legacy`: travessia de tempo, tinta e harmonia.
-- A pasta anterior em Documents/Codex não foi alterada. O histórico Git foi importado para esta pasta, incluindo os commits locais.
+## Inspeção e arte
 
-Exemplo: `java -jar outputs/NOS-Demo-v8.jar --mirror-room`.
+`--smoke-test PREFIXO --garden-menu|--water-two-menu|--water-three-menu|--iris-won|--iris-menu|--iris-large` inspeciona sem janela visível. `--intro-smoke PREFIXO shot-0` até `shot-4` verifica os planos; `--resume-iris` verifica continuação. `--audio-check` verifica áudio sem som. Isso não substitui jogar e ouvir.
 
-## Organização
+Personagens e logo aprovados, fontes e aquarela preservados. Novas aquarelas em assets/art/furnace-interior.png, ridge-gorge.png e observatory-interior.png. As colisões usam a geometria dos mapas. Cormorant Garamond e Atkinson Hyperlegible com licenças OFL em assets/ui. Licença GeneralUser junto do áudio.
 
-- `BridgeEncounter`: estado e regras do encontro, sem OpenGL.
-- `BridgeCollisionSystem`: margens, água, obstáculos e ponte.
-- `CompanionFollowSystem`: seguimento com busca de desvios caminháveis.
-- `CompanionBehaviorSystem`: percepção, reação, pedido de ajuda, sustentação e reencontro de Reflexo.
-- `GardenGateSystem`: jardineira, pedais, ajuda física e trava da grade.
-- `CompanionClearanceSystem`: desvio físico de Reflexo livre para ceder passagem à peça.
-- `SaveData`: recorde legado e checkpoints monotônicos via Preferences.
-- `GardenData` / `GardenTuning`: planta opcional e ajustes dos contrapesos.
-- `BridgeKeyBindings`: teclas remapeáveis e aliases.
-- `BridgeInput`: teclado e botões de toque.
-- `BridgeScreen`: orquestração em passos fixos.
-- `BridgeRenderer`: apresentação e câmera.
-- `BridgeUiState` / `BridgeHudRenderer`: objetivo, avisos, identificação, leitura e menus modais; tempos de apresentação separados da simulação.
-- `levels/bridge-encounter.json`: planta do encontro.
-- `levels/water-transfer.json`: segunda fase, com transferência do peso.
-- `levels/water-relay.json`: terceira fase, com revezamento da sustentação.
-- `RelayGateSystem` / `RelayData` / `RelayTuning`: pedido, travessia, espera e trava da passagem.
-- `JourneyProgress`: escolha do trecho de continuação sem dependências gráficas.
-- `BridgeTuning`: movimento, distâncias e tempos de resposta.
-
-Os testes JUnit verificam os protótipos preservados e os percursos das duas primeiras fases, controlando só Sombra. Incluem chegada física, espera por espaço, arrastar/puxar, peso insuficiente de pessoas, bloqueio da caixa por Reflexo, pausa, independência de frames, transferência e abertura permanente. `--smoke-test CAMINHO_ABSOLUTO --garden|--garden-grab|--garden-open|--garden-large` inspeciona situações do pátio sem janela visível. Para Água 02: `--water-two-start`, `--water-two-transfer`, `--water-two-open`, `--water-two-won`, `--water-two-menu`. `--garden-menu` verifica a passagem de Água 01 para Água 02. `--intro-smoke CAMINHO_ABSOLUTO --resume-water-two` verifica a continuação pelo menu. Os cenários anteriores continuam disponíveis. `--audio-check` verifica as três faixas com volume zero. Essas verificações não substituem jogar e ouvir a música.
-
-## Arte e direção
-
-Personagens e logo foram aprovados pelo usuário. Cenário, ponte, mecanismos e poses foram criados com geração de imagens e integrados ao jogo; referências originais em `design/`. Tipografia Cormorant Garamond e Atkinson Hyperlegible, com licenças OFL em `assets/ui/`. Notas e prompts em `design/BRIDGE-ARTS.md` e `design/SPRITE-REFINEMENT.md`, também entregues em `outputs/`; gerador dos atlas em `tools/`.
-
-Água 02 recebe cenário de estufa e canteiro estreito com transparência próprios. Arquivos e prompts finais em `design/WATER02-ARTS.md`.
-
-Água 03 recebe uma colunata ao entardecer, usando os mesmos sprites dos heróis e mecanismos. Prompt e caminho do cenário em `design/water-relay-bank-v1-prompt.txt`. Inspeções invisíveis: `--water-three-start`, `--water-three-west`, `--water-three-handoff`, `--water-three-hold`, `--water-three-won`, `--water-three-menu`, `--water-three-large`. A continuação pelo menu é verificada com `--intro-smoke CAMINHO_ABSOLUTO --resume-water-three`.
-
-O GDD registra a revisão ativa e preserva as concepções anteriores como histórico. Os 13 níveis e capítulos da concepção original não estão implementados.
+`--mirror-room` e `--legacy` preservam os experimentos. O GDD conserva planos antigos como histórico; a revisão do início do documento prevalece. Commits e pushes após etapas validadas na branch codex/encontro-da-ponte.

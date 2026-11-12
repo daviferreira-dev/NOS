@@ -5,6 +5,12 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class OpeningSequenceTest {
+    @Test public void fiveShotsUseDistinctScenesAndFinishAtMenu() {
+        assertEquals(5,OpeningTuning.SHOT_BACKGROUNDS.length);
+        assertEquals(5,new java.util.HashSet<String>(java.util.Arrays.asList(OpeningTuning.SHOT_BACKGROUNDS)).size());
+        OpeningSequence run=new OpeningSequence();advance(run,600);
+        assertEquals(OpeningSequence.State.TITLE,run.getState());
+    }
     private void advance(OpeningSequence run,int steps) { for(int i=0;i<steps;i++) run.update(.05f); }
     @Test public void naturalEndingWaitsAtTitleIndefinitely() {
         OpeningSequence run=new OpeningSequence();advance(run,12000);

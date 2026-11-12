@@ -7,7 +7,7 @@ import com.nos.world.Trail;
 
 /** Carrega os dados da fase pelas APIs compatíveis com desktop e web. */
 public final class LevelLoader {
-    public static final String FIRST_WATER="levels/bridge-encounter.json",SECOND_WATER="levels/water-transfer.json",THIRD_WATER="levels/water-relay.json";
+    public static final String FIRST_WATER="levels/river-meeting.json",SECOND_WATER="levels/water-transfer.json",THIRD_WATER="levels/water-relay.json",FOURTH_WATER="levels/iris-convergence.json";
     public MirrorPair load(String path) {
         LevelData data = read(path);
         return new MirrorPair(new Trail(data.trailA), new Trail(data.trailB));

@@ -1,0 +1,20 @@
+{
+  "width":1280,"height":540,"phaseNumber":4,
+  "gardenOnly":true,"backgroundPath":"art/observatory-interior.png","destinationKey":"observatoryExitLabel",
+  "ground":[60,30,1160,480],
+  "river":[-500,0,0,540],"bridge":[-500,230,0,80],
+  "winch":[-500,270],"latch":[-500,270],
+  "shadowStart":[170,270],"reflectionStart":[786,270],
+  "exit":[596,226,88,88],"obstacles":[],
+  "observatory":{
+    "center":[640,270],"coreRadius":86,
+    "outerInnerRadius":192,"outerOuterRadius":236,
+    "galleryInnerRadius":128,"galleryOuterRadius":164,
+    "entry":[60,242,370,56],"observationPoint":[422,270],"reunionPoint":[668,270],
+    "passages":[[402,242,170,56],[708,242,170,56],[612,338,56,170]],
+    "gates":[[448,242,20,56],[812,242,20,56],[612,450,56,20]],
+    "approaches":[[422,270],[858,270],[640,484]],"correctPassage":2,
+    "galleryRoute":[[786,270],[774.881,325.874],[743.238,373.238],[695.874,404.881],[640,416]],
+    "returnRoute":[[695.874,404.881],[743.238,373.238],[774.881,325.874],[786,270],[748,270],[700,270],[668,270]]
+  }
+}

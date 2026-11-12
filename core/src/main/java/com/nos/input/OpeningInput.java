@@ -8,7 +8,9 @@ import com.nos.data.OpeningTuning;
 
 /** O evento que pula o filme nunca é reaproveitado como comando de começar. */
 public final class OpeningInput extends InputAdapter {
-    public enum Action { NONE,SKIP,START,FROM_BEGINNING,REPLAY,MUSIC }
+    public enum Action { NONE,SKIP,START,FROM_BEGINNING,REPLAY,MUSIC,CHAPTERS }
+    private boolean chaptersAvailable;
+    public void setChaptersAvailable(boolean value) { chaptersAvailable=value; }
     private Action pending=Action.NONE;
     private boolean title,progressAvailable,enterHeld,skipHeld,replayHeld,freshHeld,click;
     private int clickX,clickY;
@@ -20,6 +22,7 @@ public final class OpeningInput extends InputAdapter {
         pending=Action.NONE;click=false;enterHeld=enter;replayHeld=replay;freshHeld=fresh;
     }
     @Override public boolean keyDown(int key) {
+        if(key==Input.Keys.F && title && chaptersAvailable) { pending=Action.CHAPTERS;return true; }
         if(key==Input.Keys.ENTER) { if(!enterHeld) pending=title?Action.START:Action.SKIP;enterHeld=true;return true; }
         if(key==Input.Keys.SPACE||key==Input.Keys.ESCAPE) { if(!skipHeld&&!title) pending=Action.SKIP;skipHeld=true;return true; }
         if(key==Input.Keys.R) { if(!replayHeld&&title) pending=Action.REPLAY;replayHeld=true;return true; }
@@ -54,6 +57,7 @@ public final class OpeningInput extends InputAdapter {
         if(click) {
             viewport.unproject(point.set(clickX,clickY));
             pending=buttonAt(point.x,point.y,progressAvailable);click=false;
+            if(chaptersAvailable&&inside(OpeningTuning.CHAPTERS,point.x,point.y)) pending=Action.CHAPTERS;
         }
         Action result=pending;pending=Action.NONE;return result;
     }

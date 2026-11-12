@@ -169,6 +169,7 @@ public final class GardenGateSystem {
         if(open) return "gardenGoalExit";
         if(hasTransfer()&&!transferLatched&&!transferPressed&&transferOpening<BridgeTuning.OPEN_THRESHOLD) return "transferGoalLoad";
         if(requested&&!holding) return needsRoom?"gardenGoalMakeRoom":"gardenGoalWaiting";
+        if(transferLatched&&largePressed) return smallPressed?"gardenGoalUnlocking":"gardenGoalAsk";
         if(hasTransfer()) return transferLatched?"transferGoalMove":"transferGoalHelp";
         return smallPressed?"gardenGoalWeight":"gardenGoalAsk";
     }

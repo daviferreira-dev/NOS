@@ -1,0 +1,4 @@
+Tool: built-in image_gen; no API/CLI fallback.
+Asset: assets/art/wind-bank-v1.png
+Final prompt:
+Use case: stylized-concept. Production 2D game background NÓS. Elevated orthographic 3/4 watercolor on paper, mature quiet mysterious atmosphere, restrained colors, old limestone, detailed hand-painted natural materials. Ultra-wide panorama 3.5:1. KEEP WALKABLE BAND unobstructed across whole width between 24% and73% image height: pale stone floor. All columns, vegetation and big obstructions only above24% or below73%. No people, hands, text, UI, gates, plates or puzzle props; sprites are separate. Location: exposed high riverside cloister with tall distant trees bent by wind, misty gray-lavender sky and reeds below, draped climbing vines on upper wall, leaves in upper/bottom corners only. Cold ivory and sage, different architecture from reference. Open walking floor.

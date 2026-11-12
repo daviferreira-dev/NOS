@@ -1,6 +1,48 @@
 # NÓS — Documento de Design (GDD)
 
-## Revisão ativa — Uma presença controlável, duas pessoas (07/11/2026)
+## Revisão ativa — Quatro maneiras de atravessar
+
+O mesmo controle de Sombra serve às quatro fases. O que o jogador precisa observar e decidir muda em cada lugar.
+
+| Fase | O que o jogador faz | Como reconhecer o lugar |
+| --- | --- | --- |
+| Água | Pede ajuda a Reflexo no guincho, fixa a escora na margem oposta e espera o reencontro físico. | Rio aberto, madeira e barranco. |
+| Fogo | Escolhe entre atravessar as brasas e abrir uma porta para Reflexo ou seguir com ele pelo corredor inferior. | Fornalha coberta, bocas de fogo e divisórias de metal. |
+| Vento | Sobe a encosta pelas curvas, pega uma rajada lateral para cruzar a abertura e chama Reflexo do abrigo. | Garganta rochosa, desníveis e câmera que acompanha a subida. |
+| Íris | Observa Reflexo percorrer a galeria interna, identifica a passagem indicada, entra e espera por ele no centro. Uma passagem errada permite tentar outra. | Observatório circular com uma lente central e galerias concêntricas. |
+
+Água termina na própria margem. O antigo ponto salvo do pátio retoma o reencontro na ponte. Os registros de capítulos continuam abrindo as mesmas quatro posições da campanha. O jogador pode revisitar Fogo para experimentar o outro percurso. A chegada a cada resultado espera um comando explícito para prosseguir.
+
+**Decisões em aberto**
+
+- [ ] Testar se as duas rotas de Fogo são reconhecíveis ao chegar à bifurcação.
+- [ ] Testar se o vento comunica o ponto de travessia e se é agradável fazer as curvas da encosta.
+- [ ] Testar se a posição de Reflexo basta para entender a escolha em Íris.
+
+As revisões abaixo registram os protótipos anteriores.
+
+## Histórico — Uma presença controlável, duas pessoas (07/11/2026)
+
+Com o primeiro checkpoint salvo, reabrir o jogo leva ao título. A opção Rever abertura continua disponível. A partir de Fogo, Escolher fase permite voltar ao início de qualquer fase já alcançada pelo teclado, mouse ou toque. Continuar ainda usa o ponto mais avançado da campanha.
+
+Em Fogo e Íris, uma brasa devolve Sombra ao último piso visitado fora de todo o trajeto dos perigos, com margem definida no mapa. A recuperação verifica se o lugar e a passagem até ele continuam livres. Se a jardineira ou uma grade bloquearem o retorno local, vale o ponto seguro da fase. O ponto local pertence à tentativa atual.
+
+**Revisão v9 — quatro fases no jogo inteiro, mais ação e nova abertura**
+
+O usuário gostou do protótipo, pediu reduzir de treze para quatro fases, mais ação e uma abertura sem repetir só duas imagens, e autorizou implementar todas antes de chamá-lo para testar. O plano atual é `design/PLANO-QUATRO-FASES.md`. Esta revisão prevalece sobre qualquer menção anterior a treze níveis ou quatro níveis por elemento.
+
+- Campanha: Água (ponte e apresentação), Fogo (transferência com brasas móveis), Vento (rajadas e revezamento), Íris (convergência e conclusão). Os protótipos Água 02/03 foram reaproveitados em Fogo/Vento; não são mais fases extras do mesmo capítulo.
+- `EnvironmentalActionSystem` atualiza trajetos, antecipação, atividade, recuperação segura e empurrões pela colisão. Dados em `HazardData` e JSON; ajustes em `ActionTuning`. O relógio para durante ajuda/pausa. Shift permite correr sem peso; arrastar conserva velocidade anterior. Sem dano, vidas, barras ou cronômetro global. Ação ambiental não teletransporta nem atinge Reflexo.
+- Íris combina os sistemas de jardim e revezamento em sequência, sete objetivos e saída exigindo ambos. Não há quinto mapa. `water04.journey` registra conclusão final; chaves antigas permanecem para compatibilidade. Cada resultado espera Enter/clique, incluindo a volta ao menu após a quarta fase.
+- Abertura de cinco planos distintos em 24 segundos, com personagens animados caminhando e pausando, movimentos de câmera e transições. Textos em dados. Não é CGI nem contém narração sintética. Menu e marca mantêm início explícito.
+- Recursos novos: fundos de Fogo, Vento e Íris e brasa em aquarela transparente. Carga via AssetManager; liberação no ciclo da tela.
+
+**Decisões em aberto da v9**
+- [x] Reduzir o escopo total para quatro fases e implementar fluxo até a conclusão.
+- [x] Acrescentar corrida, brasas e rajadas recuperáveis, sem trocar o controle de Sombra.
+- [x] Substituir a repetição da abertura por cinco planos e animação dos sprites.
+- [ ] Validar ação, repetição, duração e interesse das quatro fases com o usuário.
+- [ ] Validar a abertura em movimento; não considerar seu acabamento aprovado antes do teste.
 
 **Continuação — Água 03, revezamento da sustentação (v8)**
 

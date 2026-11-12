@@ -9,8 +9,9 @@ public final class SaveData {
     private static final String JOURNEY_KEY="water01.journey";
     private static final String SECOND_JOURNEY_KEY="water02.journey";
     private static final String THIRD_JOURNEY_KEY="water03.journey";
+    private static final String FOURTH_JOURNEY_KEY="water04.journey";
     private final Preferences preferences;
-    private int memoryBest,memoryJourney,memorySecondJourney,memoryThirdJourney;
+    private int memoryBest,memoryJourney,memorySecondJourney,memoryThirdJourney,memoryFourthJourney;
     public SaveData() { this(Gdx.app.getPreferences("com.nos.progress")); }
     /** Um backend nulo mantém somente memória, para inspeção e testes isolados. */
     public SaveData(Preferences preferences) { this.preferences=preferences; }
@@ -47,7 +48,16 @@ public final class SaveData {
         catch(RuntimeException invalidValue) { return false; }
         return value==1;
     }
+    public boolean isFourthJourneyAvailable() { return isThirdJourneyComplete(); }
+    public boolean isFourthJourneyComplete() {
+        if(!isFourthJourneyAvailable()) return false;
+        int value;
+        try { value=preferences==null?memoryFourthJourney:preferences.getInteger(FOURTH_JOURNEY_KEY,0); }
+        catch(RuntimeException invalidValue) { return false; }
+        return value==1;
+    }
     public int menuProgress() {
+        if(isFourthJourneyComplete()) return 5;
         if(isThirdJourneyComplete()) return 4;
         if(isSecondJourneyComplete()) return 3;
         return journeyProgress();
@@ -63,6 +73,11 @@ public final class SaveData {
         if(!isThirdJourneyAvailable()||isThirdJourneyComplete()) return;
         if(preferences==null) memoryThirdJourney=1;
         else { preferences.putInteger(THIRD_JOURNEY_KEY,1);preferences.flush(); }
+    }
+    public void recordFourthJourneyComplete() {
+        if(!isFourthJourneyAvailable()||isFourthJourneyComplete()) return;
+        if(preferences==null) memoryFourthJourney=1;
+        else { preferences.putInteger(FOURTH_JOURNEY_KEY,1);preferences.flush(); }
     }
     private void advanceJourney(int value) {
         if(value<=journeyProgress()) return;

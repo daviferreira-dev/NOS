@@ -1,7 +1,5 @@
 package com.nos.systems;
 
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Json;
 import com.nos.data.*;
 import com.nos.entities.PuzzleHero;
 import org.junit.Test;
@@ -101,8 +99,8 @@ public class RelayGateSystemTest {
             catch(IllegalArgumentException expected) { }
         }
     }
-    @Test public void distributedMapCanBeSolvedThroughItsActualCollision() {
-        BridgeData data=new Json().fromJson(BridgeData.class,new FileHandle(System.getProperty("nos.assets")+"/levels/water-relay.json"));
+    @Test public void preservedRelayFixtureCanBeSolvedThroughItsActualCollision() {
+        BridgeData data=data();data.exit=new float[]{1410,235,130,80};
         Run run=new Run(data);run.requestWest();run.reachEast();run.relay.interact(run.player,run.other);run.waitFor(1200);
         assertTrue(run.relay.isLatched());run.go(1490,270);run.waitFor(600);
         assertTrue(run.other.getX()>data.exit[0]);

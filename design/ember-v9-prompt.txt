@@ -1,0 +1,4 @@
+Tool: built-in image_gen; no API/CLI fallback.
+Asset: assets/art/ember-v1.png
+Final prompt:
+Use case: stylized-concept. One isolated transparent-background watercolor 2D game prop: short charred fallen branch with small natural amber flames licking upward and a few red embers. Elevated3/4 orthographic view for NÓS, hand-painted textured paper, mature understated, warm amber/charcoal and no neon. Whole branch and fire visible, no rectangle or ground background, tiny contact shadow, genuine transparent alpha, no text people or hands. Sprite wider than tall, small empty margins, usable at70px in game.

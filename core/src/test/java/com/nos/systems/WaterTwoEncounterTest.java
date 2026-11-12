@@ -26,30 +26,38 @@ public class WaterTwoEncounterTest {
     @Test public void levelStartsWithNewPuzzleAndClosedPassages() {
         BridgeEncounter world=create();
         assertTrue(world.isLocked());assertTrue(world.getData().gardenOnly);
-        assertTrue(world.garden().hasTransfer());assertFalse(world.garden().isOpen());
+        assertFalse(world.hasGarden());assertFalse(world.hasRelay());assertTrue(world.challenge() instanceof FurnaceSystem);
+        assertFalse(((FurnaceSystem)world.challenge()).isDoorOpen());
         assertEquals(4,world.objectiveCount());assertEquals(1,world.objectiveStep());
-        assertEquals("transferGoalLoad",world.objectiveKey());
+        assertEquals("furnaceGoalChoose",world.objectiveKey());
         assertTrue(new FileHandle(System.getProperty("nos.assets")+"/"+world.getData().backgroundPath).exists());
     }
-    @Test public void shippedMapCanBeSolvedByTransferringTheSameCart() {
+    @Test public void safeDetourCanBeCompletedByBothPeopleWithoutOpeningTheDoor() {
         BridgeEncounter world=create();
-        go(world,290,270);world.interact();assertTrue(world.garden().isDragging());
-        go(world,658,272);world.interact();waitFor(world,200);
-        assertEquals(1,world.garden().transferOpening(),.001f);assertFalse(world.garden().isTransferLatched());
-        go(world,658,218);go(world,760,218);go(world,760,270);go(world,930,270);go(world,982,186);
-        world.interact();waitFor(world,1800);
-        assertTrue("Reflexo precisa chegar ao pedal além da grade",world.garden().isHelperHolding());
-        assertTrue(world.garden().isTransferLatched());assertFalse(world.garden().isOpen());
-        go(world,930,270);go(world,760,270);go(world,760,218);go(world,658,218);go(world,658,272);
-        world.interact();assertTrue(world.garden().isDragging());
-        go(world,1178,309);world.interact();waitFor(world,300);
-        assertTrue(world.garden().weightPressed());assertTrue(world.garden().isOpen());
-        go(world,1230,248);go(world,1490,270);waitFor(world,1200);
+        go(world,440,145);go(world,1050,145);go(world,1110,260);waitFor(world,1000);
+        FurnaceSystem furnace=(FurnaceSystem)world.challenge();assertTrue(furnace.allowsExit());assertFalse(furnace.isDoorOpen());
+        go(world,1490,270);waitFor(world,1200);
         assertEquals(BridgeEncounter.State.WON,world.getState());
+    }
+    @Test public void hotShortcutOpensARealSafeRouteForCompanionInsteadOfTeleporting() {
+        BridgeEncounter world=create();go(world,440,335);go(world,600,335);waitFor(world,300);
+        FurnaceSystem furnace=(FurnaceSystem)world.challenge();assertEquals(FurnaceSystem.Route.SHORTCUT,furnace.route());
+        assertTrue(world.hero(1).getX()<500);HazardData hazard=world.getData().hazards[0];
+        float restStart=hazard.warningSeconds+hazard.activeSeconds,cycle=restStart+hazard.restSeconds;
+        for(int i=0;i<4000;i++) {
+            float local=(world.actions().time()+hazard.phase)%cycle;
+            if(local>=restStart&&local<restStart+BridgeTuning.FIXED_STEP*2) break;
+            world.update(0,0,BridgeTuning.FIXED_STEP);
+        }
+        go(world,1080,335);go(world,1100,335);
+        float x=world.hero(1).getX(),y=world.hero(1).getY();world.interact();
+        assertTrue(furnace.isDoorOpen());assertEquals(x,world.hero(1).getX(),0);assertEquals(y,world.hero(1).getY(),0);
+        waitFor(world,1200);assertTrue(furnace.allowsExit());assertTrue(world.hero(1).getX()>1050);
+        go(world,1490,270);waitFor(world,1200);assertEquals(BridgeEncounter.State.WON,world.getState());
     }
     @Test public void allSecondLevelObjectivesHaveReadableCopies() {
         I18NBundle strings=I18NBundle.createBundle(new FileHandle(System.getProperty("nos.assets")+"/ui/strings"));
-        for(String key:new String[]{"transferGoalLoad","transferGoalHelp","transferGoalMove","gardenGoalWaiting","gardenGoalMakeRoom","gardenGoalExit"}) {
+        for(String key:new String[]{"furnaceGoalChoose","furnaceGoalDoor","furnaceGoalDetour","furnaceGoalWait","furnaceGoalExit"}) {
             assertFalse(strings.get(key).isEmpty());assertFalse(strings.get(key+"Compact").isEmpty());
         }
     }

@@ -16,5 +16,6 @@ public final class BridgeTuning {
     public static final float COMPANION_WINCH_RADIUS=3,COMPANION_APPROACH_SPEED=145;
     public static final float COMPANION_OBSERVE_PLAYER_RANGE=170,COMPANION_OBSERVE_OWN_RANGE=250;
     public static final float COMPANION_CLEARANCE=36;
+    public static final float REUNION_DISTANCE=COMPANION_START_DISTANCE;
     private BridgeTuning() { }
 }

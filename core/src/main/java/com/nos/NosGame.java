@@ -2,6 +2,7 @@ package com.nos;
 
 import com.badlogic.gdx.Game;
 import com.nos.screens.GameScreen;
+import com.nos.screens.GameOverScreen;
 import com.nos.screens.IntroScreen;
 import com.nos.screens.PuzzleScreen;
 import com.nos.screens.BridgeScreen;
@@ -27,19 +28,39 @@ public class NosGame extends Game {
     public void create() {
         soundtrack=new Soundtrack(silent);
         progress=silent||skipIntro||legacy?new SaveData(null):new SaveData();
-        setScreen(legacy ? new GameScreen() : skipIntro ? new BridgeScreen(false,progress,false) : new IntroScreen(this));
+        if(legacy) setScreen(new GameScreen());
+        else if(skipIntro) setScreen(new BridgeScreen(false,progress,false));
+        else {
+            IntroScreen intro=new IntroScreen(this);
+            if(progress.canResumeJourney()) intro.showTitle();
+            setScreen(intro);
+        }
         if(skipIntro) soundtrack.journey();
+    }
+
+    private float runSeconds;
+    private int runRestarts;
+    public void addRunTime(float seconds) { runSeconds+=seconds; }
+    public void addRunRestart() { runRestarts++; }
+    /** Pontuação da campanha: 5000 menos o tempo jogado e os recomeços. */
+    public int runScore() { return Math.max(0,5000-Math.round(runSeconds*4)-runRestarts*150); }
+    public void showGameOver() {
+        com.badlogic.gdx.Screen previous=getScreen();
+        setScreen(new GameOverScreen(this,runScore(),runSeconds,runRestarts));
+        if(previous!=null) previous.dispose();
     }
 
     public Soundtrack soundtrack() { return soundtrack; }
     public SaveData progress() { return progress; }
     public void returnToTitle() {
+        runSeconds=0;runRestarts=0;
         com.badlogic.gdx.Screen previous=getScreen();IntroScreen menu=new IntroScreen(this);
         menu.showTitle();setScreen(menu);if(previous!=null) previous.dispose();
     }
     public void beginJourney() { beginJourney(progress.canResumeJourney()); }
     public void beginJourney(boolean resumeCheckpoint) {
         JourneyProgress.Stage stage=JourneyProgress.start(progress,resumeCheckpoint);
+        if(stage==JourneyProgress.Stage.WATER_FOUR) { beginWaterFour();return; }
         if(stage==JourneyProgress.Stage.WATER_THREE) { beginWaterThree();return; }
         if(stage==JourneyProgress.Stage.WATER_TWO) { beginWaterTwo();return; }
         boolean resume=stage==JourneyProgress.Stage.GARDEN;
@@ -58,6 +79,12 @@ public class NosGame extends Game {
         if(!progress.isThirdJourneyAvailable()) { returnToTitle();return; }
         com.badlogic.gdx.Screen previous=getScreen();
         setScreen(new BridgeScreen(true,progress,false,3));soundtrack.garden();
+        if(previous!=null) previous.dispose();
+    }
+    public void beginWaterFour() {
+        if(!progress.isFourthJourneyAvailable()) { returnToTitle();return; }
+        com.badlogic.gdx.Screen previous=getScreen();
+        setScreen(new BridgeScreen(true,progress,false,4));soundtrack.garden();
         if(previous!=null) previous.dispose();
     }
     @Override public void render() {
