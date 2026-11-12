@@ -97,7 +97,7 @@ public final class BridgeScreen extends ScreenAdapter {
         if(!ui.settings&&start&&!restart&&encounter.getState()==BridgeEncounter.State.WON
             &&Gdx.app.getApplicationListener() instanceof NosGame) {
             NosGame game=(NosGame)Gdx.app.getApplicationListener();
-            if(isWaterFour()) game.showGameOver();else if(isWaterThree()) game.beginWaterFour();else if(isWaterTwo()) game.beginWaterThree();else game.beginWaterTwo();
+            if(isWaterFour()) game.showGameOver(true);else if(isWaterThree()) game.beginWaterFour();else if(isWaterTwo()) game.beginWaterThree();else game.beginWaterTwo();
             return;
         }
         if(!ui.settings&&!settingsKeyFrame) {
@@ -121,6 +121,9 @@ public final class BridgeScreen extends ScreenAdapter {
             while(accumulator>=BridgeTuning.FIXED_STEP) { encounter.update(input.x(),input.y(),BridgeTuning.FIXED_STEP,input.isSprinting());accumulator-=BridgeTuning.FIXED_STEP; }
         } else accumulator=0;
         recordProgress();
+        if(encounter.isOutOfLives()&&Gdx.app.getApplicationListener() instanceof NosGame) {
+            ((NosGame)Gdx.app.getApplicationListener()).showGameOver(false);return;
+        }
         if(encounter.isLocked()&&encounter.getData().phaseNumber==1&&Gdx.app.getApplicationListener() instanceof NosGame) {
             NosGame game=(NosGame)Gdx.app.getApplicationListener();
             if(game.soundtrack()!=null) game.soundtrack().garden();

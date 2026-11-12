@@ -44,9 +44,9 @@ public class NosGame extends Game {
     public void addRunRestart() { runRestarts++; }
     /** Pontuação da campanha: 5000 menos o tempo jogado e os recomeços. */
     public int runScore() { return Math.max(0,5000-Math.round(runSeconds*4)-runRestarts*150); }
-    public void showGameOver() {
+    public void showGameOver(boolean won) {
         com.badlogic.gdx.Screen previous=getScreen();
-        setScreen(new GameOverScreen(this,runScore(),runSeconds,runRestarts));
+        setScreen(new GameOverScreen(this,won,runScore(),runSeconds,runRestarts));
         if(previous!=null) previous.dispose();
     }
 
@@ -59,6 +59,7 @@ public class NosGame extends Game {
     }
     public void beginJourney() { beginJourney(progress.canResumeJourney()); }
     public void beginJourney(boolean resumeCheckpoint) {
+        runSeconds=0;runRestarts=0;
         JourneyProgress.Stage stage=JourneyProgress.start(progress,resumeCheckpoint);
         if(stage==JourneyProgress.Stage.WATER_FOUR) { beginWaterFour();return; }
         if(stage==JourneyProgress.Stage.WATER_THREE) { beginWaterThree();return; }

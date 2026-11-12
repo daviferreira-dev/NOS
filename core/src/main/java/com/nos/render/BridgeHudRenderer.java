@@ -54,6 +54,7 @@ final class BridgeHudRenderer {
             panel(780,26,130,43,1);
         } else panel(keysX,20,keysWidth,32,1);
         shapes.end();batch.begin();
+        if(encounter.getData().phaseNumber>=2) stage=stage+"    Vidas: "+encounter.getLives();
         text(stage,43,(expanded?510:505)+cardOffset,.28f*scale,gold);
         if(expanded) wrappedTitle(goal,43,485+cardOffset,goalWidth,.43f*scale,ink);
         else wrapped(summary,summaryX,505+cardOffset,summaryWidth,.28f*scale,ink);
