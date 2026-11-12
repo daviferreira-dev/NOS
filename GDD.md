@@ -1,6 +1,27 @@
 # NÓS — Documento de Design (GDD)
 
-## Revisão ativa — Uma presença controlável, duas pessoas (07/11/2026)
+## Revisão ativa — Quatro maneiras de atravessar
+
+O mesmo controle de Sombra serve às quatro fases. O que o jogador precisa observar e decidir muda em cada lugar.
+
+| Fase | O que o jogador faz | Como reconhecer o lugar |
+| --- | --- | --- |
+| Água | Pede ajuda a Reflexo no guincho, fixa a escora na margem oposta e espera o reencontro físico. | Rio aberto, madeira e barranco. |
+| Fogo | Escolhe entre atravessar as brasas e abrir uma porta para Reflexo ou seguir com ele pelo corredor inferior. | Fornalha coberta, bocas de fogo e divisórias de metal. |
+| Vento | Sobe a encosta pelas curvas, pega uma rajada lateral para cruzar a abertura e chama Reflexo do abrigo. | Garganta rochosa, desníveis e câmera que acompanha a subida. |
+| Íris | Observa Reflexo percorrer a galeria interna, identifica a passagem indicada, entra e espera por ele no centro. Uma passagem errada permite tentar outra. | Observatório circular com uma lente central e galerias concêntricas. |
+
+Água termina na própria margem. O antigo ponto salvo do pátio retoma o reencontro na ponte. Os registros de capítulos continuam abrindo as mesmas quatro posições da campanha. O jogador pode revisitar Fogo para experimentar o outro percurso. A chegada a cada resultado espera um comando explícito para prosseguir.
+
+**Decisões em aberto**
+
+- [ ] Testar se as duas rotas de Fogo são reconhecíveis ao chegar à bifurcação.
+- [ ] Testar se o vento comunica o ponto de travessia e se é agradável fazer as curvas da encosta.
+- [ ] Testar se a posição de Reflexo basta para entender a escolha em Íris.
+
+As revisões abaixo registram os protótipos anteriores.
+
+## Histórico — Uma presença controlável, duas pessoas (07/11/2026)
 
 Com o primeiro checkpoint salvo, reabrir o jogo leva ao título. A opção Rever abertura continua disponível. A partir de Fogo, Escolher fase permite voltar ao início de qualquer fase já alcançada pelo teclado, mouse ou toque. Continuar ainda usa o ponto mais avançado da campanha.
 

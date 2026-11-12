@@ -1,26 +1,22 @@
 {
   "width":1600,"height":540,
-  "phaseNumber":2,"gardenOnly":true,"backgroundPath":"art/fire-bank-v1.png","destinationKey":"transferExitLabel",
-  "ground":[60,145,1480,265],
+  "phaseNumber":2,"gardenOnly":true,"backgroundPath":"art/furnace-interior.png","destinationKey":"furnaceExitLabel",
+  "ground":[60,95,1480,350],
   "river":[-500,0,0,540],"bridge":[-500,230,0,80],
   "winch":[-500,270],"latch":[-500,270],
-  "shadowStart":[170,255],"reflectionStart":[240,300],
-  "exit":[1410,235,130,80],
-  "obstacles":[[400,145,62,55],[540,355,70,55]],
-  "recoveryPoint":[190,250],
-  "localRecoveryMargin":32,
-  "hazards":[{"type":"ember","x":760,"y":270,"amplitudeX":0,"amplitudeY":45,"period":7,"phase":0,"radius":24,"warningSeconds":1,"activeSeconds":2,"restSeconds":3}],
-  "garden":{
-    "cartStart":[330,270],
-    "transferPlate":[660,248,76,48],
-    "transferGate":[820,230,24,95],
-    "transferCable":[[698,294],[698,344],[826,344],[826,302]],
-    "helperPlate":[1000,170,48,32],
-    "weightPlate":[1180,285,76,48],
-    "gate":[1370,230,24,95],
-    "barriers":[[790,145,90,85],[790,325,90,85],[1330,145,210,85],[1330,325,210,85]],
-    "helperCable":[[1024,201],[1024,222],[1380,222],[1380,245]],
-    "weightCable":[[1218,332],[1218,352],[1380,352],[1380,302]],
-    "checkpointShadow":[170,255],"checkpointReflection":[240,300]
+  "shadowStart":[170,270],"reflectionStart":[240,300],
+  "exit":[1400,235,140,100],
+  "obstacles":[[500,185,500,45],[500,290,500,25],[500,355,500,90]],
+  "recoveryPoint":[430,335],"localRecoveryMargin":26,
+  "hazards":[
+    {"type":"ember","x":650,"y":335,"amplitudeX":0,"amplitudeY":0,"period":6,"phase":0,"radius":18,"warningSeconds":1,"activeSeconds":1.5,"restSeconds":3.5},
+    {"type":"ember","x":865,"y":335,"amplitudeX":0,"amplitudeY":0,"period":6,"phase":0,"radius":18,"warningSeconds":1,"activeSeconds":1.5,"restSeconds":3.5}
+  ],
+  "furnace":{
+    "gate":[700,230,24,60],"lever":[1100,335],
+    "hotZone":[430,315,610,40],"detourZone":[430,105,650,80],
+    "waitingPoint":[450,260],
+    "shortcutRoute":[[560,260],[940,260],[1100,260]],
+    "detourRoute":[[450,145],[1050,145],[1110,260]]
   }
 }

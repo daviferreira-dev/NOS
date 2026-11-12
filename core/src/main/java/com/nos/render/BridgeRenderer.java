@@ -20,10 +20,13 @@ public final class BridgeRenderer implements Disposable {
     private final GardenMechanismRenderer gardenRenderer;
     private final BridgeUiState ui=new BridgeUiState();
     private final TextureRegion bridgeRock;
+    private FurnaceRenderer furnace;
+    private RidgeRenderer ridge;
+    private ObservatoryRenderer observatory;
     private final Matrix4 scene=new Matrix4();
     private final GlyphLayout layout=new GlyphLayout();
     private final Color ink=new Color(.23f,.22f,.36f,1),paper=new Color(.98f,.95f,.87f,1),gold=new Color(.64f,.45f,.22f,1);
-    private float camera,time;
+    private float camera,cameraY,time;
     private final int[] actorOrder={0,1,2};
     private final ActionHazardRenderer hazards=new ActionHazardRenderer();
     public BridgeRenderer() { this(null); }
@@ -34,6 +37,7 @@ public final class BridgeRenderer implements Disposable {
     }
     public BridgeUiState ui() { return ui; }
     public void snapTo(BridgeEncounter encounter) {
+        cameraY=Math.max(0,Math.min(encounter.getData().height-540,encounter.hero(0).getY()-250));
         camera=Math.max(0,Math.min(encounter.getData().width-960,encounter.hero(encounter.getActive()).getX()-360));
     }
     public void render(BridgeEncounter encounter,Viewport viewport,float delta) {
@@ -46,10 +50,25 @@ public final class BridgeRenderer implements Disposable {
         float[] interaction=encounter.interactionPoint();
         float target=Math.max(0,Math.min(data.width-960,encounter.hero(encounter.getActive()).getX()-360));
         camera+=(target-camera)*(1-(float)Math.exp(-5*delta));
-        viewport.apply();scene.setToOrtho2D(camera,0,960,540);
+        viewport.apply();cameraY+=(Math.max(0,Math.min(data.height-540,encounter.hero(0).getY()-250))-cameraY)*(1-(float)Math.exp(-5*delta));
+        scene.setToOrtho2D(camera,cameraY,960,540);
         batch.setProjectionMatrix(scene);shapes.setProjectionMatrix(scene);
         batch.begin();batch.setColor(Color.WHITE);batch.draw(assets.bridgeBackground,0,0,data.width,data.height);
-        for(float[] obstacle:data.obstacles) batch.draw(bridgeRock,obstacle[0],obstacle[1],obstacle[2],obstacle[3]);
+        batch.end();
+        if(data.furnace!=null) {
+            if(furnace==null) furnace=new FurnaceRenderer(assets);
+            furnace.draw(encounter,batch,shapes);
+        } else if(data.ridge!=null) {
+            if(ridge==null) ridge=new RidgeRenderer(assets);
+            ridge.draw(encounter,batch,shapes);
+        } else if(data.observatory!=null) {
+            if(observatory==null) observatory=new ObservatoryRenderer(assets);
+            observatory.draw(encounter,batch,shapes);
+        }
+        batch.begin();
+        if(encounter.challenge()==null) {
+            for(float[] obstacle:data.obstacles) batch.draw(bridgeRock,obstacle[0],obstacle[1],obstacle[2],obstacle[3]);
+        }
         batch.setColor(Color.WHITE);batch.end();
         blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
         if(encounter.hasGarden()) gardenRenderer.cables(encounter);
@@ -116,29 +135,36 @@ public final class BridgeRenderer implements Disposable {
             String action=actionText(encounter);
             assets.font.getData().setScale(.29f*ui.textScale);layout.setText(assets.font,action);
             float promptWidth=Math.max(124,layout.width+20);
+            float promptX=Math.max(camera+promptWidth/2+4,Math.min(camera+956-promptWidth/2,interaction[0]));
+            float promptY=interaction[1]+97>cameraY+536?interaction[1]-45:interaction[1]+67;
             blend();shapes.begin(ShapeRenderer.ShapeType.Filled);
             shapes.setColor(paper.r,paper.g,paper.b,.96f);
-            shapes.rect(interaction[0]-promptWidth/2,interaction[1]+67,promptWidth,29);
-            shapes.setColor(gold);shapes.rect(interaction[0]-promptWidth/2,interaction[1]+94,promptWidth,2);
+            shapes.rect(promptX-promptWidth/2,promptY,promptWidth,29);
+            shapes.setColor(gold);shapes.rect(promptX-promptWidth/2,promptY+27,promptWidth,2);
             shapes.end();batch.begin();
-            centered(action,interaction[0],interaction[1]+81.5f+UiTypography.BODY_VISUAL_CENTER*.29f*ui.textScale,.29f*ui.textScale,ink);
+            centered(action,promptX,promptY+14.5f+UiTypography.BODY_VISUAL_CENTER*.29f*ui.textScale,.29f*ui.textScale,ink);
             batch.end();
         }
         String speech=encounter.companionSpeech();
         if(speech!=null&&encounter.getState()==BridgeEncounter.State.PLAYING) {
             PuzzleHero other=encounter.hero(1);
             blend();shapes.begin(ShapeRenderer.ShapeType.Filled);shapes.setColor(paper.r,paper.g,paper.b,.93f);
-            shapes.rect(other.getX()-82,other.getY()+88,164,29);shapes.end();
-            batch.begin();centered(assets.text.get(speech),other.getX(),other.getY()+102.5f+UiTypography.BODY_VISUAL_CENTER*.30f*ui.textScale,.30f*ui.textScale,ink);batch.end();
+            String line=assets.text.get(speech);
+            assets.font.getData().setScale(.30f*ui.textScale);
+            layout.setText(assets.font,line);
+            float bubbleWidth=layout.width+24;
+            float bubbleY=other.getY()+118>cameraY+536?other.getY()-42:other.getY()+88;
+            shapes.rect(other.getX()-bubbleWidth/2,bubbleY,bubbleWidth,29);shapes.end();
+            batch.begin();centered(line,other.getX(),bubbleY+14.5f+UiTypography.BODY_VISUAL_CENTER*.30f*ui.textScale,.30f*ui.textScale,ink);batch.end();
         }
-        if(encounter.isLocked()&&(!encounter.hasGarden()||encounter.garden().isOpen())&&(!encounter.hasRelay()||encounter.relay().isLatched())) {
+        if(data.checkpointShadow==null && encounter.isLocked()&&(encounter.challenge()==null||encounter.challenge().allowsExit())&&(!encounter.hasGarden()||encounter.garden().isOpen())&&(!encounter.hasRelay()||encounter.relay().isLatched())) {
             float destinationX=data.exit[0]+data.exit[2]/2,destinationY=data.exit[1]+32;
             blend();shapes.begin(ShapeRenderer.ShapeType.Filled);shapes.setColor(paper.r,paper.g,paper.b,.9f);
             shapes.rect(destinationX-51,destinationY,102,26);shapes.end();
             batch.begin();centered(assets.text.get(data.destinationKey),destinationX,destinationY+13+UiTypography.BODY_VISUAL_CENTER*.33f*ui.textScale,.33f*ui.textScale,ink);batch.end();
         }
         batch.setProjectionMatrix(viewport.getCamera().combined);shapes.setProjectionMatrix(viewport.getCamera().combined);
-        hud.render(encounter,touchControls,help,ui);
+        hud.render(encounter,touchControls,help,ui,encounter.hero(0).getY()-cameraY);
     }
     private String actionText(BridgeEncounter encounter) {
         String action=assets.text.get(encounter.action());
@@ -164,5 +190,12 @@ public final class BridgeRenderer implements Disposable {
     private void centered(String s,float x,float y,float scale,Color color) {
         assets.font.getData().setScale(scale);layout.setText(assets.font,s);text(s,x-layout.width/2,y,scale,color);
     }
-    @Override public void dispose() { batch.dispose();shapes.dispose();assets.dispose(); }
+    @Override public void dispose() {
+        if(furnace!=null) furnace.dispose();
+        if(ridge!=null) ridge.dispose();
+        if(observatory!=null) observatory.dispose();
+        batch.dispose();
+        shapes.dispose();
+        assets.dispose();
+    }
 }

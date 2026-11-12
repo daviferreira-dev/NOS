@@ -2,6 +2,7 @@ package com.nos;
 
 import com.badlogic.gdx.Game;
 import com.nos.screens.GameScreen;
+import com.nos.screens.GameOverScreen;
 import com.nos.screens.IntroScreen;
 import com.nos.screens.PuzzleScreen;
 import com.nos.screens.BridgeScreen;
@@ -37,9 +38,22 @@ public class NosGame extends Game {
         if(skipIntro) soundtrack.journey();
     }
 
+    private float runSeconds;
+    private int runRestarts;
+    public void addRunTime(float seconds) { runSeconds+=seconds; }
+    public void addRunRestart() { runRestarts++; }
+    /** Pontuação da campanha: 5000 menos o tempo jogado e os recomeços. */
+    public int runScore() { return Math.max(0,5000-Math.round(runSeconds*4)-runRestarts*150); }
+    public void showGameOver() {
+        com.badlogic.gdx.Screen previous=getScreen();
+        setScreen(new GameOverScreen(this,runScore(),runSeconds,runRestarts));
+        if(previous!=null) previous.dispose();
+    }
+
     public Soundtrack soundtrack() { return soundtrack; }
     public SaveData progress() { return progress; }
     public void returnToTitle() {
+        runSeconds=0;runRestarts=0;
         com.badlogic.gdx.Screen previous=getScreen();IntroScreen menu=new IntroScreen(this);
         menu.showTitle();setScreen(menu);if(previous!=null) previous.dispose();
     }

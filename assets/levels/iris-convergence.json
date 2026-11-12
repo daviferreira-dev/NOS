@@ -1,36 +1,20 @@
 {
-  "width":2240,"height":540,"phaseNumber":4,
-  "gardenOnly":true,"backgroundPath":"art/iris-convergence-v1.png","destinationKey":"irisExitLabel",
-  "ground":[60,145,2120,265],
+  "width":1280,"height":540,"phaseNumber":4,
+  "gardenOnly":true,"backgroundPath":"art/observatory-interior.png","destinationKey":"observatoryExitLabel",
+  "ground":[60,30,1160,480],
   "river":[-500,0,0,540],"bridge":[-500,230,0,80],
   "winch":[-500,270],"latch":[-500,270],
-  "shadowStart":[170,255],"reflectionStart":[240,300],
-  "exit":[2050,235,130,80],
-  "obstacles":[[400,145,62,55],[540,355,70,55]],
-  "recoveryPoint":[190,250],
-  "localRecoveryMargin":32,
-  "hazards":[
-    {"type":"ember","x":760,"y":270,"amplitudeX":0,"amplitudeY":45,"period":7,"phase":0,"radius":24,"warningSeconds":1,"activeSeconds":2,"restSeconds":3},
-    {"type":"gust","x":1510,"y":285,"amplitudeX":0,"amplitudeY":40,"period":6,"phase":1,"radius":36,"warningSeconds":1,"activeSeconds":2,"restSeconds":3,"pushX":0,"pushY":100}
-  ],
-  "garden":{
-    "cartStart":[330,270],
-    "transferPlate":[660,248,76,48],
-    "transferGate":[820,230,24,95],
-    "transferCable":[[698,294],[698,344],[826,344],[826,302]],
-    "helperPlate":[1000,170,48,32],
-    "weightPlate":[1180,285,76,48],
-    "gate":[1370,230,24,95],
-    "barriers":[[790,145,90,85],[790,325,90,85],[1330,145,210,85],[1330,325,210,85]],
-    "helperCable":[[1024,201],[1024,222],[1380,222],[1380,245]],
-    "weightCable":[[1218,332],[1218,352],[1380,352],[1380,302]],
-    "checkpointShadow":[170,255],"checkpointReflection":[240,300]
-  },
-  "relay":{
-    "westPlate":[1640,175,48,32],"eastPlate":[2020,175,48,32],
-    "gate":[1850,230,24,95],"reunionPoint":[2040,290],
-    "barriers":[[1820,145,90,85],[1820,325,90,85]],
-    "westCable":[[1664,206],[1664,222],[1860,222],[1860,245]],
-    "eastCable":[[2044,206],[2044,222],[1870,222],[1870,245]]
+  "shadowStart":[170,270],"reflectionStart":[786,270],
+  "exit":[596,226,88,88],"obstacles":[],
+  "observatory":{
+    "center":[640,270],"coreRadius":86,
+    "outerInnerRadius":192,"outerOuterRadius":236,
+    "galleryInnerRadius":128,"galleryOuterRadius":164,
+    "entry":[60,242,370,56],"observationPoint":[422,270],"reunionPoint":[668,270],
+    "passages":[[402,242,170,56],[708,242,170,56],[612,338,56,170]],
+    "gates":[[448,242,20,56],[812,242,20,56],[612,450,56,20]],
+    "approaches":[[422,270],[858,270],[640,484]],"correctPassage":2,
+    "galleryRoute":[[786,270],[774.881,325.874],[743.238,373.238],[695.874,404.881],[640,416]],
+    "returnRoute":[[695.874,404.881],[743.238,373.238],[774.881,325.874],[786,270],[748,270],[700,270],[668,270]]
   }
 }

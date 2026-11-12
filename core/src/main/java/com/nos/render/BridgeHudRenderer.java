@@ -17,7 +17,7 @@ final class BridgeHudRenderer {
     private final GlyphLayout layout=new GlyphLayout();
     private final Color ink=new Color(.19f,.20f,.30f,1),paper=new Color(.985f,.96f,.89f,1),gold=new Color(.56f,.40f,.24f,1),edge=new Color(.70f,.64f,.53f,1);
     BridgeHudRenderer(GameAssets assets,SpriteBatch batch,ShapeRenderer shapes) { this.assets=assets;this.batch=batch;this.shapes=shapes; }
-    void render(BridgeEncounter encounter,boolean touch,boolean help,BridgeUiState ui) {
+    void render(BridgeEncounter encounter,boolean touch,boolean help,BridgeUiState ui,float playerScreenY) {
         if(encounter.getState()==BridgeEncounter.State.PAUSED) { if(ui.settings) bindings(ui);else pause(encounter,ui);return; }
         if(encounter.getState()!=BridgeEncounter.State.PLAYING) { result(encounter,ui);return; }
         float scale=ui.textScale;
@@ -26,7 +26,7 @@ final class BridgeHudRenderer {
         float goalWidth=348;
         assets.title.getData().setScale(.43f*scale);layout.setText(assets.title,goal,ink,goalWidth,Align.left,true);
         float objectiveHeight=expanded?Math.max(79,44+layout.height):40;
-        String stage=assets.text.format(encounter.getData().phaseNumber==4?"irisStageCounter":encounter.hasRelay()?"relayStageCounter":encounter.getData().gardenOnly?"transferStageCounter":"bridgeStageCounter",encounter.objectiveStep(),encounter.objectiveCount());
+        String stage=assets.text.format(encounter.getData().phaseNumber==4?"irisStageCounter":encounter.getData().phaseNumber==3?"relayStageCounter":encounter.getData().gardenOnly?"transferStageCounter":"bridgeStageCounter",encounter.objectiveStep(),encounter.objectiveCount());
         assets.font.getData().setScale(.28f*scale);layout.setText(assets.font,stage);
         float summaryX=43+layout.width+16,summaryWidth=392-summaryX;
         String summary=assets.text.get(encounter.objectiveKey()+"Compact");
@@ -44,8 +44,9 @@ final class BridgeHudRenderer {
         assets.font.getData().setScale(.29f*scale);layout.setText(assets.font,shortcuts);
         if(layout.width>500) { shortcuts=keyName(ui.bindings.key(BridgeKeyBindings.Action.HELP))+"  "+assets.text.get("bridgeHelpShort");layout.setText(assets.font,shortcuts); }
         float keysWidth=layout.width+28,keysX=936-keysWidth;
-        fill();panel(24,516-objectiveHeight,388,objectiveHeight,1);
-        if(notice!=null) panel(432,516-noticeHeight,504,noticeHeight,alpha);
+        float cardOffset=playerScreenY>355 ? 100+Math.max(objectiveHeight,noticeHeight)-516 : 0;
+        fill();panel(24,516+cardOffset-objectiveHeight,388,objectiveHeight,1);
+        if(notice!=null) panel(432,516+cardOffset-noticeHeight,504,noticeHeight,alpha);
         panel(touch?178:24,20,statusWidth,statusHeight,1);
         if(touch) {
             shapes.setColor(paper.r,paper.g,paper.b,.91f);shapes.circle(90,50,32);
@@ -53,9 +54,9 @@ final class BridgeHudRenderer {
             panel(780,26,130,43,1);
         } else panel(keysX,20,keysWidth,32,1);
         shapes.end();batch.begin();
-        text(stage,43,expanded?510:505,.28f*scale,gold);
-        if(expanded) wrappedTitle(goal,43,485,goalWidth,.43f*scale,ink);
-        else wrapped(summary,summaryX,505,summaryWidth,.28f*scale,ink);
+        text(stage,43,(expanded?510:505)+cardOffset,.28f*scale,gold);
+        if(expanded) wrappedTitle(goal,43,485+cardOffset,goalWidth,.43f*scale,ink);
+        else wrapped(summary,summaryX,505+cardOffset,summaryWidth,.28f*scale,ink);
         float sx=touch?196:42;
         text(assets.text.get("bridgeShadowControlled"),sx,statusHeaderY,.33f*scale,ink);
         wrapped(status,sx,statusBodyY,statusTextWidth,.27f*scale,ink);
@@ -63,8 +64,8 @@ final class BridgeHudRenderer {
         else text(shortcuts,keysX+14,44,.29f*scale,ink);
         if(notice!=null) {
             Color tint=new Color(ink.r,ink.g,ink.b,alpha);
-            text(assets.text.get(notice+"Title"),449,503,.36f*scale,tint);
-            wrapped(localized(notice,ui),449,474,469,.31f*scale,tint);
+            text(assets.text.get(notice+"Title"),449,503+cardOffset,.36f*scale,tint);
+            wrapped(localized(notice,ui),449,474+cardOffset,469,.31f*scale,tint);
         }
         batch.end();
     }
@@ -92,7 +93,7 @@ final class BridgeHudRenderer {
         button(190,141,176,30);button(384,141,176,30);button(578,141,176,30);button(190,92,176,34);
         shapes.end();batch.begin();
         title(assets.text.get("bridgePauseTitle"),188,450,.60f*s,ink);
-        text(assets.text.get(encounter.getData().phaseNumber==4?"irisPauseSubtitle":encounter.hasRelay()?"relayPauseSubtitle":encounter.getData().gardenOnly?"transferPauseSubtitle":encounter.isLocked()&&encounter.hasGarden()?"gardenPauseSubtitle":"bridgePauseSubtitle"),190,385,.30f*s,gold);
+        text(assets.text.get(encounter.getData().phaseNumber==4?"irisPauseSubtitle":encounter.getData().phaseNumber==3?"relayPauseSubtitle":encounter.getData().gardenOnly?"transferPauseSubtitle":encounter.isLocked()&&encounter.hasGarden()?"gardenPauseSubtitle":"bridgePauseSubtitle"),190,385,.30f*s,gold);
         title(assets.text.get("bridgeMovementGroup"),190,365,.37f*s,ink);
         title(assets.text.get("bridgeSystemGroup"),500,365,.37f*s,ink);
         for(BridgeKeyBindings.Action a:new BridgeKeyBindings.Action[]{BridgeKeyBindings.Action.UP,BridgeKeyBindings.Action.LEFT,BridgeKeyBindings.Action.DOWN,BridgeKeyBindings.Action.RIGHT}) {
@@ -140,10 +141,10 @@ final class BridgeHudRenderer {
             for(int i=1;i<=3;i++) centered(assets.text.get("bridgeIntro"+i),480,282-(i-1)*31,.34f,ink);
             centered(assets.text.get("bridgeStart"),480,164,.34f,gold);
         } else {
-            String result=encounter.getData().phaseNumber==4?"irisWon":encounter.hasRelay()?"relayWon":encounter.getData().gardenOnly?"transferWon":encounter.hasGarden()?"gardenWon":"bridgeWon";
+            String result=encounter.getData().phaseNumber==4?"irisWon":encounter.getData().phaseNumber==3?"relayWon":encounter.getData().gardenOnly?"transferWon":"waterWon";
             centeredTitle(assets.text.get(result),480,340,.54f,ink);centered(assets.text.get(result+"Detail"),480,267,.36f,ink);
-            centered(localized(encounter.getData().phaseNumber==4?"gardenReturnToMenu":encounter.hasRelay()?"relayNextPhase":encounter.getData().gardenOnly?"transferNextPhase":encounter.hasGarden()?"gardenNextPhase":"bridgeAgain",ui),480,192,.33f*ui.textScale,gold);
-            if(encounter.hasGarden()||encounter.hasRelay()) centered(localized(encounter.getData().phaseNumber==4?"irisReplayShort":encounter.hasRelay()?"relayReplayShort":encounter.getData().gardenOnly?"transferReplayShort":"gardenReplayShort",ui),480,162,.27f*ui.textScale,ink);
+            centered(localized(encounter.getData().phaseNumber==4?"gardenReturnToMenu":encounter.getData().phaseNumber==3?"relayNextPhase":encounter.getData().gardenOnly?"transferNextPhase":"gardenNextPhase",ui),480,192,.33f*ui.textScale,gold);
+            centered(localized(encounter.getData().phaseNumber==4?"irisReplayShort":encounter.getData().phaseNumber==3?"relayReplayShort":encounter.getData().gardenOnly?"transferReplayShort":"gardenReplayShort",ui),480,162,.27f*ui.textScale,ink);
         }
         batch.end();
     }
