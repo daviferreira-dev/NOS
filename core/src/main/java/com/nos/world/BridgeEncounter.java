@@ -29,6 +29,7 @@ public final class BridgeEncounter {
     private boolean locked;
     private String notice="bridgeWelcome";
     private boolean introducedNearbyHazard;
+    private int lives=3;
     public BridgeEncounter(BridgeData data) {
         this.data=data;collision=new BridgeCollisionSystem(data);
         if(data.furnace!=null) challenge=new FurnaceSystem(data,collision);
@@ -134,6 +135,7 @@ public final class BridgeEncounter {
             garden.interact(heroes[0],heroes[1]);drainGardenNotice();
         }
         if(actions.didRecover()) {
+            if(data.phaseNumber>=2&&lives>0) lives--;
             stop();notify("actionRecovered");
         }
         introduceNearbyHazard();
@@ -239,6 +241,9 @@ public final class BridgeEncounter {
     public String companionSpeech() { return challenge!=null?challenge.speech():companion.speech(); }
     public boolean isOpen() { return support>=BridgeTuning.OPEN_THRESHOLD; }
     public boolean isLocked() { return locked; }
+    /** Vidas da fase: cada contato com brasa tira uma; zero encerra o jogo. */
+    public int getLives() { return lives; }
+    public boolean isOutOfLives() { return data.phaseNumber>=2&&lives<=0; }
     public State getState() { return state; }
     public BridgeData getData() { return data; }
     public PuzzleHero hero(int index) { return heroes[index]; }

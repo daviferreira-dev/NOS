@@ -8,7 +8,7 @@ Quatro fases (Água, Fogo, Vento, Íris), cada uma com um jeito diferente de atr
 
 **Restrição sorteada: "Espelho".** Cada ação afeta os dois personagens ao mesmo tempo; não existe solução local, o que ajuda um custa ao outro.
 
-**Requisitos da atividade:** menu inicial (com abertura animada), 4 fases com dificuldade crescente, tela de **Fim de jogo** ao terminar a Íris, e **pontuação** = 5000 − 4 pontos por segundo jogado − 150 por recomeço. Código separado em `screens`, `systems`, `world`, `entities`, `render`, `data`, `input` e `audio`.
+**Requisitos da atividade:** menu inicial (com abertura animada), 4 fases com dificuldade crescente, tela de **Fim de jogo** ao terminar a Íris, **3 vidas por fase** (cada contato com brasa tira uma; zerar leva ao Fim de jogo de derrota) e **pontuação** = 5000 − 4 pontos por segundo jogado − 150 por recomeço. Código separado em `screens`, `systems`, `world`, `entities`, `render`, `data`, `input` e `audio`.
 
 **Como jogar rápido:** baixe `NOS.jar` (Releases) e rode `java -jar NOS.jar` (Java 17+), ou abra `Jogar NÓS.bat`.
 
